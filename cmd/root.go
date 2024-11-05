@@ -19,18 +19,18 @@ var pbCmd = &cobra.Command{
 			fmt.Printf("Error reading protobuf snapshot: %v\n", err)
 			return
 		}
-		r, err := renderer.NewRenderer(snapshotData)
+		r, err := renderer.NewRenderer(snapshotData, os.Stdout)
 		if err != nil {
 			fmt.Printf("Error rendering snapshot: %v\n", err)
 			return
 		}
 
-		err = r.RenderPage()
+		r.RootComp = r.RenderPage()
+		err = r.Render()
 		if err != nil {
 			fmt.Printf("Error rendering page: %v\n", err)
 			return
 		}
-		fmt.Println(r.HTML())
 		// if err != nil {
 		// 	fmt.Printf("Error reading creating page from snapshot: %v\n", err)
 		// 	return

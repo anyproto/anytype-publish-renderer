@@ -1,7 +1,7 @@
 package renderer
 
-func (r Renderer) RenderPage() (err error) {
-	templ := PageTemplate(&r)
-	err = r.templToString(templ)
-	return
+import "github.com/a-h/templ"
+
+func (r *Renderer) RenderPage() templ.Component {
+	return PageTemplate(r)
 }

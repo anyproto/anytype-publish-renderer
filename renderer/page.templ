@@ -13,6 +13,7 @@ templ PageTemplate(r *Renderer) {
             <div class="todo-class">
 				todo-iconEmoji
                 <div>
+					@r.RenderText("some text")
 					todo-children
                 </div>
             </div>

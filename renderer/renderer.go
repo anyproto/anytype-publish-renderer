@@ -3,7 +3,7 @@ package renderer
 import (
 	"context"
 	"fmt"
-	"strings"
+	"io"
 
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -13,11 +13,12 @@ import (
 )
 
 type Renderer struct {
-	Sp   *pb.SnapshotWithType
-	Html *strings.Builder
+	Sp       *pb.SnapshotWithType
+	Out      io.Writer
+	RootComp templ.Component
 }
 
-func NewRenderer(snapshotData []byte) (r *Renderer, err error) {
+func NewRenderer(snapshotData []byte, writer io.Writer) (r *Renderer, err error) {
 	snapshot := pb.SnapshotWithType{}
 	err = proto.Unmarshal(snapshotData, &snapshot)
 	if err != nil {
@@ -30,19 +31,17 @@ func NewRenderer(snapshotData []byte) (r *Renderer, err error) {
 	}
 
 	r = &Renderer{
-		Sp:   &snapshot,
-		Html: &strings.Builder{},
+		Sp:  &snapshot,
+		Out: writer,
 	}
 
 	return
-
 }
 
-func (r *Renderer) HTML() string {
-	return r.Html.String()
-}
-
-func (r *Renderer) templToString(component templ.Component) (err error) {
-	err = component.Render(context.Background(), r.Html)
+func (r *Renderer) Render() (err error) {
+	err = r.RootComp.Render(context.Background(), r.Out)
+	if err != nil {
+		return
+	}
 	return
 }
