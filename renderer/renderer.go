@@ -6,16 +6,25 @@ import (
 	"io"
 
 	"github.com/anyproto/anytype-heart/pb"
+	"github.com/anyproto/anytype-heart/pkg/lib/logging"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-publish-renderer/renderer/blockutils"
 
 	"github.com/a-h/templ"
 	"github.com/gogo/protobuf/proto"
+	types "github.com/gogo/protobuf/types"
+	"go.uber.org/zap"
 )
+
+var log = logging.Logger("renderer").Desugar()
 
 type Renderer struct {
 	Sp       *pb.SnapshotWithType
 	Out      io.Writer
 	RootComp templ.Component
+
+	Root       *model.Block
+	BlocksById map[string]*model.Block
 }
 
 func NewRenderer(snapshotData []byte, writer io.Writer) (r *Renderer, err error) {
@@ -30,10 +39,21 @@ func NewRenderer(snapshotData []byte, writer io.Writer) (r *Renderer, err error)
 		return
 	}
 
-	r = &Renderer{
-		Sp:  &snapshot,
-		Out: writer,
+	blocks := snapshot.Snapshot.Data.GetBlocks()
+	blocksById := make(map[string]*model.Block)
+	for _, block := range blocks {
+		blocksById[block.Id] = block
 	}
+
+	details := snapshot.Snapshot.Data.GetDetails()
+
+	r = &Renderer{
+		Sp:         &snapshot,
+		Out:        writer,
+		BlocksById: blocksById,
+		Root:       blocks[0],
+	}
+	r.hydrateSpecialBlocks(details)
 
 	return
 }
@@ -44,4 +64,18 @@ func (r *Renderer) Render() (err error) {
 		return
 	}
 	return
+}
+
+// Adds text from Details to special blocks like `title`
+func (r *Renderer) hydrateSpecialBlocks(details *types.Struct) {
+	titleBlock, ok := r.BlocksById["title"]
+	if !ok {
+		log.Warn("hydrate: title block not found, skipping")
+		return
+	}
+
+	err := blockutils.HydrateBlock(titleBlock, details)
+	if err != nil {
+		log.Warn("hydrate: failed to hydrate title block", zap.Error(err))
+	}
 }

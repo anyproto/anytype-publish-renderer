@@ -13,8 +13,10 @@ templ PageTemplate(r *Renderer) {
             <div class="todo-class">
 				todo-iconEmoji
                 <div>
-					@r.RenderText("some text")
-					todo-children
+					for _, childId := range r.Root.ChildrenIds {
+						<br>
+                        @r.RenderBlock(r.BlocksById[childId])
+                    }
                 </div>
             </div>
         </main>
