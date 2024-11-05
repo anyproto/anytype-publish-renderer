@@ -4,25 +4,33 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/anyproto/anytype-publish-renderer/renderer"
 	"github.com/spf13/cobra"
 )
 
-var (
-	inputFile  string
-	outputFile string
-)
-
 var pbCmd = &cobra.Command{
-	Use:   "anytype-publish-renderer",
+	Use:   "anytype-publish-renderer <objects/snapshot.pb>",
+	Args:  cobra.MinimumNArgs(1),
 	Short: "Convert Anytype exported protobuf to HTML",
 	Run: func(cmd *cobra.Command, args []string) {
-		snapshotData, err := os.ReadFile(inputFile)
+		snapshotPath := args[0]
+		snapshotData, err := os.ReadFile(snapshotPath)
 		if err != nil {
 			fmt.Printf("Error reading protobuf snapshot: %v\n", err)
 			return
 		}
+		r, err := renderer.NewRenderer(snapshotData)
+		if err != nil {
+			fmt.Printf("Error rendering snapshot: %v\n", err)
+			return
+		}
 
-		// page, err := models.NewPageFromPbSnapshot(snapshotData)
+		err = r.RenderPage()
+		if err != nil {
+			fmt.Printf("Error rendering page: %v\n", err)
+			return
+		}
+		fmt.Println(r.HTML())
 		// if err != nil {
 		// 	fmt.Printf("Error reading creating page from snapshot: %v\n", err)
 		// 	return
@@ -38,9 +46,4 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func init() {
-	pbCmd.Flags().StringVarP(&inputFile, "input", "i", "", "Input snapshot file")
-	pbCmd.Flags().StringVarP(&outputFile, "output", "o", "", "Output HTML file")
 }
