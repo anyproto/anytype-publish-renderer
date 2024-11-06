@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -10,11 +11,15 @@ import (
 )
 
 func (r *Renderer) RenderPage() templ.Component {
+	log.Debug("root type", zap.String("type", reflect.TypeOf(r.Root.Content).String()))
 	return PageTemplate(r)
 }
 
 func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
-	log.Debug("block type", zap.String("type", reflect.TypeOf(b.Content).String()))
+	log.Debug("block type",
+		zap.String("type", reflect.TypeOf(b.Content).String()),
+		zap.String("id", b.Id))
+
 	switch b.Content.(type) {
 	case *model.BlockContentOfText:
 		return r.RenderText(b)
@@ -31,6 +36,12 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 
 	}
 
-	log.Warn("block is not supported", zap.String("type", reflect.TypeOf(b.Content).String()))
-	return TextTemplate(r, "block is not supported")
+	log.Warn("block is not supported",
+		zap.String("type", reflect.TypeOf(b.Content).String()),
+		zap.String("id", b.Id))
+	return NoneTemplate(r, fmt.Sprintf("not supported: %s, %s", b.Id, reflect.TypeOf(b.Content).String()))
+}
+
+func (r *Renderer) pageClasses() string {
+	return "blocks"
 }

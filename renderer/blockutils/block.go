@@ -8,6 +8,7 @@ import (
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 
 	types "github.com/gogo/protobuf/types"
+	"go.uber.org/zap"
 )
 
 var log = logging.Logger("renderer.blockutils").Desugar()
@@ -17,6 +18,7 @@ func HydrateBlock(block *model.Block, details *types.Struct) (err error) {
 	if textBlock, ok := block.GetContent().(*model.BlockContentOfText); ok {
 		if detailsKeys.Text != "" {
 			text := pbtypes.GetString(details, detailsKeys.Text)
+			log.Debug("details:", zap.String("id", block.Id), zap.String("text", text))
 			textBlock.Text.Text = text
 		}
 		if detailsKeys.Checked != "" {
