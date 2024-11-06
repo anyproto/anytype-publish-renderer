@@ -60,7 +60,9 @@ func NewRenderer(snapshotData []byte, writer io.Writer) (r *Renderer, err error)
 		BlocksById: blocksById,
 		Root:       blocks[0],
 	}
-	r.hydrateSpecialBlocks(details)
+
+	specialBlocks := []string{"title", "description"}
+	r.hydrateSpecialBlocks(specialBlocks, details)
 
 	return
 }
@@ -74,15 +76,21 @@ func (r *Renderer) Render() (err error) {
 }
 
 // Adds text from Details to special blocks like `title`
-func (r *Renderer) hydrateSpecialBlocks(details *types.Struct) {
-	titleBlock, ok := r.BlocksById["title"]
-	if !ok {
-		log.Warn("hydrate: title block not found, skipping")
-		return
+func (r *Renderer) hydrateSpecialBlocks(blockIds []string, details *types.Struct) {
+	for _, bId := range blockIds {
+		titleBlock, ok := r.BlocksById[bId]
+		if !ok {
+			log.Warn("hydrate: block not found, skipping", zap.String("id", bId))
+			return
+		}
+
+		err := blockutils.HydrateBlock(titleBlock, details)
+		if err != nil {
+			log.Warn("hydrate: failed to hydrate block",
+				zap.String("id", bId),
+				zap.Error(err))
+		}
+
 	}
 
-	err := blockutils.HydrateBlock(titleBlock, details)
-	if err != nil {
-		log.Warn("hydrate: failed to hydrate title block", zap.Error(err))
-	}
 }
