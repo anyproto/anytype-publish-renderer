@@ -23,15 +23,16 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 	switch b.Content.(type) {
 	case *model.BlockContentOfText:
 		return r.RenderText(b)
+	case *model.BlockContentOfLayout:
+		return r.RenderLayout(b)
+	case *model.BlockContentOfFeaturedRelations:
+		return NoneTemplate(r, "")
 	case *model.BlockContentOfFile:
 	case *model.BlockContentOfBookmark:
 	case *model.BlockContentOfDiv:
-	case *model.BlockContentOfLayout:
-		return r.RenderLayout(b)
 	case *model.BlockContentOfLink:
 	case *model.BlockContentOfTable:
 	case *model.BlockContentOfSmartblock:
-
 	default:
 
 	}
