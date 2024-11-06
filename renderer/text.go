@@ -5,6 +5,19 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 )
 
+type TextRenderParams struct {
+	Classes string
+	Id string
+	Text string
+}
+
 func (r *Renderer) RenderText(b *model.Block) templ.Component {
-	return TextTemplate(r, b.GetText().Text)
+	textClass := "text" + b.GetText().GetStyle().String()
+	params := TextRenderParams{
+		Id: "block" + b.Id,
+		Classes: "block blockText " + textClass,
+		Text: b.GetText().Text,
+	}
+
+	return TextTemplate(r, &params)
 }

@@ -1,5 +1,15 @@
 package renderer
 
-templ TextTemplate(r *Renderer, text string) {
-	text: { text }
+templ TextTemplate(r *Renderer, p *TextRenderParams) {
+	<div id={ p.Id } class={ p.Classes}>
+		<div class="content">
+			<div class="flex">
+				<div class="text">
+					{ p.Text }
+				</div>
+			</div>
+		</div>
+		<div class="children">
+		</div>
+	</div>
 }

@@ -1,18 +1,13 @@
 package renderer
 
-import (
-	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-)
-
-templ LayoutTemplate(r *Renderer, b *model.Block) {
-	    <div id={ "block-" + b.Id } class="todo-class">
+templ LayoutTemplate(r *Renderer, p *LayoutRenderParams) {
+	<div id={ p.Id } class={ p.Classes }>
         <div class="content">
             // this is for template wrapping, actual block children processed below
 			// { children... }
         </div>
 		<div class="children">
-			for _, childId := range b.ChildrenIds {
-				<br>
+			for _, childId := range p.ChildrenIds {
 				@r.RenderBlock(r.BlocksById[childId])
 			}
 		</div>
