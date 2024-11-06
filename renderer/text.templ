@@ -10,6 +10,9 @@ templ TextTemplate(r *Renderer, p *TextRenderParams) {
 			</div>
 		</div>
 		<div class="children">
+			for _, childId := range p.ChildrenIds {
+				@r.RenderBlock(r.BlocksById[childId])
+			}
 		</div>
 	</div>
 }

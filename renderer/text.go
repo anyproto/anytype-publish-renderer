@@ -9,9 +9,16 @@ import (
 )
 
 type TextRenderParams struct {
-	Classes string
-	Id string
-	Text string
+	Classes     string
+	Id          string
+	Text        string
+	ChildrenIds []string
+}
+
+func processMarks(text string, marks []*model.BlockContentTextMark) string {
+	var markedText strings.Builder
+
+	return text
 }
 
 func (r *Renderer) RenderText(b *model.Block) templ.Component {
@@ -19,10 +26,13 @@ func (r *Renderer) RenderText(b *model.Block) templ.Component {
 	align := "align" + strconv.Itoa(int(b.GetAlign()))
 	classes := []string{"block", "blockText", textClass, align}
 
+	marks := b.GetText().GetMarks().Marks
+	textWithMarkup := processMarks(b.GetText().Text, marks)
 	params := TextRenderParams{
-		Id: "block-" + b.Id,
-		Classes: strings.Join(classes, " "),
-		Text: b.GetText().Text,
+		Id:          "block-" + b.Id,
+		Classes:     strings.Join(classes, " "),
+		Text:        textWithMarkup,
+		ChildrenIds: b.ChildrenIds,
 	}
 
 	return TextTemplate(r, &params)
