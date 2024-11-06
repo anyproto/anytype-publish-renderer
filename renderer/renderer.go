@@ -11,11 +11,11 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-publish-renderer/renderer/blockutils"
+	"go.uber.org/zap"
 
 	"github.com/a-h/templ"
 	"github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
-	"go.uber.org/zap"
 )
 
 var log = logging.Logger("renderer").Desugar()

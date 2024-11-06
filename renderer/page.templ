@@ -10,11 +10,10 @@ templ PageTemplate(r *Renderer) {
 		<body>
         <main>
 			todo-cover
-            <div class="todo-class">
+            <div class={ r.pageClasses() }>
 				todo-iconEmoji
                 <div>
 					for _, childId := range r.Root.ChildrenIds {
-						<br>
                         @r.RenderBlock(r.BlocksById[childId])
                     }
                 </div>
