@@ -100,6 +100,10 @@ func (r *Renderer) RenderText(b *model.Block) templ.Component {
 	align := "align" + strconv.Itoa(int(b.GetAlign()))
 	classes := []string{"block", "blockText", textClass, align}
 
+	if bgColor := b.GetBackgroundColor(); bgColor != "" {
+		classes = append(classes, "bgColor", "bgColor-"+bgColor)
+	}
+
 	text := blockText.Text
 	var comp templ.Component
 
