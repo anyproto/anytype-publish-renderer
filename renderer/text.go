@@ -13,6 +13,8 @@ import (
 	"go.uber.org/zap"
 )
 
+const CDN_URL = "https://anytype-static.fra1.cdn.digitaloceanspaces.com"
+
 type TextRenderParams struct {
 	Classes      string
 	Id           string
@@ -53,7 +55,7 @@ func applyMark(s string, mark *model.BlockContentTextMark) string {
 		return "<markupmention>" + s + "</markupmention>"
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
-		url := fmt.Sprintf("https://anytype-static.fra1.cdn.digitaloceanspaces.com/emojies/%x.png", code)
+		url := fmt.Sprintf("%s/emojies/%x.png", CDN_URL, code)
 		emojiHtml, err := utils.TemplToString(EmojiMarkerTemplate(url))
 		if err != nil {
 			log.Error("Failed to render emoji template", zap.Error(err))

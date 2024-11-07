@@ -1,0 +1,21 @@
+package renderer
+
+templ DivTemplate(p *DivRenderParams) {
+	<div class={ p.Classes }>
+		<div class="content">
+			@p.Comp
+		</div>
+	</div>
+}
+
+templ DivDotTemplate() {
+	<div class="dots">
+		<div class="dot"></div>
+		<div class="dot"></div>
+		<div class="dot"></div>
+	</div>
+}
+
+templ DivLineTemplate() {
+	<div class="line"></div>
+}
