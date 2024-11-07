@@ -1,15 +1,26 @@
 package renderer
 
+templ PlainTextTemplate(text string) {
+	<div class="text">
+		{ text }
+	</div>
+}
+templ PlainTextWrapTemplate(comp templ.Component) {
+	<div class="text">
+		@comp
+	</div>
+}
+
 templ TextTemplate(r *Renderer, p *TextRenderParams) {
 	<div id={ p.Id } class={ p.Classes}>
+		for _, comp := range p.OuterFlex {
+			@comp
+		}
 		<div class="content">
 			<div class="flex">
-				if p.ExternalComp != nil {
-					@p.ExternalComp
+				for _, comp := range p.InnerFlex {
+					@comp
 				}
-				<div class="text">
-					@p.TextComp
-				</div>
 			</div>
 		</div>
 		<div class="children">

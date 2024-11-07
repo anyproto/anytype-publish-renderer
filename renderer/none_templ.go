@@ -29,7 +29,7 @@ func NoneTemplate(r *Renderer, text string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"not supported\" class=\"block blockText textParagraph align0\"><div class=\"content\"><div class=\"flex\"><div class=\"text\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"block blockText textParagraph align0 notSupported\"><div class=\"content\"><div class=\"flex\"><div class=\"text\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -21,11 +21,11 @@ func emojiUrl(code rune) string {
 }
 
 type TextRenderParams struct {
-	Classes      string
-	Id           string
-	TextComp     templ.Component
-	ExternalComp templ.Component
-	ChildrenIds  []string
+	Classes     string
+	Id          string
+	InnerFlex   []templ.Component
+	OuterFlex   []templ.Component
+	ChildrenIds []string
 }
 
 func cmpMarks(a, b *model.BlockContentTextMark) int {
@@ -105,30 +105,38 @@ func (r *Renderer) RenderText(b *model.Block) templ.Component {
 	}
 
 	text := blockText.Text
-	var comp templ.Component
-
+	var textComp templ.Component
 	if style != model.BlockContentText_Code {
 		marks := blockText.GetMarks().Marks
 		text = applyMarks(text, marks)
-		comp = templ.Raw(text)
+		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
-		comp = PlainTextTemplate(text)
+		textComp = PlainTextTemplate(text)
 	}
 
-	var externalComp templ.Component
-	if style == model.BlockContentText_Marked {
-		externalComp = BulletMarkerTemplate()
-	}
-	if style == model.BlockContentText_Callout {
-		externalComp = AdditionalEmojiTemplate()
+	var outerFlex []templ.Component
+	var innerFlex []templ.Component
+	switch style {
+	case model.BlockContentText_Marked:
+		externalComp := BulletMarkerTemplate()
+		innerFlex = append(innerFlex, externalComp, textComp)
+	case model.BlockContentText_Callout:
+		externalComp := AdditionalEmojiTemplate()
+		innerFlex = append(innerFlex, externalComp, textComp)
+	case model.BlockContentText_Quote:
+		externalComp := AdditionalQuoteTemplate()
+		outerFlex = append(outerFlex, externalComp)
+		innerFlex = append(innerFlex, textComp)
+	default:
+		innerFlex = append(innerFlex, textComp)
 	}
 
 	params := TextRenderParams{
-		Id:           "block-" + b.Id,
-		Classes:      strings.Join(classes, " "),
-		TextComp:     comp,
-		ExternalComp: externalComp,
-		ChildrenIds:  b.ChildrenIds,
+		Id:          "block-" + b.Id,
+		Classes:     strings.Join(classes, " "),
+		ChildrenIds: b.ChildrenIds,
+		OuterFlex:   outerFlex,
+		InnerFlex:   innerFlex,
 	}
 
 	return TextTemplate(r, &params)
