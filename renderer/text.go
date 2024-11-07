@@ -9,6 +9,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-publish-renderer/utils"
 	"go.uber.org/zap"
 )
 
@@ -51,7 +52,16 @@ func applyMark(s string, mark *model.BlockContentTextMark) string {
 	case model.BlockContentTextMark_Mention:
 		return "<markupmention>" + s + "</markupmention>"
 	case model.BlockContentTextMark_Emoji:
-		return "<markupemoji>" + s + "</markupemoji>"
+		code := []rune(mark.Param)[0]
+		url := fmt.Sprintf("https://anytype-static.fra1.cdn.digitaloceanspaces.com/emojies/%x.png", code)
+		emojiHtml, err := utils.TemplToString(EmojiMarkerTemplate(url))
+		if err != nil {
+			log.Error("Failed to render emoji template", zap.Error(err))
+			return ""
+		} else {
+			return emojiHtml
+		}
+
 	}
 
 	return "<markupobject>" + s + "</markupobject>"

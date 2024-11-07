@@ -8,3 +8,15 @@ templ BulletMarkerTemplate() {
 		</div>
 	</div>
 }
+
+templ EmojiMarkerTemplate(url string) {
+	<markupemoji contenteditable="false">
+		<smile>
+			<div class="iconObject c28 isPage">
+				<div class="iconEmoji">
+					<img src={url} class="iconCommon c28">
+					</div>
+				</div>
+			</smile>
+		</markupemoji>
+}
