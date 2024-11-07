@@ -4,6 +4,9 @@ templ TextTemplate(r *Renderer, p *TextRenderParams) {
 	<div id={ p.Id } class={ p.Classes}>
 		<div class="content">
 			<div class="flex">
+				if p.ExternalComp != nil {
+					@p.ExternalComp
+				}
 				<div class="text">
 					@p.TextComp
 				</div>

@@ -13,10 +13,11 @@ import (
 )
 
 type TextRenderParams struct {
-	Classes     string
-	Id          string
-	TextComp    templ.Component
-	ChildrenIds []string
+	Classes      string
+	Id           string
+	TextComp     templ.Component
+	ExternalComp templ.Component
+	ChildrenIds  []string
 }
 
 func cmpMarks(a, b *model.BlockContentTextMark) int {
@@ -95,11 +96,17 @@ func (r *Renderer) RenderText(b *model.Block) templ.Component {
 		comp = PlainTextTemplate(text)
 	}
 
+	var externalComp templ.Component
+	if style == model.BlockContentText_Marked {
+		externalComp = BulletMarkerTemplate()
+	}
+
 	params := TextRenderParams{
-		Id:          "block-" + b.Id,
-		Classes:     strings.Join(classes, " "),
-		TextComp:    comp,
-		ChildrenIds: b.ChildrenIds,
+		Id:           "block-" + b.Id,
+		Classes:      strings.Join(classes, " "),
+		TextComp:     comp,
+		ExternalComp: externalComp,
+		ChildrenIds:  b.ChildrenIds,
 	}
 
 	return TextTemplate(r, &params)
