@@ -9,14 +9,25 @@ templ BulletMarkerTemplate() {
 	</div>
 }
 
-templ EmojiMarkerTemplate(url string) {
+templ InlineEmojiTemplate(code rune, sizeClass string) {
 	<markupemoji contenteditable="false">
 		<smile>
-			<div class="iconObject c28 isPage">
-				<div class="iconEmoji">
-					<img src={url} class="iconCommon c28">
-					</div>
-				</div>
-			</smile>
-		</markupemoji>
+			@EmojiTemplate(code, sizeClass)
+		</smile>
+	</markupemoji>
+}
+
+templ EmojiTemplate(code rune, sizeClass string) {
+	<div class={"iconObject", "isPage", sizeClass}>
+		<div class="iconEmoji">
+			<img src={emojiUrl(code)} class={"iconCommon", sizeClass}>
+		</div>
+	</div>
+
+}
+
+templ AdditionalEmojiTemplate() {
+	<div class="additional">
+		@EmojiTemplate(bulbEmoji, "c20")
+	</div>
 }

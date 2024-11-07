@@ -14,6 +14,11 @@ import (
 )
 
 const CDN_URL = "https://anytype-static.fra1.cdn.digitaloceanspaces.com"
+const bulbEmoji = 0x1F4A1
+
+func emojiUrl(code rune) string {
+	return fmt.Sprintf("%s/emojies/%x.png", CDN_URL, code)
+}
 
 type TextRenderParams struct {
 	Classes      string
@@ -55,15 +60,13 @@ func applyMark(s string, mark *model.BlockContentTextMark) string {
 		return "<markupmention>" + s + "</markupmention>"
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
-		url := fmt.Sprintf("%s/emojies/%x.png", CDN_URL, code)
-		emojiHtml, err := utils.TemplToString(EmojiMarkerTemplate(url))
+		emojiHtml, err := utils.TemplToString(InlineEmojiTemplate(code, "c28"))
 		if err != nil {
 			log.Error("Failed to render emoji template", zap.Error(err))
 			return ""
 		} else {
 			return emojiHtml
 		}
-
 	}
 
 	return "<markupobject>" + s + "</markupobject>"
@@ -111,6 +114,9 @@ func (r *Renderer) RenderText(b *model.Block) templ.Component {
 	var externalComp templ.Component
 	if style == model.BlockContentText_Marked {
 		externalComp = BulletMarkerTemplate()
+	}
+	if style == model.BlockContentText_Callout {
+		externalComp = AdditionalEmojiTemplate()
 	}
 
 	params := TextRenderParams{
