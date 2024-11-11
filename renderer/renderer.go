@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
@@ -40,7 +39,8 @@ type Renderer struct {
 }
 
 func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err error) {
-	snapshotData, err := os.ReadFile(resolver.GetRootPagePath())
+	rootPath := resolver.GetRootPagePath()
+	snapshotData, err := resolver.GetSnapshotPbFile(rootPath)
 	if err != nil {
 		fmt.Printf("Error reading protobuf snapshot: %v\n", err)
 		return
