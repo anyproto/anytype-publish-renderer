@@ -22,6 +22,7 @@ var log = logging.Logger("renderer").Desugar()
 // Maps asset addresses from snapshot to different location
 // <a href>, <img src>, emoji address, etc
 type AssetResolver interface {
+	GetSnapshotPbFile(string) ([]byte, error)
 	GetRootPagePath() string
 	ByEmojiCode(rune) string
 	ByTargetObjectId(string) (string, error)

@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -9,8 +10,9 @@ import (
 )
 
 type ImageRenderParams struct {
-	Id  string
-	Src string
+	Id      string
+	Src     string
+	Classes string
 }
 
 func (r *Renderer) RenderFile(b *model.Block) templ.Component {
@@ -23,10 +25,12 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 			log.Warn("file type is not supported", zap.String("type", fileType.String()))
 			return NoneTemplate(fmt.Sprintf("file not found %s", file.TargetObjectId))
 		}
+		align := "align" + strconv.Itoa(int(b.GetAlign()))
 
 		params := &ImageRenderParams{
-			Id:  b.Id,
-			Src: src,
+			Id:      b.Id,
+			Src:     src,
+			Classes: align,
 		}
 		return FileImageTemplate(r, params)
 	default:
