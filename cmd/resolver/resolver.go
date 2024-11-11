@@ -1,21 +1,26 @@
 package resolver
 
-import "fmt"
+import (
+	"fmt"
+	"path/filepath"
+)
 
 type SimpleAssetResolver struct {
-	cdnUrl string
+	CdnUrl      string
+	SnapshotDir string
+	RootPageId  string
 }
 
-func New(cdnUrl string) SimpleAssetResolver {
-	return SimpleAssetResolver{
-		cdnUrl: cdnUrl,
-	}
+func (r SimpleAssetResolver) GetRootPagePath() string {
+	rootPbPath := filepath.Join(r.SnapshotDir, "objects", r.RootPageId+".pb")
+	return rootPbPath
 }
 
 func (r SimpleAssetResolver) ByEmojiCode(code rune) string {
-	return fmt.Sprintf("%s/emojies/%x.png", r.cdnUrl, code)
+	return fmt.Sprintf("%s/emojies/%x.png", r.CdnUrl, code)
 }
 
-func (r SimpleAssetResolver) ByImgPath(imagePath string) string {
-	return "/static/" + imagePath
+func (r SimpleAssetResolver) ByTargetObjectId(id string) (path string, err error) {
+	filePbPath := filepath.Join(r.SnapshotDir, "filesObjects", id+".pb")
+	return filePbPath, nil
 }

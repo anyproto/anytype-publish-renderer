@@ -2,7 +2,6 @@ package renderer
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -23,8 +22,9 @@ var log = logging.Logger("renderer").Desugar()
 // Maps asset addresses from snapshot to different location
 // <a href>, <img src>, emoji address, etc
 type AssetResolver interface {
-	ByEmojiCode(code rune) string
-	ByImgPath(imagePath string) string
+	GetRootPagePath() string
+	ByEmojiCode(rune) string
+	ByTargetObjectId(string) (string, error)
 }
 
 type Renderer struct {
@@ -38,16 +38,18 @@ type Renderer struct {
 	AssetResolver AssetResolver
 }
 
-func NewRenderer(snapshotData []byte, resolver AssetResolver, writer io.Writer) (r *Renderer, err error) {
+func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err error) {
+	snapshotData, err := os.ReadFile(resolver.GetRootPagePath())
+	if err != nil {
+		fmt.Printf("Error reading protobuf snapshot: %v\n", err)
+		return
+	}
+
 	snapshot := pb.SnapshotWithType{}
 	err = proto.Unmarshal(snapshotData, &snapshot)
 	if err != nil {
 		return
 	}
-
-	var snapshotJson []byte
-	snapshotJson, err = json.Marshal(snapshot)
-	os.WriteFile("./snapshot.json", snapshotJson, 0644)
 
 	if snapshot.SbType != model.SmartBlockType_Page {
 		err = fmt.Errorf("published snaphost is not Page, %d", snapshot.SbType)

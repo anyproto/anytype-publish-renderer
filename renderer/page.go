@@ -26,10 +26,11 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 	case *model.BlockContentOfLayout:
 		return r.RenderLayout(b)
 	case *model.BlockContentOfFeaturedRelations:
-		return NoneTemplate(r, "")
+		return NoneTemplate("")
 	case *model.BlockContentOfDiv:
 		return r.RenderDiv(b)
 	case *model.BlockContentOfFile:
+		return r.RenderFile(b)
 	case *model.BlockContentOfBookmark:
 	case *model.BlockContentOfLink:
 	case *model.BlockContentOfTable:
@@ -41,7 +42,7 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 	log.Warn("block is not supported",
 		zap.String("type", reflect.TypeOf(b.Content).String()),
 		zap.String("id", b.Id))
-	return NoneTemplate(r, fmt.Sprintf("not supported: %s, %s", b.Id, reflect.TypeOf(b.Content).String()))
+	return NoneTemplate(fmt.Sprintf("not supported: %s, %s", b.Id, reflect.TypeOf(b.Content).String()))
 }
 
 func (r *Renderer) pageClasses() string {

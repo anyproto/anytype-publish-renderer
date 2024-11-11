@@ -12,18 +12,21 @@ import (
 const CDN_URL = "https://anytype-static.fra1.cdn.digitaloceanspaces.com"
 
 var pbCmd = &cobra.Command{
-	Use:   "anytype-publish-renderer <objects/snapshot.pb>",
-	Args:  cobra.MinimumNArgs(1),
-	Short: "Convert Anytype exported protobuf to HTML",
+	Use: `anytype-publish-renderer <snapshot-dir> <root-page-id>
+
+<root-page-id> is one of the pages .pb files, typically stored in snapshot-folder/objects/*.pb
+`,
+	Args:  cobra.MinimumNArgs(2),
+	Short: "Convert Anytype exported protobuf folder to HTML",
 	Run: func(cmd *cobra.Command, args []string) {
-		snapshotPath := args[0]
-		snapshotData, err := os.ReadFile(snapshotPath)
-		if err != nil {
-			fmt.Printf("Error reading protobuf snapshot: %v\n", err)
-			return
+		snapshotDir := args[0]
+		rootId := args[1]
+		resolver := resolver.SimpleAssetResolver{
+			CdnUrl:      CDN_URL,
+			SnapshotDir: snapshotDir,
+			RootPageId:  rootId,
 		}
-		resolver := resolver.New(CDN_URL)
-		r, err := renderer.NewRenderer(snapshotData, resolver, os.Stdout)
+		r, err := renderer.NewRenderer(resolver, os.Stdout)
 		if err != nil {
 			fmt.Printf("Error rendering snapshot: %v\n", err)
 			return
