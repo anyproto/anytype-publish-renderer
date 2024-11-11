@@ -37,7 +37,7 @@ func BulletMarkerTemplate() templ.Component {
 	})
 }
 
-func InlineEmojiTemplate(code rune, sizeClass string) templ.Component {
+func InlineEmojiTemplate(emojiPath, sizeClass string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -62,7 +62,7 @@ func InlineEmojiTemplate(code rune, sizeClass string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = EmojiTemplate(code, sizeClass).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = EmojiTemplate(emojiPath, sizeClass).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -74,7 +74,7 @@ func InlineEmojiTemplate(code rune, sizeClass string) templ.Component {
 	})
 }
 
-func EmojiTemplate(code rune, sizeClass string) templ.Component {
+func EmojiTemplate(emojiPath, sizeClass string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -127,9 +127,9 @@ func EmojiTemplate(code rune, sizeClass string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(emojiUrl(code))
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(emojiPath)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 23, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 23, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -156,7 +156,7 @@ func EmojiTemplate(code rune, sizeClass string) templ.Component {
 	})
 }
 
-func AdditionalEmojiTemplate() templ.Component {
+func AdditionalEmojiTemplate(emojiPath string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -181,7 +181,7 @@ func AdditionalEmojiTemplate() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = EmojiTemplate(bulbEmoji, "c20").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = EmojiTemplate(emojiPath, "c20").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

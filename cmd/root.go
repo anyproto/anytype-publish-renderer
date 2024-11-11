@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/anyproto/anytype-publish-renderer/cmd/resolver"
 	"github.com/anyproto/anytype-publish-renderer/renderer"
 	"github.com/spf13/cobra"
 )
+
+const CDN_URL = "https://anytype-static.fra1.cdn.digitaloceanspaces.com"
 
 var pbCmd = &cobra.Command{
 	Use:   "anytype-publish-renderer <objects/snapshot.pb>",
@@ -19,7 +22,8 @@ var pbCmd = &cobra.Command{
 			fmt.Printf("Error reading protobuf snapshot: %v\n", err)
 			return
 		}
-		r, err := renderer.NewRenderer(snapshotData, os.Stdout)
+		resolver := resolver.New(CDN_URL)
+		r, err := renderer.NewRenderer(snapshotData, resolver, os.Stdout)
 		if err != nil {
 			fmt.Printf("Error rendering snapshot: %v\n", err)
 			return

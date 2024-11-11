@@ -13,12 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const CDN_URL = "https://anytype-static.fra1.cdn.digitaloceanspaces.com"
 const bulbEmoji = 0x1F4A1
-
-func emojiUrl(code rune) string {
-	return fmt.Sprintf("%s/emojies/%x.png", CDN_URL, code)
-}
 
 type TextRenderParams struct {
 	Classes     string
@@ -32,7 +27,7 @@ func cmpMarks(a, b *model.BlockContentTextMark) int {
 	return cmp.Compare(a.Range.From, b.Range.From)
 }
 
-func applyMark(s string, mark *model.BlockContentTextMark) string {
+func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string {
 	switch mark.Type {
 	case model.BlockContentTextMark_Strikethrough:
 		return "<markupstrike>" + s + "</markupstrike>"
@@ -60,7 +55,8 @@ func applyMark(s string, mark *model.BlockContentTextMark) string {
 		return "<markupmention>" + s + "</markupmention>"
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
-		emojiHtml, err := utils.TemplToString(InlineEmojiTemplate(code, "c28"))
+		emojiSrc := r.AssetResolver.ByEmojiCode(code)
+		emojiHtml, err := utils.TemplToString(InlineEmojiTemplate(emojiSrc, "c28"))
 		if err != nil {
 			log.Error("Failed to render emoji template", zap.Error(err))
 			return ""
@@ -72,7 +68,7 @@ func applyMark(s string, mark *model.BlockContentTextMark) string {
 	return "<markupobject>" + s + "</markupobject>"
 }
 
-func applyMarks(text string, marks []*model.BlockContentTextMark) string {
+func (r *Renderer) applyMarks(text string, marks []*model.BlockContentTextMark) string {
 	if len(marks) == 0 {
 		return text
 	}
@@ -87,7 +83,7 @@ func applyMarks(text string, marks []*model.BlockContentTextMark) string {
 		markedText.WriteString(string(before))
 
 		markedPart := rText[mark.Range.From:mark.Range.To]
-		markedText.WriteString(applyMark(string(markedPart), mark))
+		markedText.WriteString(r.applyMark(string(markedPart), mark))
 		lastPos = mark.Range.To
 	}
 	return markedText.String()
@@ -108,7 +104,7 @@ func (r *Renderer) RenderText(b *model.Block) templ.Component {
 	var textComp templ.Component
 	if style != model.BlockContentText_Code {
 		marks := blockText.GetMarks().Marks
-		text = applyMarks(text, marks)
+		text = r.applyMarks(text, marks)
 		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
 		textComp = PlainTextTemplate(text)
@@ -121,7 +117,8 @@ func (r *Renderer) RenderText(b *model.Block) templ.Component {
 		externalComp := BulletMarkerTemplate()
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Callout:
-		externalComp := AdditionalEmojiTemplate()
+		emojiSrc := r.AssetResolver.ByEmojiCode(bulbEmoji)
+		externalComp := AdditionalEmojiTemplate(emojiSrc)
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Quote:
 		externalComp := AdditionalQuoteTemplate()

@@ -20,6 +20,13 @@ import (
 
 var log = logging.Logger("renderer").Desugar()
 
+// Maps asset addresses from snapshot to different location
+// <a href>, <img src>, emoji address, etc
+type AssetResolver interface {
+	ByEmojiCode(code rune) string
+	ByImgPath(imagePath string) string
+}
+
 type Renderer struct {
 	Sp       *pb.SnapshotWithType
 	Out      io.Writer
@@ -27,9 +34,11 @@ type Renderer struct {
 
 	Root       *model.Block
 	BlocksById map[string]*model.Block
+
+	AssetResolver AssetResolver
 }
 
-func NewRenderer(snapshotData []byte, writer io.Writer) (r *Renderer, err error) {
+func NewRenderer(snapshotData []byte, resolver AssetResolver, writer io.Writer) (r *Renderer, err error) {
 	snapshot := pb.SnapshotWithType{}
 	err = proto.Unmarshal(snapshotData, &snapshot)
 	if err != nil {
@@ -55,10 +64,11 @@ func NewRenderer(snapshotData []byte, writer io.Writer) (r *Renderer, err error)
 	details := snapshot.Snapshot.Data.GetDetails()
 
 	r = &Renderer{
-		Sp:         &snapshot,
-		Out:        writer,
-		BlocksById: blocksById,
-		Root:       blocks[0],
+		Sp:            &snapshot,
+		Out:           writer,
+		BlocksById:    blocksById,
+		Root:          blocks[0],
+		AssetResolver: resolver,
 	}
 
 	specialBlocks := []string{"title", "description"}

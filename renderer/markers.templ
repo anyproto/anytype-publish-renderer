@@ -9,26 +9,26 @@ templ BulletMarkerTemplate() {
 	</div>
 }
 
-templ InlineEmojiTemplate(code rune, sizeClass string) {
+templ InlineEmojiTemplate(emojiPath, sizeClass string) {
 	<markupemoji contenteditable="false">
 		<smile>
-			@EmojiTemplate(code, sizeClass)
+			@EmojiTemplate(emojiPath, sizeClass)
 		</smile>
 	</markupemoji>
 }
 
-templ EmojiTemplate(code rune, sizeClass string) {
+templ EmojiTemplate(emojiPath, sizeClass string) {
 	<div class={"iconObject", "isPage", sizeClass}>
 		<div class="iconEmoji">
-			<img src={emojiUrl(code)} class={"iconCommon", sizeClass}>
+			<img src={emojiPath} class={"iconCommon", sizeClass}>
 		</div>
 	</div>
 
 }
 
-templ AdditionalEmojiTemplate() {
+templ AdditionalEmojiTemplate(emojiPath string) {
 	<div class="additional">
-		@EmojiTemplate(bulbEmoji, "c20")
+		@EmojiTemplate(emojiPath, "c20")
 	</div>
 }
 
