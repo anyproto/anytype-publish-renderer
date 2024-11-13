@@ -14,7 +14,7 @@
         name = "anytype-publish-renderer";
         ANYTYPE_LOG_LEVEL="renderer*=DEBUG;*=WARN";
         nativeBuildInputs = [
-          pkgs.go_1_22
+          pkgs.go_1_23
           pkgs.templ
         ];
       };
