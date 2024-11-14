@@ -37,12 +37,12 @@ func TestMakeRenderDivParams(t *testing.T) {
 	divBlock := r.BlocksById["66c5b61a7e4bcd764b24c213"]
 
 	expected := &DivRenderParams{
-		Id:      "block-66c5b61a7e4bcd764b24c213",
-		Classes: "block blockDiv divDot",
+		Id:      "66c5b61a7e4bcd764b24c213",
+		Classes: "divDot",
 	}
 
 	actual := r.MakeRenderDivParams(divBlock)
 
-	assert.EqualValues(t, expected.Id, actual.Id)
-	assert.EqualValues(t, expected.Classes, actual.Classes)
+	assert.Equal(t, expected.Id, actual.Id)
+	assert.Equal(t, expected.Classes, actual.Classes)
 }

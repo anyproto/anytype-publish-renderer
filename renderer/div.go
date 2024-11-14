@@ -26,9 +26,9 @@ func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *DivRenderParams)
 		comp = DivDotTemplate()
 	}
 
-	classes := []string{"block", "blockDiv", divClass}
+	classes := []string{divClass}
 	params = &DivRenderParams{
-		Id:      "block-" + b.Id,
+		Id:      b.Id,
 		Classes: strings.Join(classes, " "),
 		Comp:    comp,
 	}

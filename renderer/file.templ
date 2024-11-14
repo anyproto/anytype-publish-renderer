@@ -1,7 +1,7 @@
 package renderer
 
 templ FileImageTemplate(r *Renderer, p *FileRenderParams) {
-	<div class={"block blockMedia isImage index0 withContent " + p.Classes}>
+	<div id={"block" + p.Id } class={"block blockMedia isImage index0 withContent " + p.Classes}>
 		<div class="content">
 			<div class="flex">
 				<div  class="wrap" style="width: 65%">
