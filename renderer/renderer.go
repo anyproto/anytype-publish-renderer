@@ -60,7 +60,6 @@ func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err err
 	blocks := snapshot.Snapshot.Data.GetBlocks()
 	blocksById := make(map[string]*model.Block)
 	for _, block := range blocks {
-
 		blocksById[block.Id] = block
 	}
 
