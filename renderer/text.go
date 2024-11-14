@@ -92,9 +92,9 @@ func (r *Renderer) applyMarks(text string, marks []*model.BlockContentTextMark) 
 func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParams) {
 	blockText := b.GetText()
 	style := blockText.GetStyle()
-	textClass := "text" + style.String()
+	textClass := "blockText" + style.String()
 	align := "align" + strconv.Itoa(int(b.GetAlign()))
-	classes := []string{"block", "blockText", textClass, align}
+	classes := []string{textClass, align}
 
 	if bgColor := b.GetBackgroundColor(); bgColor != "" {
 		classes = append(classes, "bgColor", "bgColor-"+bgColor)
@@ -129,7 +129,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	}
 
 	params = &TextRenderParams{
-		Id:          "block-" + b.Id,
+		Id:          b.Id,
 		Classes:     strings.Join(classes, " "),
 		ChildrenIds: b.ChildrenIds,
 		OuterFlex:   outerFlex,
