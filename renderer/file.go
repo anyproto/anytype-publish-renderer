@@ -9,32 +9,47 @@ import (
 	"go.uber.org/zap"
 )
 
-type ImageRenderParams struct {
+type FileRenderParams struct {
+	Type    model.BlockContentFileType
 	Id      string
 	Src     string
 	Classes string
 }
 
-func (r *Renderer) RenderFile(b *model.Block) templ.Component {
+func (r *Renderer) MakeRenderFileParams(b *model.Block) (params *FileRenderParams, err error) {
 	file := b.GetFile()
 	fileType := file.GetType()
 	switch fileType {
 	case model.BlockContentFile_Image:
-		src, err := r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+		var src string
+		src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
 		if err != nil {
-			log.Warn("file type is not supported", zap.String("type", fileType.String()))
-			return NoneTemplate(fmt.Sprintf("file not found %s", file.TargetObjectId))
+			log.Warn("file type is not supported", zap.String("type", fileType.String()), zap.Error(err))
+			err = fmt.Errorf("file not found %s", file.TargetObjectId)
+			return
 		}
-		align := "align" + strconv.Itoa(int(b.GetAlign()))
 
-		params := &ImageRenderParams{
+		align := "align" + strconv.Itoa(int(b.GetAlign()))
+		params = &FileRenderParams{
+			Type:    model.BlockContentFile_Image,
 			Id:      b.Id,
 			Src:     src,
 			Classes: align,
 		}
-		return FileImageTemplate(r, params)
 	default:
 		log.Warn("file type is not supported", zap.String("type", fileType.String()))
-		return NoneTemplate(fmt.Sprintf("file type is not supported: %s", fileType.String()))
+		err = fmt.Errorf("file type is not supported: %s", fileType.String())
 	}
+
+	return
+}
+
+func (r *Renderer) RenderFile(b *model.Block) templ.Component {
+	params, err := r.MakeRenderFileParams(b)
+	if err != nil {
+		return NoneTemplate(err.Error())
+	}
+
+	return FileImageTemplate(r, params)
+
 }

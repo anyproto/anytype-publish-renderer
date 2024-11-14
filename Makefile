@@ -4,3 +4,6 @@ EXEC:=./bin/anytype-publish-renderer
 render:
 	templ generate -lazy
 	go build -o $(EXEC) . && $(EXEC) $(SNAPSHOT_DIR) $(ROOT_ID) > index.html
+
+test:
+	go test -v ./...

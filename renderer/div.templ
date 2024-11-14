@@ -1,7 +1,7 @@
 package renderer
 
 templ DivTemplate(p *DivRenderParams) {
-	<div class={ p.Classes }>
+	<div id={"block-" + p.Id } class={"block blockDiv" + p.Classes }>
 		<div class="content">
 			@p.Comp
 		</div>

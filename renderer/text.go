@@ -89,12 +89,12 @@ func (r *Renderer) applyMarks(text string, marks []*model.BlockContentTextMark) 
 	return markedText.String()
 }
 
-func (r *Renderer) RenderText(b *model.Block) templ.Component {
+func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParams) {
 	blockText := b.GetText()
 	style := blockText.GetStyle()
-	textClass := "text" + style.String()
+	textClass := "blockText" + style.String()
 	align := "align" + strconv.Itoa(int(b.GetAlign()))
-	classes := []string{"block", "blockText", textClass, align}
+	classes := []string{textClass, align}
 
 	if bgColor := b.GetBackgroundColor(); bgColor != "" {
 		classes = append(classes, "bgColor", "bgColor-"+bgColor)
@@ -128,13 +128,17 @@ func (r *Renderer) RenderText(b *model.Block) templ.Component {
 		innerFlex = append(innerFlex, textComp)
 	}
 
-	params := TextRenderParams{
-		Id:          "block-" + b.Id,
+	params = &TextRenderParams{
+		Id:          b.Id,
 		Classes:     strings.Join(classes, " "),
 		ChildrenIds: b.ChildrenIds,
 		OuterFlex:   outerFlex,
 		InnerFlex:   innerFlex,
 	}
+	return
 
-	return TextTemplate(r, &params)
+}
+func (r *Renderer) RenderText(b *model.Block) templ.Component {
+	params := r.MakeRenderTextParams(b)
+	return TextTemplate(r, params)
 }

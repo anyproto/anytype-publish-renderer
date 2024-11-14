@@ -13,7 +13,7 @@ type DivRenderParams struct {
 	Comp    templ.Component
 }
 
-func (r *Renderer) RenderDiv(b *model.Block) templ.Component {
+func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *DivRenderParams) {
 	var divClass string
 	var comp templ.Component
 
@@ -26,12 +26,17 @@ func (r *Renderer) RenderDiv(b *model.Block) templ.Component {
 		comp = DivDotTemplate()
 	}
 
-	classes := []string{"block", "blockDiv", divClass}
-	params := DivRenderParams{
-		Id:      "block-" + b.Id,
+	classes := []string{divClass}
+	params = &DivRenderParams{
+		Id:      b.Id,
 		Classes: strings.Join(classes, " "),
 		Comp:    comp,
 	}
 
-	return DivTemplate(&params)
+	return
+}
+
+func (r *Renderer) RenderDiv(b *model.Block) templ.Component {
+	params := r.MakeRenderDivParams(b)
+	return DivTemplate(params)
 }
