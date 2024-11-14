@@ -18,9 +18,9 @@ type LayoutRenderParams struct {
 func (r *Renderer) MakeRenderLayoutParams(b *model.Block) (params *LayoutRenderParams) {
 	layoutClass := "layout" + b.GetLayout().GetStyle().String()
 	align := "align" + strconv.Itoa(int(b.GetAlign()))
-	classes := []string{"block", "blockLayout", layoutClass, align}
+	classes := []string{layoutClass, align}
 	params = &LayoutRenderParams{
-		Id:          "block-" + b.Id,
+		Id:          b.Id,
 		Classes:     strings.Join(classes, " "),
 		ChildrenIds: b.ChildrenIds,
 	}
