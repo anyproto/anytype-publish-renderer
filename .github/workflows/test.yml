@@ -36,6 +36,9 @@ jobs:
           repository: anyproto/open
           ref: refs/heads/main
           path: ./open
+      - name: Go build
+        run: |
+          make build
       - name: Go test
         run: |
           make test
