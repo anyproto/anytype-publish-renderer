@@ -92,7 +92,7 @@ func (r *Renderer) applyMarks(text string, marks []*model.BlockContentTextMark) 
 func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParams) {
 	blockText := b.GetText()
 	style := blockText.GetStyle()
-	textClass := "blockText" + style.String()
+	textClass := "text" + style.String()
 	align := "align" + strconv.Itoa(int(b.GetAlign()))
 	classes := []string{textClass, align}
 
