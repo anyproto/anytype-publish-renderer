@@ -2,7 +2,6 @@ package renderer
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	"github.com/anyproto/anytype-heart/pb"
@@ -42,7 +41,7 @@ func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err err
 	rootPath := resolver.GetRootPagePath()
 	snapshotData, err := resolver.GetSnapshotPbFile(rootPath)
 	if err != nil {
-		fmt.Printf("Error reading protobuf snapshot: %v\n", err)
+		log.Error("Error reading protobuf snapshot", zap.Error(err))
 		return
 	}
 
@@ -53,7 +52,7 @@ func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err err
 	}
 
 	if snapshot.SbType != model.SmartBlockType_Page {
-		err = fmt.Errorf("published snaphost is not Page, %d", snapshot.SbType)
+		log.Error("published snaphost is not Page", zap.Int("type", int(snapshot.SbType)))
 		return
 	}
 
