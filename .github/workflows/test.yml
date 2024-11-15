@@ -6,9 +6,11 @@ on:
     branches:
       - '**'
 
+name: test
+
 jobs:
   unit-test:
-    runs-on: ${{ vars.RUNNER_TEST }}
+    runs-on: ubuntu-latest
     env:
       GOPRIVATE: github.com/anyproto
     steps:
