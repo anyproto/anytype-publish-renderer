@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	github.com/a-h/templ v0.2.793
-	github.com/anyproto/anytype-heart v0.36.7
+	github.com/anyproto/anytype-heart v0.36.10
 	github.com/gogo/protobuf v1.3.2
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
@@ -39,9 +39,8 @@ require (
 	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/text v0.20.0 // indirect
 	gopkg.in/Graylog2/go-gelf.v2 v2.0.0-20180125164251-1832d8546a9f // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.3.0 // indirect
 )
 
-replace github.com/anyproto/anytype-heart => ../anytype-heart
+// replace github.com/anyproto/anytype-heart => ../anytype-heart

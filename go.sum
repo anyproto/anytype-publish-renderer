@@ -4,6 +4,8 @@ github.com/anyproto/any-store v0.1.2 h1:/WKsPOQxK1jOHS7efTIosnyJTvy0O3gYg/DSnt41
 github.com/anyproto/any-store v0.1.2/go.mod h1:SDlN2AzysAfs8CDd28rrs6boUUtf5H/ydCvwmj+EbsE=
 github.com/anyproto/any-sync v0.5.17 h1:KD0QUjRHhWYxDfHSV1hlgvPUGzyraybJUnl7xr1GsrA=
 github.com/anyproto/any-sync v0.5.17/go.mod h1:BOy7swQk2LTrjTXCpUOpy19kL1ggwKHt/JSYzFLLg0c=
+github.com/anyproto/anytype-heart v0.36.10 h1:JMpcxDd0MvouqOy207O0uSZlDbitwukY4BItpcmdruE=
+github.com/anyproto/anytype-heart v0.36.10/go.mod h1:pOVp11g24Wx3xf1rInXZkTO162EnGtpvCUldrFw9aCc=
 github.com/cheggaaa/mb v1.0.3 h1:03ksWum+6kHclB+kjwKMaBtgl5gtNYUwNpxsHQciKe8=
 github.com/cheggaaa/mb v1.0.3/go.mod h1:NUl0GBtFLlfg2o6iZwxzcG7Lslc2wV/ADTFbLXtVPE4=
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
@@ -102,8 +104,6 @@ gopkg.in/Graylog2/go-gelf.v2 v2.0.0-20180125164251-1832d8546a9f h1:B3N0yLsfAjXYk
 gopkg.in/Graylog2/go-gelf.v2 v2.0.0-20180125164251-1832d8546a9f/go.mod h1:CeDeqW4tj9FrgZXF/dQCWZrBdcZWWBenhJtxLH4On2g=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
-gopkg.in/natefinch/lumberjack.v2 v2.2.1 h1:bBRl1b0OH9s/DuPhuXpNl+VtCaJXFZ5/uEFST95x9zc=
-gopkg.in/natefinch/lumberjack.v2 v2.2.1/go.mod h1:YD8tP3GAjkrDg1eZH7EGmyESg/lsYskCTPBJVb9jqSc=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 lukechampine.com/blake3 v1.3.0 h1:sJ3XhFINmHSrYCgl958hscfIa3bw8x4DqMP3u1YvoYE=
