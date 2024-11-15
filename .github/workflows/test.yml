@@ -38,6 +38,7 @@ jobs:
           path: ./open
       - name: Go build
         run: |
+          make deps
           make build
       - name: Go test
         run: |
