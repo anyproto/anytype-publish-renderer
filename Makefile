@@ -9,7 +9,7 @@ setup-go:
 	@echo 'Setting up go modules...'
 	@go mod download
 
-build: setup-go
+build: setup-go deps
 	templ generate -lazy
 	go build -o $(EXEC) .
 
