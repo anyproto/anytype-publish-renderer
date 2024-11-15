@@ -12,7 +12,7 @@ templ PlainTextWrapTemplate(comp templ.Component) {
 }
 
 templ TextTemplate(r *Renderer, p *TextRenderParams) {
-	<div id={"block-" + p.Id } class={"block " + p.Classes}>
+	<div id={"block-" + p.Id } class={"block blockText " + p.Classes}>
 		for _, comp := range p.OuterFlex {
 			@comp
 		}
