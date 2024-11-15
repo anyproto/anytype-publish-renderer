@@ -13,7 +13,7 @@ func TestMakeRenderText(t *testing.T) {
 
 	expected := &TextRenderParams{
 		Id:          id,
-		Classes:     "blockTextParagraph align0",
+		Classes:     "blockTextParagraph align0 foo",
 		ChildrenIds: nil,
 	}
 
