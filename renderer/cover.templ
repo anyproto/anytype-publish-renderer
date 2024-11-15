@@ -1,0 +1,22 @@
+package renderer
+
+templ CoverTemplate(r *Renderer, p *CoverRenderParams) {
+	<div id={ p.Id } class="block blockCover align1 index0 noPlus">
+		<div class="content">
+			<div class="wrap">
+				<img id="cover" src={ p.Src }
+								class={"cover" + p.Classes}
+								style="opacity: 1; height: auto; width: 100%; transform: translate3d(0%, -25%, 0px);"
+				 />
+			</div>
+		</div>
+	</div>
+}
+
+templ UnsplashReferral() {
+	<div class="author label">
+		Photo by
+		<a href="https://unsplash.com/@santesson89?utm_source=Anytype&amp;utm_medium=referral">Andrea De Santis</a> on <a href="https://unsplash.com/?utm_source=Anytype&amp;utm_medium=referral">Unsplash</a>
+	</div>
+
+}
