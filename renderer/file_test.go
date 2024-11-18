@@ -8,14 +8,14 @@ import (
 )
 
 func TestMakeRenderFileParams(t *testing.T) {
-	r := getTestRenderer()
+	r := getTestRenderer("snapshot_pb")
 	id := "66c7055b7e4bcd7bc81f3f37"
 	imageBlock := r.BlocksById[id]
 
 	expected := &FileRenderParams{
 		Id:      id,
 		Classes: "align1",
-		Src:     "/../snapshot_pb/files/img_5296.jpeg",
+		Src:     "/../test_snapshots/snapshot_pb/files/img_5296.jpeg",
 		Type:    model.BlockContentFile_Image,
 	}
 

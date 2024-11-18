@@ -1,5 +1,5 @@
-SNAPSHOT_DIR:=./snapshot_pb/
-ROOT_ID:=bafyreiftcdiken5kayp3x4ix7tm4okmizhyshev3jjl5r2jjenz2d5uwui
+SNAPSHOT_DIR:=./test_snapshots/snapshot_pb2/
+ROOT_ID:=bafyreiecs2ivic6ne2lvkohrf3ojqizngmsk5ywilexo6xhtzlqfgngp64
 EXEC:=./bin/anytype-publish-renderer
 TEMPL_VER:=$(shell cat go.mod | grep templ | cut -d' ' -f2)
 
