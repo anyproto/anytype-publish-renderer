@@ -7,7 +7,7 @@ import (
 )
 
 func TestMakeRenderLayoutParams(t *testing.T) {
-	r := getTestRenderer()
+	r := getTestRenderer("snapshot_pb")
 	id := "div-66c82ef37e4bcdd7891d4276"
 	layoutBlock := r.BlocksById[id]
 

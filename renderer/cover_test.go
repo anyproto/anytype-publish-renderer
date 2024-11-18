@@ -7,7 +7,7 @@ import (
 )
 
 func TestMakeRenderCoverParams(t *testing.T) {
-	r := getTestRenderer()
+	r := getTestRenderer("snapshot_pb")
 	_, err := r.MakeRenderPageCoverParams()
 	assert.Error(t, err)
 

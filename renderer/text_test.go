@@ -7,7 +7,7 @@ import (
 )
 
 func TestMakeRenderText(t *testing.T) {
-	r := getTestRenderer()
+	r := getTestRenderer("snapshot_pb")
 	id := "66c58b2a7e4bcd764b24c205"
 	textBlock := r.BlocksById[id]
 
