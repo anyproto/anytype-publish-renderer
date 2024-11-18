@@ -14,7 +14,7 @@ var testRenderer *Renderer
 func makeTestRenderer() *Renderer {
 	resolver := resolver.SimpleAssetResolver{
 		CdnUrl:      "http://test-cdn",
-		SnapshotDir: "../snapshot_pb",
+		SnapshotDir: "../test_snapshots/snapshot_pb",
 		RootPageId:  "bafyreiftcdiken5kayp3x4ix7tm4okmizhyshev3jjl5r2jjenz2d5uwui",
 	}
 

@@ -15,7 +15,7 @@ func TestMakeRenderFileParams(t *testing.T) {
 	expected := &FileRenderParams{
 		Id:      id,
 		Classes: "align1",
-		Src:     "/../snapshot_pb/files/img_5296.jpeg",
+		Src:     "/../test_snapshots/snapshot_pb/files/img_5296.jpeg",
 		Type:    model.BlockContentFile_Image,
 	}
 
