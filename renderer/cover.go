@@ -22,7 +22,7 @@ func (r *Renderer) MakeRenderPageCoverParams() (params *CoverRenderParams, err e
 	}
 
 	params = &CoverRenderParams{
-		Id:      "block-" + coverId,
+		Id:      coverId,
 		Src:     src,
 		Classes: "type1",
 	}

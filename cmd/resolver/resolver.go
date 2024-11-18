@@ -54,7 +54,6 @@ func (r SimpleAssetResolver) ByTargetObjectId(id string) (path string, err error
 func (r SimpleAssetResolver) GetSnapshotPbFile(path string) (snapshotData []byte, err error) {
 	snapshotData, err = os.ReadFile(path)
 	if err != nil {
-		fmt.Printf("Error reading protobuf snapshot: %v\n", err)
 		return
 	}
 
