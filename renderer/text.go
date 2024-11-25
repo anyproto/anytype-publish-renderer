@@ -124,6 +124,14 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		externalComp := AdditionalQuoteTemplate()
 		outerFlex = append(outerFlex, externalComp)
 		innerFlex = append(innerFlex, textComp)
+	case model.BlockContentText_Checkbox:
+		var checkboxComp templ.Component
+		if blockText.Checked {
+			checkboxComp = CheckboxCheckedTemplate()
+		} else {
+			checkboxComp = CheckboxUncheckedTemplate()
+		}
+		innerFlex = append(innerFlex, checkboxComp, textComp)
 	default:
 		innerFlex = append(innerFlex, textComp)
 	}
