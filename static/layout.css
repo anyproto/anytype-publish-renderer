@@ -421,6 +421,21 @@ main {
   background: #e5f8d6 !important;
 }
 
+.blocks .block.align1 > .wrapContent {
+    text-align: center;
+}
+.blocks .block.blockIconPage {
+    padding: 0px 0px 16px 0px;
+}
+
+.blocks .block.blockIconPage .iconObject {
+    position: relative;
+    z-index: 2;
+    display: inline-block;
+    box-shadow: 0px 0px 0px 4px var(--color-bg-primary);
+    background-color: var(--color-bg-primary) !important;
+}
+
 .iconObject {
   display: inline-block;
   vertical-align: top;
@@ -752,7 +767,7 @@ main {
 .iconObject.withImage.c112,
 .iconObject.withImage.c128,
 .iconObject.withImage.c160 {
-  border-radius: 4px !important;
+  border-radius: 12px !important;
 }
 
 .iconObject.withImage.c112:not(.isHuman):not(.isParticipant), .iconObject.withImage.c128:not(.isHuman):not(.isParticipant) {
