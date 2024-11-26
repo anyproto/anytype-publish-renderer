@@ -1,24 +1,23 @@
 package renderer
 
-templ PageTemplate(r *Renderer) {
+templ PageTemplate(r *Renderer, p *RenderPageParams) {
     <html lang="en">
         <head>
             <link rel="shortcut icon" href="" />
             <link rel="stylesheet" href="/static/layout.css" />
         </head>
-
 		<body>
-        <main>
-			@r.RenderPageCover()
-            <div class="blocks">
-				todo-iconEmoji
-                <div>
-					for _, childId := range r.Root.ChildrenIds {
-                        @r.RenderBlock(r.BlocksById[childId])
-                    }
-                </div>
-            </div>
-        </main>
+			<main>
+				@r.RenderPageCover()
+				<div class={"blocks " + p.Classes }>
+ 					@r.RenderPageIconImage()
+					<div>
+						for _, childId := range r.Root.ChildrenIds {
+							@r.RenderBlock(r.BlocksById[childId])
+						}
+					</div>
+				</div>
+			</main>
         </body>
     </html>
 }

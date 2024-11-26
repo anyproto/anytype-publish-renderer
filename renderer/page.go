@@ -5,14 +5,42 @@ import (
 	"reflect"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
 
 	"github.com/a-h/templ"
 	"go.uber.org/zap"
 )
 
+type RenderPageParams struct {
+	Classes string
+}
+
+func (r *Renderer) hasIconAndCover() bool {
+	fields := r.Sp.Snapshot.Data.GetDetails()
+	coverId := pbtypes.GetString(fields, "coverId")
+	if coverId == "" {
+		return false
+	}
+
+	_, err := r.AssetResolver.ByTargetObjectId(coverId)
+
+	return (err == nil)
+
+}
+func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
+	var classes string
+	if r.hasIconAndCover() {
+		classes = "withIconAndCover"
+	}
+	return &RenderPageParams{
+		Classes: classes,
+	}
+}
+
 func (r *Renderer) RenderPage() templ.Component {
 	log.Debug("root type", zap.String("type", reflect.TypeOf(r.Root.Content).String()))
-	return PageTemplate(r)
+	params := r.MakeRenderPageParams()
+	return PageTemplate(r, params)
 }
 
 func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
