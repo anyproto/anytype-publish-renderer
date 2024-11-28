@@ -12,7 +12,6 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/gogo/protobuf/proto"
-	types "github.com/gogo/protobuf/types"
 )
 
 var log = logging.Logger("renderer").Desugar()
@@ -33,6 +32,8 @@ type Renderer struct {
 
 	Root       *model.Block
 	BlocksById map[string]*model.Block
+
+	BlockNumbers map[string]int
 
 	AssetResolver AssetResolver
 }
@@ -62,18 +63,17 @@ func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err err
 		blocksById[block.Id] = block
 	}
 
-	details := snapshot.Snapshot.Data.GetDetails()
-
 	r = &Renderer{
 		Sp:            &snapshot,
 		Out:           writer,
 		BlocksById:    blocksById,
+		BlockNumbers:  make(map[string]int),
 		Root:          blocks[0],
 		AssetResolver: resolver,
 	}
 
-	specialBlocks := []string{"title", "description"}
-	r.hydrateSpecialBlocks(specialBlocks, details)
+	r.hydrateSpecialBlocks()
+	r.hydrateNumberBlocks()
 
 	return
 }
@@ -86,16 +86,70 @@ func (r *Renderer) Render() (err error) {
 	return
 }
 
+func (r *Renderer) unwrapLayouts(blocks []*model.Block) []*model.Block {
+	ret := make([]*model.Block, 0)
+	for _, b := range blocks {
+		switch b.Content.(type) {
+		case *model.BlockContentOfLayout:
+			break
+		default:
+			ret = append(ret, b)
+		}
+		chBlocks := make([]*model.Block, len(b.ChildrenIds))
+		for i, chId := range b.ChildrenIds {
+			chBlocks[i] = r.BlocksById[chId]
+		}
+		unwrapped := r.unwrapLayouts(chBlocks)
+		ret = append(ret, unwrapped...)
+
+	}
+
+	return ret
+}
+
+func (r *Renderer) hydrateNumberBlocksInner(blocks []*model.Block) {
+	unwrapped := r.unwrapLayouts(blocks)
+	prevNumber := 1
+	for _, b := range unwrapped {
+		if t := b.GetText(); t != nil {
+			if t.GetStyle() == model.BlockContentText_Numbered {
+				if _, ok := r.BlockNumbers[b.Id]; !ok {
+					r.BlockNumbers[b.Id] = prevNumber
+					prevNumber++
+				}
+			} else {
+				prevNumber = 1
+			}
+		}
+
+		if len(b.ChildrenIds) > 0 {
+			chBlocks := make([]*model.Block, len(b.ChildrenIds))
+			for i, chId := range b.ChildrenIds {
+				chBlocks[i] = r.BlocksById[chId]
+			}
+			r.hydrateNumberBlocksInner(chBlocks)
+		}
+	}
+}
+
+// Adds numbers as marks to text blocks with type "number"
+func (r *Renderer) hydrateNumberBlocks() {
+	r.hydrateNumberBlocksInner(r.Sp.Snapshot.Data.GetBlocks())
+}
+
 // Adds text from Details to special blocks like `title`
-func (r *Renderer) hydrateSpecialBlocks(blockIds []string, details *types.Struct) {
-	for _, bId := range blockIds {
-		titleBlock, ok := r.BlocksById[bId]
+func (r *Renderer) hydrateSpecialBlocks() {
+	specialBlocks := []string{"title", "description"}
+	details := r.Sp.Snapshot.Data.GetDetails()
+
+	for _, bId := range specialBlocks {
+		block, ok := r.BlocksById[bId]
 		if !ok {
 			log.Warn("hydrate: block not found, skipping", zap.String("id", bId))
 			return
 		}
 
-		err := blockutils.HydrateBlock(titleBlock, details)
+		err := blockutils.HydrateBlock(block, details)
 		if err != nil {
 			log.Warn("hydrate: failed to hydrate block",
 				zap.String("id", bId),
