@@ -1190,6 +1190,10 @@ markuplatex {
   align-items: center;
 }
 
+.block.blockText.textToggle.isToggled > .content > .flex .markers .marker.toggle {
+  transform: rotateZ(90deg);
+}
+
 .block.blockText > .content > .flex .markers .marker.bullet {
   display: flex;
   align-items: center;
@@ -1386,9 +1390,6 @@ markuplatex {
   display: block;
 }
 
-.block.blockText.textToggle.isToggled > .marker.toggle {
-  transform: rotateZ(90deg);
-}
 
 .block.blockText.textToggle > .children {
   display: none;

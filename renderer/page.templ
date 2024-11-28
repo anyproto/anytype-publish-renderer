@@ -6,7 +6,6 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
             <link rel="shortcut icon" href="" />
             <link rel="stylesheet" href="/static/layout.css" />
         </head>
-
 		<body>
 			<main>
 				@r.RenderPageCover()
@@ -19,6 +18,8 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 					</div>
 				</div>
 			</main>
+			<script src="/static/scripts.js"></script>
+
         </body>
     </html>
 }
