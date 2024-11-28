@@ -113,6 +113,9 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	var outerFlex []templ.Component
 	var innerFlex []templ.Component
 	switch style {
+	case model.BlockContentText_Toggle:
+		externalComp := ToggleMarkerTemplate()
+		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Numbered:
 		number := r.BlockNumbers[b.Id]
 		log.Debug("number", zap.Int("num", number), zap.String("id", b.Id))

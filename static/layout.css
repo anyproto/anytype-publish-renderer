@@ -1184,6 +1184,12 @@ markuplatex {
 .block.blockText > .content > .flex .markers .marker .icon {
   display: inline-block;
 }
+
+.block.blockText > .content > .flex .markers .marker.toggle {
+  display: flex;
+  align-items: center;
+}
+
 .block.blockText > .content > .flex .markers .marker.bullet {
   display: flex;
   align-items: center;
@@ -1376,9 +1382,18 @@ markuplatex {
 }
 
 /* Toggle */
+.block.blockText.textToggle.isToggled > .children {
+  display: block;
+}
+
+.block.blockText.textToggle.isToggled > .marker.toggle {
+  transform: rotateZ(90deg);
+}
+
 .block.blockText.textToggle > .children {
   display: none;
 }
+
 
 .block.blockDiv {
   padding: 0px;
