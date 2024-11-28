@@ -116,9 +116,8 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	case model.BlockContentText_Numbered:
 		number := r.BlockNumbers[b.Id]
 		log.Debug("number", zap.Int("num", number), zap.String("id", b.Id))
-		externalComp := NumberMarkerTemplate(fmt.Sprintf("%d", number))
-		outerFlex = append(outerFlex, externalComp)
-		innerFlex = append(innerFlex, textComp)
+		externalCompo := NumberMarkerTemplate(fmt.Sprintf("%d", number))
+		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Marked:
 		externalComp := BulletMarkerTemplate()
 		innerFlex = append(innerFlex, externalComp, textComp)

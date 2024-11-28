@@ -2,10 +2,7 @@ package renderer
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"io"
-	"os"
 
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
@@ -55,10 +52,6 @@ func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err err
 		return
 	}
 
-	var snapshotJson []byte
-	snapshotJson, err = json.Marshal(snapshot)
-	os.WriteFile("./snapshot.json", snapshotJson, 0644)
-
 	if snapshot.SbType != model.SmartBlockType_Page {
 		log.Error("published snaphost is not Page", zap.Int("type", int(snapshot.SbType)))
 		return
@@ -81,8 +74,6 @@ func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err err
 
 	r.hydrateSpecialBlocks()
 	r.hydrateNumberBlocks()
-
-	fmt.Printf("--num:: \n %#v\n", r.BlockNumbers)
 
 	return
 }
