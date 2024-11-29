@@ -1494,3 +1494,79 @@ markuplatex {
   display: block;
   cursor: zoom-in;
 }
+
+.blocks .block.blockTable {
+    padding: 6px 0px;
+}
+
+
+
+.blocks .block.blockTable .row {
+    display: grid;
+    position: relative;
+    border-right: 1px solid var(--color-shape-primary);
+}
+
+.blocks .block.blockTable .row:first-child {
+    border-radius: 4px 4px 0px 0px;
+}
+.blocks .block.blockTable .row:first-child .cell:first-child {
+    border-bottom: 1px solid var(--color-shape-primary);
+}
+
+.blocks .block.blockTable .row:first-child .cell:last-child {
+    border-radius: 0px 4px 0px 0px;
+}
+
+.blocks .block.blockTable .row:last-child {
+    border-bottom: 1px solid var(--color-shape-primary);
+    border-radius: 0px 0px 4px 4px;
+}
+.blocks .block.blockTable .row:last-child .cell:first-child {
+    border-radius: 0px 0px 0px 4px;
+}
+
+.blocks .block.blockTable .row:last-child .cell:last-child {
+    border-radius: 0px 0px 4px 0px;
+}
+
+.blocks .block.blockTable .cell {
+    font-size: var(--font-size-common);
+    line-height: var(--line-height-common);
+    letter-spacing: var(--letter-spacing-common);
+    vertical-align: top;
+    position: relative;
+    cursor: text;
+    flex-shrink: 0;
+    background: var(--color-bg-primary);
+    color: var(--color-shape-primary);
+    border-left: 1px solid var(--color-shape-primary);
+    border-top: 1px solid var(--color-shape-primary);
+}
+
+.blocks .block.blockTable .cell .block  {
+    padding: 9px 9px 9px 9px;
+    margin: 0px;
+}
+
+.blocks .block.blockTable .cell .block {
+    height: 100%;
+    border: 0px !important;
+    color: var(--color-text-primary);
+}
+.blocks .block.blockTable .cell .block a{
+    color: var(--color-text-primary);
+}
+
+.blocks .block.blockTable .row.isHeader .cell {
+    background-color: var(--color-shape-tertiary);
+}
+
+.blocks .block.blockTable .wrapContent {
+    padding: 5px;
+}
+
+.blocks .block.blockTable .wrapContent > .inner {
+    display: inline-block;
+    position: relative;
+}

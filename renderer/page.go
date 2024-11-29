@@ -59,9 +59,10 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 		return r.RenderDiv(b)
 	case *model.BlockContentOfFile:
 		return r.RenderFile(b)
+	case *model.BlockContentOfTable:
+		return r.RenderTable(b)
 	case *model.BlockContentOfBookmark:
 	case *model.BlockContentOfLink:
-	case *model.BlockContentOfTable:
 	case *model.BlockContentOfSmartblock:
 	default:
 
