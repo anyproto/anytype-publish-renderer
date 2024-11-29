@@ -1,0 +1,36 @@
+package renderer
+
+
+templ TableTemplate(r *Renderer, p *RenderTableParams) {
+	<div id={"block-" + p.Id} class="block blockTable">
+		<div class={"wrapContent " + p.Classes}>
+			<div class="inner">
+				<div id="table" class="table">
+					<div class="rows">
+						for _, rowId := range p.Rows.ChildrenIds {
+							@TableRowTemplate(r, rowId, p.ColumnSizes)
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+templ TableRowCellTemplate(r *Renderer,p *RenderTableRowCellParams) {
+	<div id={"cell-"+p.Id} class="cell align-v0">
+		@p.TextComp
+	</div>
+}
+
+templ TableRowTemplate(r *Renderer, rowId, columnSizes string) {
+	<div id={"row-"+rowId} class={"row", r.rowHeaderClass(rowId), columnSizesCss(columnSizes)}>
+		for _, cellId := range r.BlocksById[rowId].ChildrenIds {
+			@r.RenderTableRowCell(cellId)
+		}
+	</div>
+}
+
+css columnSizesCss(image string) {
+	grid-template-columns: { gridSizes(image) };
+}

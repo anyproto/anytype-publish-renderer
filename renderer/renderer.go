@@ -2,7 +2,9 @@ package renderer
 
 import (
 	"context"
+	"encoding/json"
 	"io"
+	"os"
 
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
@@ -56,6 +58,10 @@ func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err err
 		log.Error("published snaphost is not Page", zap.Int("type", int(snapshot.SbType)))
 		return
 	}
+
+	var snapshotJson []byte
+	snapshotJson, err = json.Marshal(snapshot)
+	os.WriteFile("./snapshot.json", snapshotJson, 0644)
 
 	blocks := snapshot.Snapshot.Data.GetBlocks()
 	blocksById := make(map[string]*model.Block)

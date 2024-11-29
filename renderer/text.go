@@ -77,7 +77,9 @@ func (r *Renderer) applyMarks(text string, marks []*model.BlockContentTextMark) 
 	rText := []rune(text)
 	slices.SortFunc(marks, cmpMarks)
 	for _, mark := range marks {
-		log.Debug("Marks:", zap.String("pos", fmt.Sprintf("%d: %d-%d", lastPos, mark.Range.From, mark.Range.To)))
+		log.Debug("Marks:",
+			zap.Int("len", len(rText)),
+			zap.String("text", text), zap.String("pos", fmt.Sprintf("%d: %d-%d", lastPos, mark.Range.From, mark.Range.To)))
 
 		before := rText[lastPos:mark.Range.From]
 		markedText.WriteString(string(before))
