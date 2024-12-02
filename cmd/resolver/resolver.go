@@ -23,6 +23,10 @@ func (r SimpleAssetResolver) GetRootPagePath() string {
 	return rootPbPath
 }
 
+func (r SimpleAssetResolver) GetJoinSpaceLink() string {
+	return "https://invite.any.coop/bafybeib3eh3aowv24v5rv4japcrgqw4ly7fx3h4lca2vbh3kqdy7hasoxe#29SnvBDxo83r5MooE2FdSa6wPmwJKxLkuZEinqfvoCKt"
+}
+
 func (r SimpleAssetResolver) ByEmojiCode(code rune) string {
 	return fmt.Sprintf("%s/emojies/%x.png", r.CdnUrl, code)
 }

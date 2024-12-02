@@ -23,6 +23,7 @@ var log = logging.Logger("renderer").Desugar()
 type AssetResolver interface {
 	GetSnapshotPbFile(string) ([]byte, error)
 	GetRootPagePath() string
+	GetJoinSpaceLink() string
 	ByEmojiCode(rune) string
 	ByTargetObjectId(string) (string, error)
 }
