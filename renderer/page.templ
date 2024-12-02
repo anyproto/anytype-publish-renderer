@@ -8,6 +8,9 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
         </head>
 		<body>
 			<main>
+				<div class="joinSpace">
+					<a href={r.joinSpaceLink()} target="blank">Join Space</a>
+				</div>
 				@r.RenderPageCover()
 				<div class={"blocks " + p.Classes }>
  					@r.RenderPageIconImage()

@@ -73,3 +73,7 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 		zap.String("id", b.Id))
 	return NoneTemplate(fmt.Sprintf("not supported: %s, %s", b.Id, reflect.TypeOf(b.Content).String()))
 }
+
+func (r *Renderer) joinSpaceLink() templ.SafeURL {
+	return templ.SafeURL(r.AssetResolver.GetJoinSpaceLink())
+}

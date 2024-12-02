@@ -1035,7 +1035,7 @@ markuplatex {
   width: 100%;
   border-radius: 4px;
   overflow: hidden;
-  margin: 0px auto;
+  margin: 15px auto;
 }
 
 .block.blockCover > .content {
@@ -1597,4 +1597,17 @@ markuplatex {
 
 .madeInAnytype .container .anyIcon {
 
+}
+
+.joinSpace {
+    width: 100%;
+    text-align: right;
+}
+.joinSpace a {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-common);
+    font-weight: 500;
+    padding: 15px 15px;
+    margin: 10px 0px;
+    text-decoration: none;
 }
