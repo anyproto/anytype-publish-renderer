@@ -9,6 +9,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/anyproto/anytype-publish-renderer/utils"
 	"go.uber.org/zap"
 )
@@ -109,7 +110,10 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		text = r.applyMarks(text, marks)
 		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
-		textComp = PlainTextTemplate(text)
+		fields := b.GetFields()
+		lang := pbtypes.GetString(fields, "lang")
+
+		textComp = TextCodeTemplate(text, lang)
 	}
 
 	var outerFlex []templ.Component
