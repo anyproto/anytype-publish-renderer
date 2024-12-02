@@ -30,3 +30,12 @@ templ TextTemplate(r *Renderer, p *TextRenderParams) {
 		</div>
 	</div>
 }
+
+templ TextCodeTemplate(code, lang string) {
+	<pre>
+		<code class={"language-"+lang}>
+			{code}
+		</code>
+	</pre>
+
+}

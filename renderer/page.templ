@@ -1,12 +1,17 @@
 package renderer
 
 templ PageTemplate(r *Renderer, p *RenderPageParams) {
+	<!DOCTYPE html>
     <html lang="en">
         <head>
             <link rel="shortcut icon" href="" />
             <link rel="stylesheet" href="/static/layout.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.css" />
         </head>
 		<body>
+			<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
 			<main>
 				<div class="joinSpace">
 					<a href={r.joinSpaceLink()} target="blank">Join Space</a>
