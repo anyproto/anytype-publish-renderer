@@ -11,6 +11,10 @@ import (
 func TestMarkIntervalTree(t *testing.T) {
 	ranges := []*model.Range{
 		&model.Range{
+			From: 5,
+			To:   6,
+		},
+		&model.Range{
 			From: 27,
 			To:   37,
 		},
@@ -72,6 +76,49 @@ func TestMarkIntervalTree(t *testing.T) {
 				Range: &model.Range{
 					From: 18,
 					To:   31,
+				},
+			},
+		}
+		assert.EqualValues(t, expected, results)
+	})
+
+	t.Run("single range", func(t *testing.T) {
+		results := make([]*model.BlockContentTextMark, 0)
+		SearchOverlaps(root, &model.Range{
+			From: 5,
+			To:   6,
+		}, &results)
+
+		expected := []*model.BlockContentTextMark{
+			&model.BlockContentTextMark{
+				Range: &model.Range{
+					From: 5,
+					To:   6,
+				},
+			},
+		}
+		assert.EqualValues(t, expected, results)
+	})
+
+	t.Run("one item", func(t *testing.T) {
+		singleRoot := &MarkIntervalTreeNode{
+			Mark: &model.BlockContentTextMark{
+				Range: ranges[0],
+			},
+			MaxUpperVal: ranges[0].To,
+		}
+
+		results := make([]*model.BlockContentTextMark, 0)
+		SearchOverlaps(singleRoot, &model.Range{
+			From: 5,
+			To:   6,
+		}, &results)
+
+		expected := []*model.BlockContentTextMark{
+			&model.BlockContentTextMark{
+				Range: &model.Range{
+					From: 5,
+					To:   6,
 				},
 			},
 		}

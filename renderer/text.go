@@ -82,7 +82,8 @@ func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockCont
 
 	rText := []rune(text)
 	root := &markintervaltree.MarkIntervalTreeNode{
-		Mark: marks[0],
+		Mark:        marks[0],
+		MaxUpperVal: marks[0].Range.To,
 	}
 
 	for i := 1; i < len(marks); i++ {
@@ -117,7 +118,10 @@ func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockCont
 		marksToApply := make([]*model.BlockContentTextMark, 0)
 		markintervaltree.SearchOverlaps(root, curRange, &marksToApply)
 		markedPart := string(rText[curRange.From:curRange.To])
-		log.Debug("apply marks", zap.String("markedPart", markedPart), zap.Int32("from", curRange.From), zap.Int32("to", curRange.To))
+		log.Debug("apply marks",
+			zap.String("markedPart", markedPart),
+			zap.Int32("from", curRange.From),
+			zap.Int32("to", curRange.To))
 		for _, m := range marksToApply {
 			markedPart = r.applyMark(markedPart, m)
 			log.Debug("apply mark", zap.String("markedPart", markedPart), zap.Int32("from", m.Range.From), zap.Int32("to", m.Range.To))

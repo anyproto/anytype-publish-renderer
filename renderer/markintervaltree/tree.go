@@ -44,22 +44,18 @@ func (r *MarkIntervalTreeNode) Insert(m *model.BlockContentTextMark) {
 	}
 }
 
-func marksOverlap(a, b *model.Range) bool {
-	return (a.From < b.To && a.To > b.From)
-}
-
-func rangeEqual(a, b *model.Range) bool {
-	return (a.From == b.From && a.To == b.To)
+func rangeOverlap(a, b *model.Range) bool {
+	return (a.From <
+		b.To && a.To > b.From) || (a.From == b.From && a.To == b.To)
 }
 
 func SearchOverlaps(n *MarkIntervalTreeNode, i *model.Range, result *[]*model.BlockContentTextMark) {
 	if n == nil || n.MaxUpperVal < i.From {
 		return
 	}
-
 	SearchOverlaps(n.Left, i, result)
 
-	if marksOverlap(n.Mark.Range, i) {
+	if rangeOverlap(n.Mark.Range, i) {
 		*result = append(*result, n.Mark)
 	}
 	if i.From < n.Mark.Range.From {
