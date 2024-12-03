@@ -49,11 +49,9 @@ func TestMarkIntervalTree(t *testing.T) {
 
 	t.Run("simple test", func(t *testing.T) {
 		results := make([]*model.BlockContentTextMark, 0)
-		SearchOverlaps(root, &model.BlockContentTextMark{
-			Range: &model.Range{
-				From: 17,
-				To:   19,
-			},
+		SearchOverlaps(root, &model.Range{
+			From: 17,
+			To:   19,
 		}, &results)
 
 		expected := []*model.BlockContentTextMark{
