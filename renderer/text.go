@@ -10,6 +10,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/anyproto/anytype-publish-renderer/renderer/markintervaltree"
 	"github.com/anyproto/anytype-publish-renderer/utils"
 	"go.uber.org/zap"
 )
@@ -50,7 +51,7 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 		return tag + s + "</markupcolor>"
 	case model.BlockContentTextMark_BackgroundColor:
 		color := mark.Param
-		tag := fmt.Sprintf(`<markubgpcolor class="bgColor bgColor-%s">`, color)
+		tag := fmt.Sprintf(`<markupbgcolor class="bgColor bgColor-%s">`, color)
 		return tag + s + "</markupbgcolor>"
 	case model.BlockContentTextMark_Mention:
 		return "<markupmention>" + s + "</markupmention>"
@@ -67,6 +68,70 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 	}
 
 	return "<markupobject>" + s + "</markupobject>"
+}
+
+// - make borders
+//   - make set from ranges, from-to
+//   - sort
+//   - for each range, find overlapping intervals
+//     add props from each of this ranges to this range
+func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockContentTextMark) string {
+	if len(marks) == 0 {
+		return text
+	}
+
+	rText := []rune(text)
+	root := &markintervaltree.MarkIntervalTreeNode{
+		Mark:        marks[0],
+		MaxUpperVal: marks[0].Range.To,
+	}
+
+	for i := 1; i < len(marks); i++ {
+		root.Insert(marks[i])
+	}
+
+	rangeSet := make(map[int32]bool)
+	rangeSet[0] = true
+	rangeSet[int32(len(rText))] = true
+	for _, mark := range marks {
+		rangeSet[mark.Range.From] = true
+		rangeSet[mark.Range.To] = true
+	}
+
+	rangeRay := make([]int32, len(rangeSet))
+	i := 0
+	for k := range rangeSet {
+		rangeRay[i] = k
+		i++
+	}
+
+	slices.Sort(rangeRay)
+
+	var markedText strings.Builder
+
+	log.Debug("rangeRay", zap.String("ray", fmt.Sprintf("%#v", rangeRay)))
+	for i := 0; i < len(rangeRay)-1; i++ {
+		curRange := &model.Range{
+			From: rangeRay[i],
+			To:   rangeRay[i+1],
+		}
+		marksToApply := make([]*model.BlockContentTextMark, 0)
+		markintervaltree.SearchOverlaps(root, curRange, &marksToApply)
+		markedPart := string(rText[curRange.From:curRange.To])
+		log.Debug("apply marks",
+			zap.String("markedPart", markedPart),
+			zap.Int32("from", curRange.From),
+			zap.Int32("to", curRange.To))
+		for _, m := range marksToApply {
+			markedPart = r.applyMark(markedPart, m)
+			log.Debug("apply mark", zap.String("markedPart", markedPart), zap.Int32("from", m.Range.From), zap.Int32("to", m.Range.To))
+		}
+		log.Debug("final marked part", zap.String("m", markedPart))
+		markedText.WriteString(markedPart)
+
+	}
+
+	return markedText.String()
 }
 
 func (r *Renderer) applyMarks(text string, marks []*model.BlockContentTextMark) string {
@@ -107,7 +172,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	var textComp templ.Component
 	if style != model.BlockContentText_Code {
 		marks := blockText.GetMarks().Marks
-		text = r.applyMarks(text, marks)
+		text = r.applyNonOverlapingMarks(text, marks)
 		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
 		fields := b.GetFields()
