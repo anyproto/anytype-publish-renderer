@@ -1,7 +1,7 @@
 package renderer
 
-templ FileImageTemplate(r *Renderer, p *FileRenderParams) {
-	<div id={"block" + p.Id } class={"block blockMedia isImage index0 withContent " + p.Classes}>
+templ FileImageTemplate(r *Renderer, p *FileImageRenderParams) {
+	<div id={"block" + p.Id } class={"block blockMedia isImage index0 withContent", p.Classes}>
 		<div class="content">
 			<div class="flex">
 				<div class={"wrap", imageSizeCss(string(p.ImageWidth))}>
@@ -17,4 +17,18 @@ func imageSize(width string) templ.SafeCSSProperty {
 }
 css imageSizeCss(width string) {
 	width: { imageSize(width) };
+}
+
+templ FilePDFTemplate(r *Renderer, p *FilePDFRenderParams) {
+	<div id={"block" + p.Id } class={"block blockMedia"}>
+		<div class="content">
+			<div class="flex">
+				<iframe id={"pdf-"+p.Id}
+						width="100%"
+						height="1000px"
+						src={ p.Src }>
+				</iframe>
+			</div>
+		</div>
+	</div>
 }
