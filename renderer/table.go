@@ -15,7 +15,8 @@ type RenderTableParams struct {
 
 	ColumnSizes string
 
-	Rows *model.Block
+	Rows    *model.Block
+	Columns *model.Block
 }
 
 type RenderTableRowCellParams struct {
@@ -28,8 +29,9 @@ type RenderTableRowCellParams struct {
 func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTableParams) {
 
 	var columnSizes []string
-	columnIds := r.BlocksById[b.ChildrenIds[0]].ChildrenIds
-	for _, colId := range columnIds {
+	columns := r.BlocksById[b.ChildrenIds[0]]
+
+	for _, colId := range columns.ChildrenIds {
 		col := r.BlocksById[colId]
 		fields := col.GetFields()
 		width := pbtypes.GetInt64(fields, "width")
@@ -37,6 +39,7 @@ func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTablePar
 	}
 
 	rows := r.BlocksById[b.ChildrenIds[1]]
+
 	var classes string
 	if b.BackgroundColor != "" {
 		classes = fmt.Sprintf("bgColor bgColor-%s", b.BackgroundColor)
@@ -45,6 +48,7 @@ func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTablePar
 		Classes:     classes,
 		Id:          "",
 		Rows:        rows,
+		Columns:     columns,
 		ColumnSizes: strings.Join(columnSizes, " "),
 	}
 
@@ -68,7 +72,10 @@ func (r *Renderer) MakeRenderTableRowCellParams(b *model.Block) (params *RenderT
 }
 
 func (r *Renderer) RenderTableRowCell(cellId string) templ.Component {
-	cellBlock := r.BlocksById[cellId]
+	cellBlock, ok := r.BlocksById[cellId]
+	if !ok {
+		return TableRowCellEmptyTemplate()
+	}
 	params := r.MakeRenderTableRowCellParams(cellBlock)
 	return TableRowCellTemplate(r, params)
 }
