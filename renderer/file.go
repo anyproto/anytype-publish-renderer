@@ -64,6 +64,50 @@ func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FilePDFRende
 	return
 }
 
+type FileAudioRenderParams struct {
+	Id  string
+	Src string
+}
+
+func (r *Renderer) MakeRenderFileAudioParams(b *model.Block) (params *FileAudioRenderParams, err error) {
+	file := b.GetFile()
+	var src string
+	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	if err != nil {
+		err = fmt.Errorf("file not found %s", file.TargetObjectId)
+		return
+	}
+
+	params = &FileAudioRenderParams{
+		Id:  b.Id,
+		Src: src,
+	}
+
+	return
+}
+
+type FileVideoRenderParams struct {
+	Id  string
+	Src string
+}
+
+func (r *Renderer) MakeRenderFileVideoParams(b *model.Block) (params *FileVideoRenderParams, err error) {
+	file := b.GetFile()
+	var src string
+	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	if err != nil {
+		err = fmt.Errorf("file not found %s", file.TargetObjectId)
+		return
+	}
+
+	params = &FileVideoRenderParams{
+		Id:  b.Id,
+		Src: src,
+	}
+
+	return
+}
+
 func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 	file := b.GetFile()
 	fileType := file.GetType()
@@ -80,6 +124,18 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 			return NoneTemplate(err.Error())
 		}
 		return FilePDFTemplate(r, params)
+	case model.BlockContentFile_Audio:
+		params, err := r.MakeRenderFileAudioParams(b)
+		if err != nil {
+			return NoneTemplate(err.Error())
+		}
+		return FileAudioTemplate(r, params)
+	case model.BlockContentFile_Video:
+		params, err := r.MakeRenderFileVideoParams(b)
+		if err != nil {
+			return NoneTemplate(err.Error())
+		}
+		return FileVideoTemplate(r, params)
 
 	default:
 		log.Warn("file type is not supported", zap.String("type", fileType.String()))
