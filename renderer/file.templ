@@ -32,3 +32,25 @@ templ FilePDFTemplate(r *Renderer, p *FilePDFRenderParams) {
 		</div>
 	</div>
 }
+
+templ FileAudioTemplate(r *Renderer, p *FileAudioRenderParams) {
+	<div id={"block" + p.Id } class={"block blockMedia"}>
+		<div class="content">
+			<div class="flex">
+				<audio controls src={ p.Src }></audio>
+			</div>
+		</div>
+	</div>
+}
+
+templ FileVideoTemplate(r *Renderer, p *FileVideoRenderParams) {
+	<div id={"block" + p.Id } class={"block blockMedia"}>
+		<div class="content">
+			<div class="flex">
+				<video controls width="100%">
+					<source src={ p.Src} />
+				</video>
+			</div>
+		</div>
+	</div>
+}
