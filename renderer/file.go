@@ -11,7 +11,6 @@ import (
 )
 
 type FileImageRenderParams struct {
-	Type       model.BlockContentFileType
 	Id         string
 	Src        string
 	Classes    string
@@ -34,11 +33,32 @@ func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileImageR
 	imageWidth := strconv.Itoa(int(width*100)) + "%"
 
 	params = &FileImageRenderParams{
-		Type:       model.BlockContentFile_Image,
 		Id:         b.Id,
 		Src:        src,
 		Classes:    align,
 		ImageWidth: imageWidth,
+	}
+
+	return
+}
+
+type FilePDFRenderParams struct {
+	Id  string
+	Src string
+}
+
+func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FilePDFRenderParams, err error) {
+	file := b.GetFile()
+	var src string
+	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	if err != nil {
+		err = fmt.Errorf("file not found %s", file.TargetObjectId)
+		return
+	}
+
+	params = &FilePDFRenderParams{
+		Id:  b.Id,
+		Src: src,
 	}
 
 	return
@@ -53,12 +73,17 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 		if err != nil {
 			return NoneTemplate(err.Error())
 		}
-
 		return FileImageTemplate(r, params)
+	case model.BlockContentFile_PDF:
+		params, err := r.MakeRenderFilePDFParams(b)
+		if err != nil {
+			return NoneTemplate(err.Error())
+		}
+		return FilePDFTemplate(r, params)
+
 	default:
 		log.Warn("file type is not supported", zap.String("type", fileType.String()))
 		err := fmt.Errorf("file type is not supported: %s", fileType.String())
 		return NoneTemplate(err.Error())
 	}
-
 }
