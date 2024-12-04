@@ -1500,6 +1500,9 @@ markuplatex {
 }
 
 
+.cell .block.bgColor {
+    border-radius: 0px;
+}
 
 .blocks .block.blockTable .row {
     display: grid;
@@ -1507,14 +1510,14 @@ markuplatex {
     border-right: 1px solid var(--color-shape-primary);
 }
 
-.blocks .block.blockTable .row:first-child {
+.blocks .block.blockTable .row:nth-child(2) {
     border-radius: 4px 4px 0px 0px;
 }
-.blocks .block.blockTable .row:first-child .cell:first-child {
-    border-bottom: 1px solid var(--color-shape-primary);
+.blocks .block.blockTable .row:nth-child(2) .cell:first-child {
+    border-radius: 4px 0px 0px 0px;
 }
 
-.blocks .block.blockTable .row:first-child .cell:last-child {
+.blocks .block.blockTable .row:nth-child(2) .cell:last-child {
     border-radius: 0px 4px 0px 0px;
 }
 
