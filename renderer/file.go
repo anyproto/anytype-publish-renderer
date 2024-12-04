@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/a-h/templ"
@@ -108,6 +109,46 @@ func (r *Renderer) MakeRenderFileVideoParams(b *model.Block) (params *FileVideoR
 	return
 }
 
+type FileFileRenderParams struct {
+	Id   string
+	Src  templ.SafeURL
+	Name string
+	Size string
+}
+
+func prettyByteSize(b int64) string {
+	bf := float64(b)
+	for _, unit := range []string{"", "K", "M", "G", "T", "P", "E", "Z"} {
+		if math.Abs(bf) < 1024.0 {
+			return fmt.Sprintf("%3.1f%sB", bf, unit)
+		}
+		bf /= 1024.0
+	}
+	return fmt.Sprintf("%.1fYiB", bf)
+}
+
+func (r *Renderer) MakeRenderFileFileParams(b *model.Block) (params *FileFileRenderParams, err error) {
+	file := b.GetFile()
+	var src string
+	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	if err != nil {
+		err = fmt.Errorf("file not found %s", file.TargetObjectId)
+		return
+	}
+
+	name := file.Name
+	size := prettyByteSize(file.Size_)
+
+	params = &FileFileRenderParams{
+		Id:   b.Id,
+		Src:  templ.SafeURL(src),
+		Name: name,
+		Size: size,
+	}
+
+	return
+}
+
 func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 	file := b.GetFile()
 	fileType := file.GetType()
@@ -136,6 +177,12 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 			return NoneTemplate(err.Error())
 		}
 		return FileVideoTemplate(r, params)
+	case model.BlockContentFile_File:
+		params, err := r.MakeRenderFileFileParams(b)
+		if err != nil {
+			return NoneTemplate(err.Error())
+		}
+		return FileFileTemplate(r, params)
 
 	default:
 		log.Warn("file type is not supported", zap.String("type", fileType.String()))

@@ -1568,7 +1568,8 @@ markuplatex {
     border: 0px !important;
     color: var(--color-text-primary);
 }
-.blocks .block.blockTable .cell .block a{
+
+a {
     color: var(--color-text-primary);
 }
 
