@@ -8,7 +8,7 @@ templ TableTemplate(r *Renderer, p *RenderTableParams) {
 				<div id="table" class="table">
 					<div class="rows">
 						for _, rowId := range p.Rows.ChildrenIds {
-							@TableRowTemplate(r, rowId, p.ColumnSizes)
+							@TableRowTemplate(r, rowId, p)
 						}
 					</div>
 				</div>
@@ -23,10 +23,14 @@ templ TableRowCellTemplate(r *Renderer,p *RenderTableRowCellParams) {
 	</div>
 }
 
-templ TableRowTemplate(r *Renderer, rowId, columnSizes string) {
-	<div id={"row-"+rowId} class={"row", r.rowHeaderClass(rowId), columnSizesCss(columnSizes)}>
-		for _, cellId := range r.BlocksById[rowId].ChildrenIds {
-			@r.RenderTableRowCell(cellId)
+templ TableRowCellEmptyTemplate() {
+	<div class="cell align-v0"></div>
+}
+
+templ TableRowTemplate(r *Renderer, rowId string, p *RenderTableParams) {
+	<div id={"row-"+rowId} class={"row", r.rowHeaderClass(rowId), columnSizesCss(p.ColumnSizes)}>
+		for _, columnId := range p.Columns.ChildrenIds {
+			@r.RenderTableRowCell(rowId + "-" + columnId)
 		}
 	</div>
 }
