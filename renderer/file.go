@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type FileRenderParams struct {
+type FileImageRenderParams struct {
 	Type       model.BlockContentFileType
 	Id         string
 	Src        string
@@ -18,46 +18,47 @@ type FileRenderParams struct {
 	ImageWidth string
 }
 
-func (r *Renderer) MakeRenderFileParams(b *model.Block) (params *FileRenderParams, err error) {
+func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileImageRenderParams, err error) {
 	file := b.GetFile()
-	fileType := file.GetType()
-	switch fileType {
-	case model.BlockContentFile_Image:
-		var src string
-		src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
-		if err != nil {
-			log.Warn("file type is not supported", zap.String("type", fileType.String()), zap.Error(err))
-			err = fmt.Errorf("file not found %s", file.TargetObjectId)
-			return
-		}
+	var src string
+	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	if err != nil {
+		err = fmt.Errorf("file not found %s", file.TargetObjectId)
+		return
+	}
 
-		align := "align" + strconv.Itoa(int(b.GetAlign()))
+	align := "align" + strconv.Itoa(int(b.GetAlign()))
 
-		width := pbtypes.GetFloat64(b.Fields, "width")
-		log.Debug("image width", zap.Float64("width", width))
-		imageWidth := strconv.Itoa(int(width*100)) + "%"
+	width := pbtypes.GetFloat64(b.Fields, "width")
+	log.Debug("image width", zap.Float64("width", width))
+	imageWidth := strconv.Itoa(int(width*100)) + "%"
 
-		params = &FileRenderParams{
-			Type:       model.BlockContentFile_Image,
-			Id:         b.Id,
-			Src:        src,
-			Classes:    align,
-			ImageWidth: imageWidth,
-		}
-	default:
-		log.Warn("file type is not supported", zap.String("type", fileType.String()))
-		err = fmt.Errorf("file type is not supported: %s", fileType.String())
+	params = &FileImageRenderParams{
+		Type:       model.BlockContentFile_Image,
+		Id:         b.Id,
+		Src:        src,
+		Classes:    align,
+		ImageWidth: imageWidth,
 	}
 
 	return
 }
 
 func (r *Renderer) RenderFile(b *model.Block) templ.Component {
-	params, err := r.MakeRenderFileParams(b)
-	if err != nil {
+	file := b.GetFile()
+	fileType := file.GetType()
+	switch fileType {
+	case model.BlockContentFile_Image:
+		params, err := r.MakeRenderFileImageParams(b)
+		if err != nil {
+			return NoneTemplate(err.Error())
+		}
+
+		return FileImageTemplate(r, params)
+	default:
+		log.Warn("file type is not supported", zap.String("type", fileType.String()))
+		err := fmt.Errorf("file type is not supported: %s", fileType.String())
 		return NoneTemplate(err.Error())
 	}
-
-	return FileImageTemplate(r, params)
 
 }
