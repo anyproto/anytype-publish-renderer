@@ -4,10 +4,17 @@ templ FileImageTemplate(r *Renderer, p *FileRenderParams) {
 	<div id={"block" + p.Id } class={"block blockMedia isImage index0 withContent " + p.Classes}>
 		<div class="content">
 			<div class="flex">
-				<div  class="wrap" style="width: 65%">
+				<div class={"wrap", imageSizeCss(string(p.ImageWidth))}>
 					<img src={ p.Src } class="mediaImage" />
 				</div>
 			</div>
 		</div>
 	</div>
+}
+
+func imageSize(width string) templ.SafeCSSProperty {
+	return templ.SafeCSSProperty(width);
+}
+css imageSizeCss(width string) {
+	width: { imageSize(width) };
 }
