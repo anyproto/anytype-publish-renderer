@@ -24,8 +24,8 @@ type AssetResolver interface {
 	GetSnapshotPbFile(string) ([]byte, error)
 	GetRootPagePath() string
 	GetJoinSpaceLink() string
-	ByEmojiCode(rune) string
-	ByTargetObjectId(string) (string, error)
+	GetEmojiUrl(rune) string
+	GetAssetUrl(string) string
 }
 
 type Renderer struct {
@@ -45,7 +45,7 @@ func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err err
 	rootPath := resolver.GetRootPagePath()
 	snapshotData, err := resolver.GetSnapshotPbFile(rootPath)
 	if err != nil {
-		log.Error("Error reading protobuf snapshot", zap.Error(err))
+		log.Error("Error reading protobuf snapshot index", zap.Error(err))
 		return
 	}
 

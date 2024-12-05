@@ -6,10 +6,42 @@ import (
 	"strconv"
 
 	"github.com/a-h/templ"
+	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/gogo/protobuf/proto"
 	"go.uber.org/zap"
 )
+
+func (r *Renderer) getFileUrl(id string) (url string, err error) {
+	path := fmt.Sprintf("filesObjects/%s.pb", id)
+	snapshotData, err := r.AssetResolver.GetSnapshotPbFile(path)
+	if err != nil {
+		return
+	}
+
+	snapshot := pb.SnapshotWithType{}
+	err = proto.Unmarshal(snapshotData, &snapshot)
+	if err != nil {
+		return
+	}
+
+	if snapshot.SbType != model.SmartBlockType_FileObject {
+		err = fmt.Errorf("snaphot %s is not FileObjects, %d", path, snapshot.SbType)
+		return
+	}
+
+	fields := snapshot.Snapshot.Data.GetDetails()
+	source := pbtypes.GetString(fields, "source")
+	if source == "" {
+		err = fmt.Errorf("FileObject %s 'source' is empty", id)
+		return
+	}
+
+	url = r.AssetResolver.GetAssetUrl(source)
+	return
+
+}
 
 type FileImageRenderParams struct {
 	Id         string
@@ -21,7 +53,7 @@ type FileImageRenderParams struct {
 func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileImageRenderParams, err error) {
 	file := b.GetFile()
 	var src string
-	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	src, err = r.getFileUrl(file.TargetObjectId)
 	if err != nil {
 		err = fmt.Errorf("file not found %s", file.TargetObjectId)
 		return
@@ -51,7 +83,7 @@ type FilePDFRenderParams struct {
 func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FilePDFRenderParams, err error) {
 	file := b.GetFile()
 	var src string
-	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	src, err = r.getFileUrl(file.TargetObjectId)
 	if err != nil {
 		err = fmt.Errorf("file not found %s", file.TargetObjectId)
 		return
@@ -73,7 +105,7 @@ type FileAudioRenderParams struct {
 func (r *Renderer) MakeRenderFileAudioParams(b *model.Block) (params *FileAudioRenderParams, err error) {
 	file := b.GetFile()
 	var src string
-	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	src, err = r.getFileUrl(file.TargetObjectId)
 	if err != nil {
 		err = fmt.Errorf("file not found %s", file.TargetObjectId)
 		return
@@ -95,7 +127,7 @@ type FileVideoRenderParams struct {
 func (r *Renderer) MakeRenderFileVideoParams(b *model.Block) (params *FileVideoRenderParams, err error) {
 	file := b.GetFile()
 	var src string
-	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	src, err = r.getFileUrl(file.TargetObjectId)
 	if err != nil {
 		err = fmt.Errorf("file not found %s", file.TargetObjectId)
 		return
@@ -130,7 +162,7 @@ func prettyByteSize(b int64) string {
 func (r *Renderer) MakeRenderFileFileParams(b *model.Block) (params *FileFileRenderParams, err error) {
 	file := b.GetFile()
 	var src string
-	src, err = r.AssetResolver.ByTargetObjectId(file.TargetObjectId)
+	src, err = r.getFileUrl(file.TargetObjectId)
 	if err != nil {
 		err = fmt.Errorf("file not found %s", file.TargetObjectId)
 		return
