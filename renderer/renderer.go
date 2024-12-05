@@ -22,8 +22,10 @@ type AssetResolver interface {
 	GetSnapshotPbFile(string) ([]byte, error)
 	GetRootPagePath() string
 	GetJoinSpaceLink() string
-	GetEmojiUrl(rune) string
+	GetStaticFolderUrl(string) string
 	GetAssetUrl(string) string
+	GetPrismJsUrl(string) string
+	GetEmojiUrl(rune) string
 }
 
 type Renderer struct {

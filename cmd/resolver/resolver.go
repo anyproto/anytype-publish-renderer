@@ -25,7 +25,16 @@ func (r SimpleAssetResolver) GetEmojiUrl(code rune) string {
 }
 
 func (r SimpleAssetResolver) GetAssetUrl(source string) string {
-	return fmt.Sprintf("/%s", filepath.Join(r.SnapshotDir, source))
+	fullPath := filepath.Join(r.SnapshotDir, source)
+	return fmt.Sprintf("/%s", fullPath)
+}
+
+func (r SimpleAssetResolver) GetStaticFolderUrl(filepath string) string {
+	return fmt.Sprintf("/static%s", filepath)
+}
+
+func (r SimpleAssetResolver) GetPrismJsUrl(filepath string) string {
+	return fmt.Sprintf("https://cdn.jsdelivr.net/npm/prismjs@1.29.0%s", filepath)
 }
 
 func (r SimpleAssetResolver) GetSnapshotPbFile(path string) (snapshotData []byte, err error) {

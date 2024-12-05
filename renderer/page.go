@@ -27,6 +27,7 @@ func (r *Renderer) hasIconAndCover() bool {
 	return (err == nil)
 
 }
+
 func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	var classes string
 	if r.hasIconAndCover() {
