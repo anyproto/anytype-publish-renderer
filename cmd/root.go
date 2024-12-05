@@ -38,13 +38,6 @@ var pbCmd = &cobra.Command{
 			fmt.Printf("Error rendering page: %v\n", err)
 			return
 		}
-		// if err != nil {
-		// 	fmt.Printf("Error reading creating page from snapshot: %v\n", err)
-		// 	return
-		// }
-
-		// fmt.Printf("%#v\n", page)
-
 	},
 }
 

@@ -22,7 +22,7 @@ func (r *Renderer) hasIconAndCover() bool {
 		return false
 	}
 
-	_, err := r.AssetResolver.ByTargetObjectId(coverId)
+	_, err := r.getFileUrl(coverId)
 
 	return (err == nil)
 

@@ -15,7 +15,7 @@ type CoverRenderParams struct {
 func (r *Renderer) MakeRenderPageCoverParams() (params *CoverRenderParams, err error) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
 	coverId := pbtypes.GetString(fields, "coverId")
-	src, err := r.AssetResolver.ByTargetObjectId(coverId)
+	src, err := r.getFileUrl(coverId)
 	if err != nil {
 		log.Warn("cover rendering failed", zap.Error(err))
 		return
@@ -49,7 +49,7 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 	fields := r.Sp.Snapshot.Data.GetDetails()
 	iconImageId := pbtypes.GetString(fields, "iconImage")
 	log.Debug("-- icon image", zap.String("id", iconImageId))
-	src, err := r.AssetResolver.ByTargetObjectId(iconImageId)
+	src, err := r.getFileUrl(iconImageId)
 	if err != nil {
 		log.Warn("cover image rendering failed", zap.Error(err))
 		return
