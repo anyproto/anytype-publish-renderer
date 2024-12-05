@@ -4,9 +4,15 @@ templ FileImageTemplate(r *Renderer, p *FileImageRenderParams) {
 	<div id={"block" + p.Id } class={"block blockMedia isImage index0 withContent", p.Classes}>
 		<div class="content">
 			<div class="flex">
-				<div class={"wrap", imageSizeCss(string(p.ImageWidth))}>
-					<img src={ p.Src } class="mediaImage" />
-				</div>
+				if p.ImageWidth == "" {
+					<div class="wrap">
+						<img src={ p.Src } class="mediaImage" />
+					</div>
+				} else {
+					<div class={"wrap", imageSizeCss(string(p.ImageWidth)) }>
+						<img src={ p.Src } class="mediaImage" />
+					</div>
+				}
 			</div>
 		</div>
 	</div>
