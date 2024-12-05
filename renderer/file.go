@@ -63,7 +63,10 @@ func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileImageR
 
 	width := pbtypes.GetFloat64(b.Fields, "width")
 	log.Debug("image width", zap.Float64("width", width))
-	imageWidth := strconv.Itoa(int(width*100)) + "%"
+	var imageWidth string
+	if int(width*100) != 0 {
+		imageWidth = strconv.Itoa(int(width*100)) + "%"
+	}
 
 	params = &FileImageRenderParams{
 		Id:         b.Id,

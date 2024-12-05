@@ -162,3 +162,13 @@ func (r *Renderer) hydrateSpecialBlocks() {
 	}
 
 }
+
+func Comment(text string) templ.ComponentFunc {
+
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
+		io.WriteString(w, "<!--comment:\n")
+		io.WriteString(w, text)
+		io.WriteString(w, "\n-->\n")
+		return nil
+	})
+}
