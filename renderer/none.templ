@@ -1,15 +1,5 @@
 package renderer
 
 templ NoneTemplate(text string) {
-	<div class="block blockText textParagraph align0 notSupported">
-		<div class="content">
-			<div class="flex">
-				<div class="text">
-					{ text }
-				</div>
-			</div>
-		</div>
-		<div class="children">
-		</div>
-	</div>
+	@Comment(text)
 }
