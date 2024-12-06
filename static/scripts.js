@@ -18,20 +18,20 @@ function initLatex() {
         const latexFormula = b.innerHTML
         let html = ""
         try {
-		    html = katex.renderToString(latexFormula, {
-			    displayMode: true,
-			    strict: false,
-			    throwOnError: true,
-			    output: 'html',
-			    fleqn: true,
-			    trust: trustFn,
-		    });
-	    } catch (e) {
+            html = katex.renderToString(latexFormula, {
+                displayMode: true,
+                strict: false,
+                throwOnError: true,
+                output: 'html',
+                fleqn: true,
+                trust: trustFn,
+            });
+        } catch (e) {
             console.error(e);
-		    if (e instanceof katex.ParseError) {
-			    html = `<div class="error">Error parsing LaTeX</div>`;
-		    }
-	    };
+            if (e instanceof katex.ParseError) {
+                html = `<div class="error">Error parsing LaTeX</div>`;
+            }
+        };
 
         b.innerHTML = html
 
