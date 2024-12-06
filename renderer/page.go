@@ -80,3 +80,12 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 func (r *Renderer) joinSpaceLink() templ.SafeURL {
 	return templ.SafeURL(r.AssetResolver.GetJoinSpaceLink())
 }
+
+func (r *Renderer) titleText() string {
+	titleBlock, ok := r.BlocksById["title"]
+	if !ok {
+		return ""
+	}
+
+	return titleBlock.GetText().Text
+}
