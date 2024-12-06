@@ -62,9 +62,10 @@ func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
 	case model.BlockContentLatex_GithubGist:
 		fallthrough
 	case model.BlockContentLatex_Codepen:
+		fallthrough
+	case model.BlockContentLatex_Latex:
 		params := r.MakeEmbedRenderParams(b)
 		return EmbedTemplate(r, params)
-	case model.BlockContentLatex_Latex:
 	case model.BlockContentLatex_Mermaid:
 	case model.BlockContentLatex_Chart:
 	case model.BlockContentLatex_Bilibili:
