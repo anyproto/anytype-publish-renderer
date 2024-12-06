@@ -39,8 +39,12 @@ function initLatex() {
 
 }
 
+function initMermaid() {
+     mermaid.initialize({ startOnLoad: true });
+}
+
 document.addEventListener("DOMContentLoaded", function() {
-    const initFns = [initToggles, initLatex]
+    const initFns = [initToggles, initLatex, initMermaid]
     initFns.forEach(f => {
         try {
             f()

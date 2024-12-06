@@ -26,10 +26,15 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 		classes = append(classes, "bgColor", "bgColor-"+bgColor)
 	}
 
+	content := b.GetLatex().Text
+	if b.GetLatex().Processor == model.BlockContentLatex_Mermaid {
+		content = fmt.Sprintf(`<pre class="mermaid">%s</pre>`, content)
+	}
+
 	return &EmbedRenderParams{
 		Id:      b.Id,
 		Classes: strings.Join(classes, " "),
-		Content: b.GetLatex().Text,
+		Content: content,
 	}
 }
 func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
@@ -64,9 +69,10 @@ func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
 	case model.BlockContentLatex_Codepen:
 		fallthrough
 	case model.BlockContentLatex_Latex:
+		fallthrough
+	case model.BlockContentLatex_Mermaid:
 		params := r.MakeEmbedRenderParams(b)
 		return EmbedTemplate(r, params)
-	case model.BlockContentLatex_Mermaid:
 	case model.BlockContentLatex_Chart:
 	case model.BlockContentLatex_Bilibili:
 	case model.BlockContentLatex_Excalidraw:
