@@ -71,10 +71,11 @@ func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
 	case model.BlockContentLatex_Latex:
 		fallthrough
 	case model.BlockContentLatex_Mermaid:
+		fallthrough
+	case model.BlockContentLatex_Bilibili:
 		params := r.MakeEmbedRenderParams(b)
 		return EmbedTemplate(r, params)
 	case model.BlockContentLatex_Chart:
-	case model.BlockContentLatex_Bilibili:
 	case model.BlockContentLatex_Excalidraw:
 	case model.BlockContentLatex_Kroki:
 	case model.BlockContentLatex_Graphviz:
