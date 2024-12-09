@@ -31,6 +31,10 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 		content = fmt.Sprintf(`<pre class="mermaid">%s</pre>`, content)
 	}
 
+	if b.GetLatex().Processor == model.BlockContentLatex_Kroki {
+		content = fmt.Sprintf(`<img src="%s" />`, content)
+	}
+
 	return &EmbedRenderParams{
 		Id:      b.Id,
 		Classes: strings.Join(classes, " "),
@@ -73,11 +77,12 @@ func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
 	case model.BlockContentLatex_Mermaid:
 		fallthrough
 	case model.BlockContentLatex_Bilibili:
+		fallthrough
+	case model.BlockContentLatex_Kroki:
 		params := r.MakeEmbedRenderParams(b)
 		return EmbedTemplate(r, params)
 	case model.BlockContentLatex_Chart:
 	case model.BlockContentLatex_Excalidraw:
-	case model.BlockContentLatex_Kroki:
 	case model.BlockContentLatex_Graphviz:
 	case model.BlockContentLatex_Sketchfab:
 	case model.BlockContentLatex_Image:
