@@ -35,6 +35,10 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 		content = fmt.Sprintf(`<img src="%s" />`, content)
 	}
 
+	if b.GetLatex().Processor == model.BlockContentLatex_Graphviz {
+		content = fmt.Sprintf(`<pre class="graphviz-content">%s</pre>`, content)
+	}
+
 	return &EmbedRenderParams{
 		Id:      b.Id,
 		Classes: strings.Join(classes, " "),
@@ -81,11 +85,12 @@ func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
 	case model.BlockContentLatex_Kroki:
 		fallthrough
 	case model.BlockContentLatex_Sketchfab:
+		fallthrough
+	case model.BlockContentLatex_Graphviz:
 		params := r.MakeEmbedRenderParams(b)
 		return EmbedTemplate(r, params)
 	case model.BlockContentLatex_Chart:
 	case model.BlockContentLatex_Excalidraw:
-	case model.BlockContentLatex_Graphviz:
 	case model.BlockContentLatex_Image:
 	default:
 	}

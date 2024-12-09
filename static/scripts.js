@@ -15,7 +15,7 @@ function initLatex() {
         return [ '\\url', '\\href', '\\includegraphics' ].includes(context.command)
     }
     latexBlocks.forEach(b => {
-        const latexFormula = b.innerHTML
+        const latexFormula = b.innerText
         let html = ""
         try {
             html = katex.renderToString(latexFormula, {
@@ -40,16 +40,42 @@ function initLatex() {
 }
 
 function initMermaid() {
-     mermaid.initialize({ startOnLoad: true });
+    mermaid.initialize({ startOnLoad: true });
+}
+
+function initGraphviz() {
+    const gphBlocks = document.querySelectorAll(".graphviz-content");
+    gphBlocks.forEach(b => {
+        const gphFormula = b.innerText
+        try {
+            const viz = new Viz()
+            var svg = viz.renderSVGElement(gphFormula).then(el => {
+                // todo: looks broken, try to build
+                // standalone
+                // https://github.com/mdaines/viz-js/blob/v3/packages/viz/Makefile
+                console.log("viz:", el)
+                parent = b.parentNode
+                parent.removeChild(b)
+                parent.appendChild(el);
+
+            }, err => {
+                console.error("viz:",err)
+            });
+        } catch (e) {
+            console.error(e);
+        };
+    })
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    const initFns = [initToggles, initLatex, initMermaid]
+    const initFns = [initToggles, initLatex, initMermaid, initGraphviz]
     initFns.forEach(f => {
-        try {
-            f()
-        } catch (e) {
-            console.error(`error executing init function "${f.name}":`, e)
-        }
+        setTimeout(_ => {
+            try {
+                f()
+            } catch (e) {
+                console.error(`error executing init function "${f.name}":`, e)
+            }
+        })
     })
 });
