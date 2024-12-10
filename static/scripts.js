@@ -45,14 +45,11 @@ function initMermaid() {
 
 function initGraphviz() {
     const gphBlocks = document.querySelectorAll(".isGraphviz");
-    console.log("viz:", gphBlocks)
     gphBlocks.forEach(b => {
         const gphFormula = window.svgSrc[b.id].content
-        console.log("viz:", gphFormula)
         try {
             const viz = new Viz()
             viz.renderSVGElement(gphFormula).then(svg => {
-                console.log("viz:", svg)
                 parent = b.querySelector(".content")
                 parent.appendChild(svg);
             }, err => {
