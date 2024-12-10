@@ -44,28 +44,27 @@ function initMermaid() {
 }
 
 function initGraphviz() {
-    const gphBlocks = document.querySelectorAll(".graphviz-content");
+    const gphBlocks = document.querySelectorAll(".isGraphviz");
+    console.log("viz:", gphBlocks)
     gphBlocks.forEach(b => {
-        const gphFormula = b.innerText
+        const gphFormula = window.svgSrc[b.id].content
+        console.log("viz:", gphFormula)
         try {
             const viz = new Viz()
-            var svg = viz.renderSVGElement(gphFormula).then(el => {
-                // todo: looks broken, try to build
-                // standalone
-                // https://github.com/mdaines/viz-js/blob/v3/packages/viz/Makefile
-                console.log("viz:", el)
-                parent = b.parentNode
-                parent.removeChild(b)
-                parent.appendChild(el);
-
+            viz.renderSVGElement(gphFormula).then(svg => {
+                console.log("viz:", svg)
+                parent = b.querySelector(".content")
+                parent.appendChild(svg);
             }, err => {
-                console.error("viz:",err)
+                console.error("viz error:",err)
             });
         } catch (e) {
-            console.error(e);
+            console.error("viz error:",e);
         };
     })
 }
+
+window.svgSrc = {}
 
 document.addEventListener("DOMContentLoaded", function() {
     const initFns = [initToggles, initLatex, initMermaid, initGraphviz]

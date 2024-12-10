@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -14,6 +15,10 @@ type EmbedRenderParams struct {
 	Id      string
 	Classes string
 	Content string
+}
+
+type JsSVGString struct {
+	Content string `json:"content,omitempty"`
 }
 
 func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
@@ -36,7 +41,18 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 	}
 
 	if b.GetLatex().Processor == model.BlockContentLatex_Graphviz {
-		content = fmt.Sprintf(`<pre class="graphviz-content">%s</pre>`, content)
+
+		jsObj := JsSVGString{
+			Content: content,
+		}
+		jsObjString, err := json.Marshal(jsObj)
+		if err != nil {
+			log.Error("svg json marshal error", zap.Error(err))
+			content = fmt.Sprintf("<script>window.svgSrc['%s'] = `digraph { graphviz -> render error }`</script>", "block-"+b.Id)
+		} else {
+			content = fmt.Sprintf("<script>window.svgSrc['%s'] = %s</script>", "block-"+b.Id, string(jsObjString))
+		}
+
 	}
 
 	return &EmbedRenderParams{
