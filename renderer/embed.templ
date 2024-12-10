@@ -2,8 +2,10 @@ package renderer
 
 templ EmbedTemplate(r *Renderer, p *EmbedRenderParams) {
 	<div id={"block-"+p.Id} class={"block blockEmbed", p.Classes}>
-		<div class="content">
-			@templ.Raw(p.Content)
+		<div class="wrapContent">
+			<div class="content">
+				@templ.Raw(p.Content)
+			</div>
 		</div>
 	</div>
 }

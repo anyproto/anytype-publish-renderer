@@ -423,6 +423,24 @@ main {
 
 .blocks .block.align1 > .wrapContent {
     text-align: center;
+
+}
+.wrapContent {
+    width: 100%;
+}
+
+.blockEmbed.isGraphviz svg {
+    height: auto;
+}
+
+.blockEmbed.isGraphviz {
+    height: auto;
+    width: 100%;
+}
+
+.blockEmbed:not(.isLatex) svg {
+    max-width: 100% !important;
+    background: #fff;
 }
 .blocks .block.blockIconPage {
     padding: 0px 0px 16px 0px;

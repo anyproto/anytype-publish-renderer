@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -14,6 +15,10 @@ type EmbedRenderParams struct {
 	Id      string
 	Classes string
 	Content string
+}
+
+type JsSVGString struct {
+	Content string `json:"content,omitempty"`
 }
 
 func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
@@ -33,6 +38,21 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 
 	if b.GetLatex().Processor == model.BlockContentLatex_Kroki {
 		content = fmt.Sprintf(`<img src="%s" />`, content)
+	}
+
+	if b.GetLatex().Processor == model.BlockContentLatex_Graphviz {
+
+		jsObj := JsSVGString{
+			Content: content,
+		}
+		jsObjString, err := json.Marshal(jsObj)
+		if err != nil {
+			log.Error("svg json marshal error", zap.Error(err))
+			content = fmt.Sprintf("<script>window.svgSrc['%s'] = `digraph { graphviz -> render error }`</script>", "block-"+b.Id)
+		} else {
+			content = fmt.Sprintf("<script>window.svgSrc['%s'] = %s</script>", "block-"+b.Id, string(jsObjString))
+		}
+
 	}
 
 	return &EmbedRenderParams{
@@ -81,11 +101,12 @@ func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
 	case model.BlockContentLatex_Kroki:
 		fallthrough
 	case model.BlockContentLatex_Sketchfab:
+		fallthrough
+	case model.BlockContentLatex_Graphviz:
 		params := r.MakeEmbedRenderParams(b)
 		return EmbedTemplate(r, params)
 	case model.BlockContentLatex_Chart:
 	case model.BlockContentLatex_Excalidraw:
-	case model.BlockContentLatex_Graphviz:
 	case model.BlockContentLatex_Image:
 	default:
 	}

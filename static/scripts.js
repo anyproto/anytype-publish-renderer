@@ -15,7 +15,7 @@ function initLatex() {
         return [ '\\url', '\\href', '\\includegraphics' ].includes(context.command)
     }
     latexBlocks.forEach(b => {
-        const latexFormula = b.innerHTML
+        const latexFormula = b.innerText
         let html = ""
         try {
             html = katex.renderToString(latexFormula, {
@@ -40,16 +40,41 @@ function initLatex() {
 }
 
 function initMermaid() {
-     mermaid.initialize({ startOnLoad: true });
+    mermaid.initialize({ startOnLoad: true });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    const initFns = [initToggles, initLatex, initMermaid]
-    initFns.forEach(f => {
+function initGraphviz() {
+    const gphBlocks = document.querySelectorAll(".isGraphviz");
+    console.log("viz:", gphBlocks)
+    gphBlocks.forEach(b => {
+        const gphFormula = window.svgSrc[b.id].content
+        console.log("viz:", gphFormula)
         try {
-            f()
+            const viz = new Viz()
+            viz.renderSVGElement(gphFormula).then(svg => {
+                console.log("viz:", svg)
+                parent = b.querySelector(".content")
+                parent.appendChild(svg);
+            }, err => {
+                console.error("viz error:",err)
+            });
         } catch (e) {
-            console.error(`error executing init function "${f.name}":`, e)
-        }
+            console.error("viz error:",e);
+        };
+    })
+}
+
+window.svgSrc = {}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const initFns = [initToggles, initLatex, initMermaid, initGraphviz]
+    initFns.forEach(f => {
+        setTimeout(_ => {
+            try {
+                f()
+            } catch (e) {
+                console.error(`error executing init function "${f.name}":`, e)
+            }
+        })
     })
 });
