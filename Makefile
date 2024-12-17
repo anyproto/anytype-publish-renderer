@@ -1,4 +1,5 @@
-SNAPSHOT_PATH:=./test_snapshots/anytype-web-published/Anytype.WebPublish.20241217.112212.67
+SNAPSHOT_PATH:=./test_snapshots/Anytype.WebPublish.20241217.112212.67
+# SNAPSHOT_PATH:=http://localhost:8017
 EXEC:=./bin/anytype-publish-renderer
 TEMPL_VER:=$(shell cat go.mod | grep templ | cut -d' ' -f2)
 

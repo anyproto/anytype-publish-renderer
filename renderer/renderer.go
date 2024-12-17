@@ -6,8 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
@@ -73,13 +76,38 @@ func readJsonpbSnapshot(snapshotStr string) (snapshot pb.SnapshotWithType, err e
 }
 
 func readUberSnapshot(path string) (uberSnapshot PublishingUberSnapshot, err error) {
-	// TODO: add http read
-	indexFileGz, err := os.Open(filepath.Join(path, "index.json.gz"))
-	if err != nil {
-		err = fmt.Errorf("error reading index.json.gz: %s", err)
-		return
+	var indexFileGz io.Reader
+
+	if strings.HasPrefix(path, "http") {
+		var resp *http.Response
+		var indexPath string
+
+		indexPath, err = url.JoinPath(path, "index.json.gz")
+		if err != nil {
+			err = fmt.Errorf("error making http path for index.json.gz: %s", err)
+			return
+		}
+
+		resp, err = http.Get(indexPath)
+		if err != nil {
+			err = fmt.Errorf("error reading index.json.gz: %s", err)
+			return
+		}
+
+		indexFileGz = resp.Body
+		defer resp.Body.Close()
+
+	} else {
+		var file *os.File
+		indexPath := filepath.Join(path, "index.json.gz")
+		file, err = os.Open(indexPath)
+		if err != nil {
+			err = fmt.Errorf("error reading index.json.gz: %s", err)
+			return
+		}
+		indexFileGz = file
+		defer file.Close()
 	}
-	defer indexFileGz.Close()
 
 	gzReader, err := gzip.NewReader(indexFileGz)
 	if err != nil {
