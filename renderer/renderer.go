@@ -56,7 +56,7 @@ type Renderer struct {
 	RootComp templ.Component
 	Config   RenderConfig
 
-	CachedPbFiles map[string]pb.SnapshotWithType
+	CachedPbFiles map[string]*pb.SnapshotWithType
 
 	Root       *model.Block
 	BlocksById map[string]*model.Block
@@ -141,7 +141,7 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	r = &Renderer{
 		Sp:            &snapshot,
 		UberSp:        &uberSnapshot,
-		CachedPbFiles: make(map[string]pb.SnapshotWithType),
+		CachedPbFiles: make(map[string]*pb.SnapshotWithType),
 		BlocksById:    blocksById,
 		BlockNumbers:  make(map[string]int),
 		Root:          blocks[0],
@@ -177,7 +177,7 @@ func (r *Renderer) Render(writer io.Writer) (err error) {
 	return
 }
 
-func (r *Renderer) ReadJsonpbSnapshot(path string) (pb.SnapshotWithType, error) {
+func (r *Renderer) ReadJsonpbSnapshot(path string) (*pb.SnapshotWithType, error) {
 	snapshot, ok := r.CachedPbFiles[path]
 	if ok {
 		return snapshot, nil
@@ -185,18 +185,18 @@ func (r *Renderer) ReadJsonpbSnapshot(path string) (pb.SnapshotWithType, error) 
 
 	snapshotStr, ok := r.UberSp.PbFiles[path]
 	if !ok {
-		err := fmt.Errorf("Path %s is not found in snapshot", path)
-		return pb.SnapshotWithType{}, err
+		err := fmt.Errorf("path %s is not found in snapshot", path)
+		return nil, err
 	}
 
 	newSnapshot, err := readJsonpbSnapshot(snapshotStr)
 	if err != nil {
-		return pb.SnapshotWithType{}, err
+		return nil, err
 	}
 
-	r.CachedPbFiles[path] = newSnapshot
+	r.CachedPbFiles[path] = &newSnapshot
 
-	return newSnapshot, nil
+	return &newSnapshot, nil
 }
 
 func (r *Renderer) unwrapLayouts(blocks []*model.Block) []*model.Block {
