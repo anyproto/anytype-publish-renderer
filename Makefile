@@ -1,5 +1,5 @@
-SNAPSHOT_DIR:=./test_snapshots/snapshot_pb6_with_embeds/
-ROOT_ID:=bafyreiecs2ivic6ne2lvkohrf3ojqizngmsk5ywilexo6xhtzlqfgngp64
+SNAPSHOT_PATH:=./test_snapshots/Anytype.WebPublish.20241217.112212.67
+# SNAPSHOT_PATH:=http://localhost:8017
 EXEC:=./bin/anytype-publish-renderer
 TEMPL_VER:=$(shell cat go.mod | grep templ | cut -d' ' -f2)
 
@@ -22,4 +22,4 @@ test: setup-go
 
 render: build
 	templ generate -lazy
-	$(EXEC) $(SNAPSHOT_DIR) $(ROOT_ID) > index.html
+	$(EXEC) $(SNAPSHOT_PATH) > index.html

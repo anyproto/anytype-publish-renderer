@@ -6,22 +6,14 @@ import (
 	"strconv"
 
 	"github.com/a-h/templ"
-	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
-	"github.com/gogo/protobuf/proto"
 	"go.uber.org/zap"
 )
 
 func (r *Renderer) getFileUrl(id string) (url string, err error) {
 	path := fmt.Sprintf("filesObjects/%s.pb", id)
-	snapshotData, err := r.AssetResolver.GetSnapshotPbFile(path)
-	if err != nil {
-		return
-	}
-
-	snapshot := pb.SnapshotWithType{}
-	err = proto.Unmarshal(snapshotData, &snapshot)
+	snapshot, err := r.ReadJsonpbSnapshot(path)
 	if err != nil {
 		return
 	}
@@ -38,7 +30,7 @@ func (r *Renderer) getFileUrl(id string) (url string, err error) {
 		return
 	}
 
-	url = r.AssetResolver.GetAssetUrl(source)
+	url = fmt.Sprintf("%s/%s", r.Config.PublishFilesPath, source)
 	return
 
 }

@@ -78,7 +78,7 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 }
 
 func (r *Renderer) joinSpaceLink() templ.SafeURL {
-	return templ.SafeURL(r.AssetResolver.GetJoinSpaceLink())
+	return templ.SafeURL(r.UberSp.Meta.InviteLink)
 }
 
 func (r *Renderer) titleText() string {

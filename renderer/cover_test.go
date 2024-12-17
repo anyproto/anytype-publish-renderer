@@ -7,18 +7,12 @@ import (
 )
 
 func TestMakeRenderCoverParams(t *testing.T) {
-	t.Run("no cover returns error", func(t *testing.T) {
-		r := getTestRenderer("snapshot_pb")
-		_, err := r.MakeRenderPageCoverParams()
-		assert.Error(t, err)
-	})
-
 	t.Run("cover params", func(t *testing.T) {
-		r := getTestRenderer("snapshot_pb2")
+		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
 		expected := &CoverRenderParams{
-			Id:      "bafyreie4vr5erfeecbhh5ocs6wzqmab2c3rndmp3e7aovhmcngj4geylf4",
+			Id:      "bafyreic35rt6o6jbpfoibui4oskwo2dqurapsyuub4k7o42uatcteucan4",
 			Classes: "type1",
-			Src:     "/../test_snapshots/snapshot_pb2/files/1729523760-21-10-24_17-16-00.png",
+			Src:     "../test_snapshots/Anytype.WebPublish.20241217.112212.67/files/640px-anatomy_of_a_sunset-2.webp",
 		}
 
 		actual, err := r.MakeRenderPageCoverParams()

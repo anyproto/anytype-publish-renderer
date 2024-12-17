@@ -8,14 +8,14 @@ import (
 
 func TestMakeRenderFileParams(t *testing.T) {
 	t.Run("image file", func(t *testing.T) {
-		r := getTestRenderer("snapshot_pb")
+		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
 		id := "66c7055b7e4bcd7bc81f3f37"
 		imageBlock := r.BlocksById[id]
 
 		expected := &FileImageRenderParams{
 			Id:      id,
-			Classes: "align1",
-			Src:     "/../test_snapshots/snapshot_pb/files/img_5296.jpeg",
+			Classes: "align0",
+			Src:     "../test_snapshots/Anytype.WebPublish.20241217.112212.67/files/img_5296.jpeg",
 		}
 
 		actual, err := r.MakeRenderFileImageParams(imageBlock)

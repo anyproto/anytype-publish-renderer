@@ -57,7 +57,7 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 		return "<markupmention>" + s + "</markupmention>"
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
-		emojiSrc := r.AssetResolver.GetEmojiUrl(code)
+		emojiSrc := r.GetEmojiUrl(code)
 		emojiHtml, err := utils.TemplToString(InlineEmojiTemplate(emojiSrc, "c28"))
 		if err != nil {
 			log.Error("Failed to render emoji template", zap.Error(err))
@@ -196,7 +196,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		externalComp := BulletMarkerTemplate()
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Callout:
-		emojiSrc := r.AssetResolver.GetEmojiUrl(bulbEmoji)
+		emojiSrc := r.GetEmojiUrl(bulbEmoji)
 		externalComp := AdditionalEmojiTemplate(emojiSrc)
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Quote:

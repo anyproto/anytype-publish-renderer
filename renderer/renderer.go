@@ -1,8 +1,16 @@
 package renderer
 
 import (
+	"compress/gzip"
 	"context"
+	"encoding/json"
+	"fmt"
 	"io"
+	"net/http"
+	"net/url"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
@@ -11,47 +19,139 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/a-h/templ"
-	"github.com/gogo/protobuf/proto"
+	"github.com/gogo/protobuf/jsonpb"
 )
 
 var log = logging.Logger("renderer").Desugar()
 
-// Maps asset addresses from snapshot to different location
-// <a href>, <img src>, emoji address, etc
-type AssetResolver interface {
-	GetSnapshotPbFile(string) ([]byte, error)
-	GetRootPagePath() string
-	GetJoinSpaceLink() string
-	GetStaticFolderUrl(string) string
-	GetAssetUrl(string) string
-	GetPrismJsUrl(string) string
-	GetEmojiUrl(rune) string
+type PublishingUberSnapshotMeta struct {
+	SpaceId    string `json:"spaceId,omitempty"`
+	RootPageId string `json:"rootPageId,omitempty"`
+	InviteLink string `json:"inviteLink,omitempty"`
+}
+
+// Contains all publishing .pb files
+// and publishing meta info
+type PublishingUberSnapshot struct {
+	Meta PublishingUberSnapshotMeta `json:"meta,omitempty"`
+
+	// A map of "dir/filename.pb -> jsonpb snapshot"
+	PbFiles map[string]string `json:"pbFiles,omitempty"`
+}
+
+type RenderConfig struct {
+	// common for all pages, i.e. layout.css
+	StaticFilesPath string
+	// assets which belong to published page
+	PublishFilesPath string
+
+	PrismJsCdnUrl string
+	// anytype cdn, only for emojies for now
+	AnytypeCdnUrl string
+
+	// analytics code to inject
+	AnalyticsCode string
 }
 
 type Renderer struct {
 	Sp       *pb.SnapshotWithType
-	Out      io.Writer
+	UberSp   *PublishingUberSnapshot
 	RootComp templ.Component
+	Config   RenderConfig
+
+	CachedPbFiles map[string]*pb.SnapshotWithType
 
 	Root       *model.Block
 	BlocksById map[string]*model.Block
 
 	BlockNumbers map[string]int
-
-	AssetResolver AssetResolver
 }
 
-func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err error) {
-	rootPath := resolver.GetRootPagePath()
-	snapshotData, err := resolver.GetSnapshotPbFile(rootPath)
+func readJsonpbSnapshot(snapshotStr string) (snapshot pb.SnapshotWithType, err error) {
+	err = jsonpb.UnmarshalString(snapshotStr, &snapshot)
 	if err != nil {
-		log.Error("Error reading protobuf snapshot index", zap.Error(err))
+		return
+	}
+	return
+}
+
+func readUberSnapshot(path string) (uberSnapshot PublishingUberSnapshot, err error) {
+	var indexFileGz io.Reader
+
+	if strings.HasPrefix(path, "http") {
+		var resp *http.Response
+		var indexPath string
+
+		indexPath, err = url.JoinPath(path, "index.json.gz")
+		if err != nil {
+			err = fmt.Errorf("error making http path for index.json.gz: %s", err)
+			return
+		}
+
+		resp, err = http.Get(indexPath)
+		if err != nil {
+			err = fmt.Errorf("error reading index.json.gz: %s", err)
+			return
+		}
+
+		indexFileGz = resp.Body
+		defer resp.Body.Close()
+
+	} else {
+		var file *os.File
+		indexPath := filepath.Join(path, "index.json.gz")
+		file, err = os.Open(indexPath)
+		if err != nil {
+			err = fmt.Errorf("error reading index.json.gz: %s", err)
+			return
+		}
+		indexFileGz = file
+		defer file.Close()
+	}
+
+	gzReader, err := gzip.NewReader(indexFileGz)
+	if err != nil {
+		err = fmt.Errorf("error creating .gz reader: %s", err)
 		return
 	}
 
-	snapshot := pb.SnapshotWithType{}
-	err = proto.Unmarshal(snapshotData, &snapshot)
+	indexBytes, err := io.ReadAll(gzReader)
 	if err != nil {
+		errgz := gzReader.Close()
+		err = fmt.Errorf("error ungzipping index.json.gz: %s", err)
+		if errgz != nil {
+			err = fmt.Errorf("error closing gzReader: %s", errgz)
+		}
+		return
+	}
+
+	errgz := gzReader.Close()
+	if errgz != nil {
+		err = fmt.Errorf("error closing gzReader: %s", errgz)
+		return
+	}
+
+	err = json.Unmarshal(indexBytes, &uberSnapshot)
+	if err != nil {
+		err = fmt.Errorf("error unmarshaling index.json.gz: %s", err)
+		return
+	}
+
+	return
+
+}
+
+func NewRenderer(config RenderConfig) (r *Renderer, err error) {
+	uberSnapshot, err := readUberSnapshot(config.PublishFilesPath)
+	if err != nil {
+		log.Error("Error reading config.PublishFilesPath ubersnapshot", zap.Error(err))
+		return
+	}
+
+	rootFilename := fmt.Sprintf("objects/%s.pb", uberSnapshot.Meta.RootPageId)
+	snapshot, err := readJsonpbSnapshot(uberSnapshot.PbFiles[rootFilename])
+	if err != nil {
+		log.Error("Error reading protobuf snapshot index", zap.Error(err))
 		return
 	}
 
@@ -68,25 +168,63 @@ func NewRenderer(resolver AssetResolver, writer io.Writer) (r *Renderer, err err
 
 	r = &Renderer{
 		Sp:            &snapshot,
-		Out:           writer,
+		UberSp:        &uberSnapshot,
+		CachedPbFiles: make(map[string]*pb.SnapshotWithType),
 		BlocksById:    blocksById,
 		BlockNumbers:  make(map[string]int),
 		Root:          blocks[0],
-		AssetResolver: resolver,
+		Config:        config,
 	}
 
 	r.hydrateSpecialBlocks()
 	r.hydrateNumberBlocks()
+	r.RootComp = r.RenderPage()
 
 	return
 }
 
-func (r *Renderer) Render() (err error) {
-	err = r.RootComp.Render(context.Background(), r.Out)
+// asset resolver parts
+
+func (r *Renderer) GetEmojiUrl(code rune) string {
+	return fmt.Sprintf("%s/emojies/%x.png", r.Config.AnytypeCdnUrl, code)
+}
+
+func (r *Renderer) GetStaticFolderUrl(filepath string) string {
+	return fmt.Sprintf("%s%s", r.Config.StaticFilesPath, filepath)
+}
+
+func (r *Renderer) GetPrismJsUrl(filepath string) string {
+	return fmt.Sprintf("%s%s", r.Config.PrismJsCdnUrl, filepath)
+}
+
+func (r *Renderer) Render(writer io.Writer) (err error) {
+	err = r.RootComp.Render(context.Background(), writer)
 	if err != nil {
 		return
 	}
 	return
+}
+
+func (r *Renderer) ReadJsonpbSnapshot(path string) (*pb.SnapshotWithType, error) {
+	snapshot, ok := r.CachedPbFiles[path]
+	if ok {
+		return snapshot, nil
+	}
+
+	snapshotStr, ok := r.UberSp.PbFiles[path]
+	if !ok {
+		err := fmt.Errorf("path %s is not found in snapshot", path)
+		return nil, err
+	}
+
+	newSnapshot, err := readJsonpbSnapshot(snapshotStr)
+	if err != nil {
+		return nil, err
+	}
+
+	r.CachedPbFiles[path] = &newSnapshot
+
+	return &newSnapshot, nil
 }
 
 func (r *Renderer) unwrapLayouts(blocks []*model.Block) []*model.Block {
