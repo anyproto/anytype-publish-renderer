@@ -4,10 +4,14 @@ templ CoverTemplate(r *Renderer, p *CoverRenderParams) {
 	<div id={"block-" + p.Id } class="block blockCover align1 index0 noPlus">
 		<div class="content">
 			<div class="wrap">
+			if p.Src == "" {
 				<img id="cover" src={ p.Src }
 								class={"cover " + p.Classes}
 								style="opacity: 1; height: auto; width: 100%; transform: translate3d(0%, -25%, 0px);"
 				 />
+			} else {
+			    <p></p>
+			}
 			</div>
 		</div>
 	</div>

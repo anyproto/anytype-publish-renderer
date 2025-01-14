@@ -66,7 +66,11 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 		return r.RenderEmbed(b)
 	case *model.BlockContentOfBookmark:
 	case *model.BlockContentOfLink:
+		return r.RenderLink(b)
 	case *model.BlockContentOfSmartblock:
+		return r.RenderRoot(b)
+	case *model.BlockContentOfRelation:
+
 	default:
 
 	}
