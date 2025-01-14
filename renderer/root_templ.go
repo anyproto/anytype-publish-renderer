@@ -30,7 +30,7 @@ func RootTemplate(r *Renderer, p *RootRenderParams) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if p.Style != "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"column\" style=\"{ p.Style }\"></div>")
+			templ_7745c5c3_Err = r.getStyle(p).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
