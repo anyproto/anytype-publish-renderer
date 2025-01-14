@@ -11,18 +11,31 @@ type RootRenderParams struct {
 	Style string
 }
 
-func (r *Renderer) MakeRootRenderParams(b *model.Block) (params *RootRenderParams) {
+func (r *Renderer) makeRootRenderParams(b *model.Block) (params *RootRenderParams) {
 	fields := b.Fields
 	var width float64
 	if fields != nil && fields.Fields != nil && fields.Fields["width"] != nil {
 		width = fields.Fields["width"].GetNumberValue()
 	}
 	params = &RootRenderParams{}
-	params.Style = fmt.Sprintf("style={\"width:\" + %s}", strconv.Itoa(int(width*100)))
-	return
-
+	if width == 0 {
+		return params
+	}
+	widthPercentage := strconv.Itoa(int(width*100)) + "%"
+	params.Style = fmt.Sprintf(`
+<style> 
+.blocks {
+	width: %s
 }
-func (r *Renderer) RenderRoot(b *model.Block) templ.Component {
-	params := r.MakeRootRenderParams(b)
+</style> 
+`, widthPercentage)
+	return
+}
+func (r *Renderer) getStyle(params *RootRenderParams) templ.Component {
+	return templ.Raw(params.Style)
+}
+
+func (r *Renderer) RenderRoot() templ.Component {
+	params := r.makeRootRenderParams(r.Root)
 	return RootTemplate(r, params)
 }

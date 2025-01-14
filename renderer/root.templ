@@ -2,6 +2,6 @@ package renderer
 
 templ RootTemplate(r *Renderer, p *RootRenderParams) {
 	if p.Style != "" {
-	   <div class="column" style="{ p.Style }"> </div>
+	   @r.getStyle(p)
 	}
 }

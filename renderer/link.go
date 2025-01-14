@@ -15,7 +15,7 @@ type LinkRenderParams struct {
 
 func (r *Renderer) MakeLinkRenderParams(b *model.Block) (params *LinkRenderParams) {
 	targetObjectId := b.GetLink().GetTargetBlockId()
-	spaceId := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeySpaceId.String()]
+	spaceId := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 	link := fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
 	linkComponent := fmt.Sprintf(`<a href="%s"> %s </a>`, link, link)
 	params = &LinkRenderParams{Link: templ.Raw(linkComponent)}
