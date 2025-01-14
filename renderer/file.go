@@ -35,6 +35,26 @@ func (r *Renderer) getFileUrl(id string) (url string, err error) {
 
 }
 
+func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err error) {
+	path := fmt.Sprintf("filesObjects/%s.pb", id)
+	snapshot, err := r.ReadJsonpbSnapshot(path)
+	if err != nil {
+		return
+	}
+
+	if snapshot.SbType != model.SmartBlockType_FileObject {
+		err = fmt.Errorf("snaphot %s is not FileObjects, %d", path, snapshot.SbType)
+		return
+	}
+
+	blocks := snapshot.GetSnapshot().GetData().GetBlocks()
+	for _, bl := range blocks {
+		return bl.GetFile(), nil
+	}
+	return
+
+}
+
 type FileImageRenderParams struct {
 	Id         string
 	Src        string

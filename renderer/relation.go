@@ -91,21 +91,42 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) (params *RelationRen
 		for _, value := range relationValues {
 			if tag, ok := r.CachedPbFiles[value.GetStringValue()]; ok {
 				name := tag.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeyName.String()].GetStringValue()
-				elements = append(elements, ListElement(params, name, ""))
+				elements = append(elements, ListElement(name))
 			}
 		}
-		params.Value = ListTemplate(params, elements)
+		params.Value = ListTemplate(elements)
 	case model.RelationFormat_object:
 		params.Format = "c-object"
 		spaceId := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeySpaceId.String()]
 		var elements []templ.Component
 		for _, value := range relationValue.GetListValue().Values {
 			link := fmt.Sprintf(linkTemplate, value, spaceId)
-			elements = append(elements, ListElement(params, link, ""))
+			elements = append(elements, ListElement(link))
 		}
-		params.Value = ListTemplate(params, elements)
+		params.Value = ListTemplate(elements)
 	case model.RelationFormat_file:
 		params.Format = "c-file"
+		var elements []templ.Component
+		for _, value := range relationValue.GetListValue().Values {
+			url, err := r.getFileUrl(value.GetStringValue())
+			if err != nil {
+				continue
+			}
+			fileBlock, err := r.getFileBlock(value.GetStringValue())
+			if err != nil {
+				continue
+			}
+			switch fileBlock.GetType() {
+			case model.BlockContentFile_Audio:
+				elements = append(elements, AudioIconTemplate(url))
+			case model.BlockContentFile_Image:
+				elements = append(elements, ImageIconTemplate(url, fileBlock.GetName()))
+			case model.BlockContentFile_Video:
+				elements = append(elements, VideoIconTemplate(url, fileBlock.GetName()))
+			default:
+				elements = append(elements, FileIconTemplate(url))
+			}
+		}
 	case model.RelationFormat_phone:
 		params.Format = "c-phone"
 		params.Value = BasicTemplate(params, relationValue.GetStringValue())

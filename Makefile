@@ -1,4 +1,5 @@
 SNAPSHOT_PATH:=./test_snapshots/Anytype.WebPublish.20241217.112212.67
+TEST_PATH:=./test_snapshots/test
 # SNAPSHOT_PATH:=http://localhost:8017
 EXEC:=./bin/anytype-publish-renderer
 TEMPL_VER:=$(shell cat go.mod | grep templ | cut -d' ' -f2)
@@ -23,3 +24,4 @@ test: setup-go
 render: build
 	templ generate -lazy
 	$(EXEC) $(SNAPSHOT_PATH) > index.html
+	$(EXEC) $(TEST_PATH) > index1.html

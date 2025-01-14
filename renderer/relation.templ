@@ -8,7 +8,6 @@ templ RelationTemplate(p *RelationRenderParams) {
                 <div class={"info noValue"}></div>>
             } else {
                 <div class="info">
-                     <div class="name"> p.Name </div>
                      if p.IsEmpty != "" {
                          <div class="cell">
                              <div class={ "cellContent" + p.IsEmpty }>
@@ -33,7 +32,7 @@ templ BasicTemplate(p *RelationRenderParams, value string) {
      </div>
 }
 
-templ ListTemplate(p *RelationRenderParams, elements []templ.Component) {
+templ ListTemplate(elements []templ.Component) {
     <div class="wrap">
         <div class="over">
             for _, elem := range elements {
@@ -43,7 +42,68 @@ templ ListTemplate(p *RelationRenderParams, elements []templ.Component) {
     </div>
 }
 
-templ ListElement(p *RelationRenderParams, value string, iconOption string) {
+templ FileIconTemplate(value string) {
+    <div class="element">
+        <div class="flex">
+            <div class="iconObject c24 isFile">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M2 1.5C2 0.671573 2.67157 0 3.5 0H16.5C17.3284 0 18 0.671573 18 1.5V18.5C18 19.3284 17.3284 20 16.5 20H3.5C2.67157 20 2 19.3284 2 18.5V1.5Z" fill="#F2F2F2"/>
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M18 18.5C18 18.7761 17.3284 19 16.5 19H3.5C2.67157 19 2 18.7761 2 18.5C2 19.3284 2.67157 20 3.5 20H16.5C17.3284 20 18 19.3284 18 18.5Z" fill="#EBEBEB"/>
+							<path d="M6 6H14V7H6V6Z" fill="#2AA7EE"/>
+							<path d="M6 8H14V9H6V8Z" fill="#2AA7EE"/>
+							<path d="M6 10H14V11H6V10Z" fill="#2AA7EE"/>
+							<path d="M6 12H12V13H6V12Z" fill="#2AA7EE"/>
+				</svg>
+            </div>
+            <div class="name"> { value } </div>
+         </div>
+    </div>
+}
+
+templ AudioIconTemplate(value string) {
+    <div class="element">
+        <div class="flex">
+            <div class="iconObject c24 isAudio">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 1.5C2 0.671573 2.67157 0 3.5 0H16.5C17.3284 0 18 0.671573 18 1.5V18.5C18 19.3284 17.3284 20 16.5 20H3.5C2.67157 20 2 19.3284 2 18.5V1.5Z" fill="#2B2B2B"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18 18.5C18 18.7761 17.3284 19 16.5 19H3.5C2.67157 19 2 18.7761 2 18.5C2 19.3284 2.67157 20 3.5 20H16.5C17.3284 20 18 19.3284 18 18.5Z" fill="#3F3F3F"/>
+                    <path d="M10.5 12.5C10.5 13.3284 9.82843 14 9 14C8.17157 14 7.5 13.3284 7.5 12.5C7.5 11.6716 8.17157 11 9 11C9.82843 11 10.5 11.6716 10.5 12.5Z" fill="#E51CA0"/>
+                    <path d="M10 7H10.5V12.5H10V7Z" fill="#E51CA0"/>
+                    <path d="M10 6L13 6.5V8L10 7.5V6Z" fill="#E51CA0"/>
+                </svg>
+            </div>
+            <div class="name"> { value } </div>
+         </div>
+    </div>
+}
+
+templ ImageIconTemplate(src, value string) {
+    <div class="element">
+        <div class="flex">
+            <div class="iconObject c24 isImage withImage">
+                <img src={ src }  class="iconImage c18">
+            </div>
+            <div class="name"> { value } </div>
+         </div>
+    </div>
+}
+
+templ VideoIconTemplate(src, value string) {
+    <div class="element">
+        <div class="flex">
+            <div class="iconObject c20 isVideo">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 1.5C2 0.671573 2.67157 0 3.5 0H16.5C17.3284 0 18 0.671573 18 1.5V18.5C18 19.3284 17.3284 20 16.5 20H3.5C2.67157 20 2 19.3284 2 18.5V1.5Z" fill="#2B2B2B"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18 18.5C18 18.7761 17.3284 19 16.5 19H3.5C2.67157 19 2 18.7761 2 18.5C2 19.3284 2.67157 20 3.5 20H16.5C17.3284 20 18 19.3284 18 18.5Z" fill="#3F3F3F"/>
+                    <path d="M13.9688 9.94801L8 6.50195V13.3941L13.9688 9.94801Z" fill="#2AA7EE"/>
+                </svg>
+            </div>
+            <div class="name"> { value } </div>
+         </div>
+    </div>
+}
+
+templ ListElement(value string) {
     <div class="element">
         <div class="flex">
             <div class="iconObject">  </div>
