@@ -1,0 +1,69 @@
+package renderer
+
+templ RelationTemplate(p *RelationRenderParams) {
+	<div id={"block-" + p.Id} class={"block blockRelation " + p.BackgroundColor}>
+		<div class={ "wrap " + p.IsDeleted } >
+            <div class="sides">
+            if p.IsDeleted != "" {
+                <div class={"info noValue"}></div>>
+            } else {
+                <div class="info">
+                     <div class="name"> p.Name </div>
+                     if p.IsEmpty != "" {
+                         <div class="cell">
+                             <div class={ "cellContent" + p.IsEmpty }>
+                                <div class="empty"></div>
+                             </div>>
+                         </div>
+                     } else {
+                        @p.Value
+                     }
+                </div>
+            }
+		    </div>
+		</div>
+	</div>
+}
+
+templ BasicTemplate(p *RelationRenderParams, value string) {
+     <div class={ "cell" + p.Format }>
+         <div class={ "cellContent" + p.Format }>
+              <div class="name"> { value } </div>
+         </div>>
+     </div>
+}
+
+templ ListTemplate(p *RelationRenderParams, elements []templ.Component) {
+    <div class="wrap">
+        <div class="over">
+            for _, elem := range elements {
+                @elem
+            }
+        </div>
+    </div>
+}
+
+templ ListElement(p *RelationRenderParams, value string, iconOption string) {
+    <div class="element">
+        <div class="flex">
+            <div class="iconObject">  </div>
+            <div class="name"> { value } </div>
+         </div>
+    </div>
+}
+
+templ ActiveCheckBoxTemplate(p *RelationRenderParams) {
+    <div class={ "cell" + p.Format }>
+        <div class={ "cellContent" + p.Format }>
+             <div class="icon active"> </div>
+        </div>>
+    </div>
+}
+
+templ DisabledCheckBoxTemplate(p *RelationRenderParams) {
+    <div class={ "cell" + p.Format }>
+        <div class={ "cellContent" + p.Format }>
+             <div class="icon"> </div>
+        </div>>
+    </div>
+}
