@@ -69,7 +69,7 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 		return r.RenderLink(b)
 	case *model.BlockContentOfSmartblock:
 	case *model.BlockContentOfRelation:
-
+		return r.RenderRelations(b)
 	default:
 
 	}

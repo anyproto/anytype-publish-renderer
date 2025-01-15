@@ -421,6 +421,115 @@ main {
   background: #e5f8d6 !important;
 }
 
+.isMultiSelect.archive {
+  color: var(--color-text-secondary);
+  background: var(--color-shape-tertiary);
+}
+
+.isMultiSelect.tagColor-default {
+  color: var(--color-text-primary) !important;
+  background: var(--color-bg-primary) !important;
+  box-shadow: 0px 0px 0px 1px var(--color-shape-secondary) inset;
+}
+
+.isMultiSelect.tagColor-grey {
+  color: #8c9ea5 !important;
+  background: var(--color-shape-primary) !important;
+}
+
+.isMultiSelect.tagColor-yellow {
+  color: #b2a616 !important;
+  background: #f4eb91 !important;
+}
+
+.isMultiSelect.tagColor-orange {
+  color: #d3720d !important;
+  background: #fcdc9c !important;
+}
+
+.isMultiSelect.tagColor-red {
+  color: #e2400c !important;
+  background: #fcd1c3 !important;
+}
+
+.isMultiSelect.tagColor-pink {
+  color: #ca1b8e !important;
+  background: #f8c2e5 !important;
+}
+
+.isMultiSelect.tagColor-purple {
+  color: #9e30c4 !important;
+  background: #e8d0f1 !important;
+}
+
+.isMultiSelect.tagColor-blue {
+  color: var(--color-blue) !important;
+  background: #cbd2fa !important;
+}
+
+.isMultiSelect.tagColor-ice {
+  color: #1c8bca !important;
+  background: #b2dff9 !important;
+}
+
+.isMultiSelect.tagColor-teal {
+  color: #0caaa3 !important;
+  background: #a9ebe6 !important;
+}
+
+.isMultiSelect.tagColor-lime {
+  color: #64b90f !important;
+  background: #c5efa3 !important;
+}
+
+.isSelect.tagColor-default {
+  color: var(--color-text-primary) !important;
+}
+
+.isSelect.tagColor-black {
+  color: var(--color-text-primary) !important;
+}
+
+.isSelect.tagColor-grey {
+  color: var(--color-control-active) !important;
+}
+
+.isSelect.tagColor-yellow {
+  color: var(--color-yellow) !important;
+}
+
+.isSelect.tagColor-orange {
+  color: var(--color-orange) !important;
+}
+
+.isSelect.tagColor-red {
+  color: var(--color-red) !important;
+}
+
+.isSelect.tagColor-pink {
+  color: var(--color-pink) !important;
+}
+
+.isSelect.tagColor-purple {
+  color: var(--color-purple) !important;
+}
+
+.isSelect.tagColor-blue {
+  color: var(--color-blue) !important;
+}
+
+.isSelect.tagColor-ice {
+  color: var(--color-ice) !important;
+}
+
+.isSelect.tagColor-teal {
+  color: var(--color-teal) !important;
+}
+
+.isSelect.tagColor-lime {
+  color: var(--color-lime) !important;
+}
+
 .blocks .block.align1 > .wrapContent {
     text-align: center;
 
@@ -1602,6 +1711,336 @@ a {
 .blocks .block.blockTable .wrapContent > .inner {
     display: inline-block;
     position: relative;
+}
+
+.blocks .block.blockRelation {
+  font-size: var(--font-size-common);
+  line-height: var(--line-height-common);
+  letter-spacing: var(--letter-spacing-common);
+}
+.blocks .block.blockRelation > .wrapContent > .selectionTarget > .dropTarget {
+  padding: 0px;
+}
+.blocks .block.blockRelation .icon.edit {
+  display: none;
+}
+.blocks .block.blockRelation .icon.checkbox {
+  width: 20px;
+  height: 20px;
+  vertical-align: top;
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMiAyMEMxNi40MTgzIDIwIDIwIDE2LjQxODMgMjAgMTJDMjAgNy41ODE3MiAxNi40MTgzIDQgMTIgNEM3LjU4MTcyIDQgNCA3LjU4MTcyIDQgMTJDNCAxNi40MTgzIDcuNTgxNzIgMjAgMTIgMjBaTTIxIDEyQzIxIDE2Ljk3MDYgMTYuOTcwNiAyMSAxMiAyMUM3LjAyOTQ0IDIxIDMgMTYuOTcwNiAzIDEyQzMgNy4wMjk0NCA3LjAyOTQ0IDMgMTIgM0MxNi45NzA2IDMgMjEgNy4wMjk0NCAyMSAxMloiIGZpbGw9IiNiNmI2YjYiLz4KPC9zdmc+);
+}
+.blocks .block.blockRelation .icon.checkbox.active {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiByeD0iOSIgZmlsbD0iIzJBQTdFRSIvPgo8cGF0aCBkPSJNNy41IDEyLjAwM0wxMS4yODk1IDE2TDE2LjUgOCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KPC9zdmc+Cg==);
+}
+.blocks .block.blockRelation .input {
+  font-size: var(--font-size-common);
+  line-height: var(--line-height-common);
+  letter-spacing: var(--letter-spacing-common);
+  line-height: 22px;
+  vertical-align: top;
+  display: inline-block;
+  height: 22px;
+  padding: 0px;
+}
+.blocks .block.blockRelation .sides {
+  display: flex;
+  width: 100%;
+}
+.blocks .block.blockRelation .info {
+  padding: 6px 2px;
+  line-height: 20px;
+  width: 100%;
+  min-width: 40px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: flex-start;
+  gap: 0px 6px;
+}
+.blocks .block.blockRelation .info.noValue {
+  width: 100%;
+  color: var(--color-text-tertiary);
+}
+.blocks .block.blockRelation .info .name {
+  display: inline-block;
+  vertical-align: top;
+  font-size: var(--font-size-common);
+  line-height: var(--line-height-common);
+  letter-spacing: var(--letter-spacing-common);
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-secondary);
+}
+.blocks .block.blockRelation .info .icon.lock {
+  width: 8px;
+  height: 20px;
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDggMTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0wIDYuMDMxMjVDMCA1LjQ3ODk3IDAuNDQ3NzE1IDUuMDMxMjUgMSA1LjAzMTI1SDdDNy41NTIyOCA1LjAzMTI1IDggNS40Nzg5NyA4IDYuMDMxMjVWMTFDOCAxMS41NTIzIDcuNTUyMjggMTIgNyAxMkgxQzAuNDQ3NzE1IDEyIDAgMTEuNTUyMyAwIDExVjYuMDMxMjVaIiBmaWxsPSIjYjZiNmI2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNiA4VjNDNiAxLjg5NTQzIDUuMTA0NTcgMSA0IDFDMi44OTU0MyAxIDIgMS44OTU0MyAyIDNWOEMyIDkuMTA0NTcgMi44OTU0MyAxMCA0IDEwQzUuMTA0NTcgMTAgNiA5LjEwNDU3IDYgOFpNNCAwQzIuMzQzMTUgMCAxIDEuMzQzMTUgMSAzVjhDMSA5LjY1Njg1IDIuMzQzMTUgMTEgNCAxMUM1LjY1Njg1IDExIDcgOS42NTY4NSA3IDhWM0M3IDEuMzQzMTUgNS42NTY4NSAwIDQgMFoiIGZpbGw9IiNiNmI2YjYiLz4KPC9zdmc+);
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  transition: all 0.1s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+.blocks .block.blockRelation .info .icon.ghost {
+  width: 20px;
+  height: 20px;
+}
+.blocks .block.blockRelation .wrap.isDeleted .info .name {
+  color: var(--color-text-secondary);
+}
+.blocks .block.blockRelation .cellContent.canEdit .empty {
+  display: block;
+}
+.blocks .block.blockRelation .cell {
+  font-size: var(--font-size-common);
+  line-height: var(--line-height-common);
+  letter-spacing: var(--letter-spacing-common);
+  width: 70%;
+  position: relative;
+  border-radius: 4px;
+  transition: background 0.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.blocks .block.blockRelation .cell.canEdit:hover {
+  background: var(--color-shape-highlight-light);
+}
+.blocks .block.blockRelation .cell.c-select {
+  line-height: 18px;
+}
+.blocks .block.blockRelation .cell.c-select .empty {
+  line-height: 18px;
+}
+.blocks .block.blockRelation .cell.c-select .over,
+.blocks .block.blockRelation .cell.c-object .over,
+.blocks .block.blockRelation .cell.c-file .over {
+  flex-wrap: wrap;
+}
+.blocks .block.blockRelation .cell.isEditing {
+  padding: 0px;
+}
+.blocks .block.blockRelation .cell.isEditing .cellContent {
+  position: relative;
+  height: auto !important;
+  min-height: 32px;
+  border-radius: 4px;
+}
+.blocks .block.blockRelation .cell.isEditing .cellContent.isName .input {
+  height: 20px;
+  line-height: 20px;
+  width: calc(100% - 24px);
+}
+.blocks .block.blockRelation .cell.isEditing .icon.clear {
+  right: 8px;
+}
+.blocks .block.blockRelation .cell.isEditing #entry {
+  line-height: 18px;
+  height: 18px;
+  vertical-align: top;
+  display: inline-block;
+}
+.blocks .block.blockRelation .cell.isEditing.c-select .cellContent, .blocks .block.blockRelation .cell.isEditing.c-select .placeholder {
+  padding: 6px 8px 4px 8px;
+}
+.blocks .block.blockRelation .cell.isEditing.c-select.isSelect .over {
+  width: calc(100% - 26px);
+}
+.blocks .block.blockRelation .cell.isEditing.c-shortText .cellContent,
+.blocks .block.blockRelation .cell.isEditing.c-number .cellContent,
+.blocks .block.blockRelation .cell.isEditing.c-url .cellContent,
+.blocks .block.blockRelation .cell.isEditing.c-phone .cellContent,
+.blocks .block.blockRelation .cell.isEditing.c-email .cellContent {
+  padding: 5px 8px !important;
+}
+.blocks .block.blockRelation .cell.isEditing.c-date .cellContent {
+  padding: 5px 8px 4px 8px !important;
+}
+.blocks .block.blockRelation .cell.c-object .element {
+  background: none !important;
+}
+.blocks .block.blockRelation .cell.isEditing.c-object .cellContent, .blocks .block.blockRelation .cell.isEditing.c-object .placeholder {
+  padding: 5px 8px 1px 8px !important;
+}
+.blocks .block.blockRelation .cell.isEditing.c-file .cellContent, .blocks .block.blockRelation .cell.isEditing.c-file .placeholder {
+  padding: 5px 8px !important;
+}
+.blocks .block.blockRelation .cell.isEditing.c-longText .cellContent {
+  box-shadow: 0px 0px;
+  visibility: hidden;
+  border: 0px;
+  padding: 5px 8px;
+}
+.blocks .block.blockRelation .cell.isEditing.c-longText .cellContent span:empty {
+  height: 22px;
+}
+.blocks .block.blockRelation > .wrapContent > .dropTarget.targetBot {
+  display: block;
+  height: 2px;
+}
+.tagItem {
+  padding: 0px 4px;
+  font-size: var(--font-size-common);
+  line-height: var(--line-height-common);
+  letter-spacing: var(--letter-spacing-common);
+  line-height: 18px;
+  border-radius: 3px;
+  white-space: nowrap;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 100%;
+  height: 18px;
+}
+
+.tagItem .inner {
+  display: inline-block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
+.tagItem .tagRemove img {
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -5px 0px 0px -5px;
+}
+
+.tagItem.isSelect {
+  padding: 0px;
+  font-size: var(--font-size-common);
+  line-height: var(--line-height-common);
+  letter-spacing: var(--letter-spacing-common);
+  line-height: 18px;
+  box-shadow: 0px 0px !important;
+}
+
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  transition: all 0.1s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.cell.c-shortText .name, .cell.c-url .name, .cell.c-email .name, .cell.c-phone .name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: top;
+  width: 100%;
+}
+
+.cellContent {
+  cursor: default;
+}
+
+.cellContent .iconObject {
+  margin-right: 8px;
+  vertical-align: top;
+  flex-shrink: 0;
+  cursor: default;
+}
+.cellContent .icon.clear {
+  display: none;
+}
+.cellContent .name {
+  display: inline-block;
+  vertical-align: top;
+  user-select: text !important;
+}
+.cellContent .empty {
+  vertical-align: top;
+  display: none;
+}
+
+.cellContent.c-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0px 2px;
+}
+
+.cellContent.c-file .element {
+  display: inline-block;
+  vertical-align: top;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.cellContent.c-file .element .iconObject {
+  flex-shrink: 0;
+}
+.cellContent.c-file .element .name {
+  line-height: 20px;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cellContent.c-file .cellContent {
+  white-space: normal;
+}
+
+.cellContent.c-object .element {
+  display: inline-block;
+  vertical-align: top;
+  max-width: 100%;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.cellContent.c-object .element .iconObject {
+  margin: 0px !important;
+}
+.cellContent.c-object .element .flex {
+  align-items: center;
+  gap: 0px 4px;
+}
+.cellContent.c-object .element .name {
+  line-height: 20px;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cellContent.c-select .over,
+.cellContent.c-object .over,
+.cellContent.c-file .over {
+  display: inline-flex;
+  vertical-align: top;
+  width: 100%;
+  gap: 4px 8px;
+  align-items: flex-start;
+}
+
+.cellContent.c-longText {
+  white-space: pre-wrap;
+}
+
+.cellContent.c-url .name,
+.cellContent.c-email .name,
+.cellContent.c-phone .name {
+  text-decoration: none;
+  transition: all 0.1s cubic-bezier(0.22, 1, 0.36, 1);
+  width: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .madeInAnytype {
