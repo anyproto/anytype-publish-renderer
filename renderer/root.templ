@@ -1,0 +1,7 @@
+package renderer
+
+templ RootTemplate(r *Renderer, p *RootRenderParams) {
+	if p.Style != "" {
+	   @r.getStyle(p)
+	}
+}

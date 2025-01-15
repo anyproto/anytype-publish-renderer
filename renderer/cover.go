@@ -3,6 +3,7 @@ package renderer
 import (
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/globalsign/mgo/bson"
 	"go.uber.org/zap"
 )
 
@@ -34,7 +35,7 @@ func (r *Renderer) MakeRenderPageCoverParams() (params *CoverRenderParams, err e
 func (r *Renderer) RenderPageCover() templ.Component {
 	params, err := r.MakeRenderPageCoverParams()
 	if err != nil {
-		return NoneTemplate("")
+		return EmptyCoverTemplate(bson.NewObjectId().Hex())
 	}
 
 	return CoverTemplate(r, params)
