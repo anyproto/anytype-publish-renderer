@@ -37,7 +37,14 @@ func (r *Renderer) getFileUrl(id string) (url string, err error) {
 
 func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err error) {
 	path := fmt.Sprintf("filesObjects/%s.pb", id)
-	snapshot, err := r.ReadJsonpbSnapshot(path)
+	var (
+		jsonPbSnapshot string
+		ok             bool
+	)
+	if jsonPbSnapshot, ok = r.UberSp.PbFiles[path]; !ok {
+		return nil, fmt.Errorf("file %s not exists", id)
+	}
+	snapshot, err := readJsonpbSnapshot(jsonPbSnapshot)
 	if err != nil {
 		return
 	}
@@ -49,10 +56,12 @@ func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err e
 
 	blocks := snapshot.GetSnapshot().GetData().GetBlocks()
 	for _, bl := range blocks {
+		if bl.GetFile() == nil {
+			continue
+		}
 		return bl.GetFile(), nil
 	}
 	return
-
 }
 
 type FileImageRenderParams struct {

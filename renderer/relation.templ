@@ -5,16 +5,23 @@ templ RelationTemplate(p *RelationRenderParams) {
 		<div class={ "wrap " + p.IsDeleted } >
             <div class="sides">
             if p.IsDeleted != "" {
-                <div class={"info noValue"}></div>>
+                <div class={"info noValue"}>
+                    <div class="name"> { p.Name } </div>
+                </div>
             } else {
                 <div class="info">
+                     if p.IsSystem {
+                          <div class="icon lock"></div>
+                     }
                      if p.IsEmpty != "" {
                          <div class="cell">
-                             <div class={ "cellContent" + p.IsEmpty }>
+                             <div class={ "cellContent " + p.IsEmpty }>
                                 <div class="empty"></div>
-                             </div>>
+                                <div class="name"> { p.Name } </div>
+                             </div>
                          </div>
                      } else {
+                        <div class="name"> { p.Name } </div>
                         @p.Value
                      }
                 </div>
@@ -25,21 +32,26 @@ templ RelationTemplate(p *RelationRenderParams) {
 }
 
 templ BasicTemplate(p *RelationRenderParams, value string) {
-     <div class={ "cell" + p.Format }>
-         <div class={ "cellContent" + p.Format }>
+     <div class={ "cell " + p.Format }>
+         <div class={ "cellContent " + p.Format }>
               <div class="name"> { value } </div>
-         </div>>
+         </div>
      </div>
 }
 
-templ ListTemplate(elements []templ.Component) {
-    <div class="wrap">
-        <div class="over">
-            for _, elem := range elements {
-                @elem
-            }
-        </div>
+templ ListTemplate(p *RelationRenderParams, elements []templ.Component) {
+    <div class={ "cell " + p.Format }>
+         <div class={ "cellContent " + p.Format }>
+              <div class="wrap">
+                      <div class="over">
+                          for _, elem := range elements {
+                              @elem
+                          }
+                      </div>
+              </div>
+         </div>
     </div>
+
 }
 
 templ FileIconTemplate(value string) {
@@ -103,27 +115,36 @@ templ VideoIconTemplate(src, value string) {
     </div>
 }
 
-templ ListElement(value string) {
+templ BasicListElement(value string) {
     <div class="element">
         <div class="flex">
-            <div class="iconObject">  </div>
             <div class="name"> { value } </div>
          </div>
     </div>
 }
 
+templ OptionElement(value, color, relationType string) {
+    <div class="element">
+        <div class="flex">
+            <div class={ "tagItem " + relationType + " tagColor-" + color } >
+                  <div class="inner"> { value } </div>
+             </div>
+         </div>
+    </div>
+}
+
 templ ActiveCheckBoxTemplate(p *RelationRenderParams) {
-    <div class={ "cell" + p.Format }>
-        <div class={ "cellContent" + p.Format }>
-             <div class="icon active"> </div>
-        </div>>
+    <div class={ "cell " + p.Format }>
+        <div class={ "cellContent " + p.Format }>
+             <div class="icon checkbox active"> </div>
+        </div>
     </div>
 }
 
 templ DisabledCheckBoxTemplate(p *RelationRenderParams) {
-    <div class={ "cell" + p.Format }>
-        <div class={ "cellContent" + p.Format }>
-             <div class="icon"> </div>
-        </div>>
+    <div class={ "cell " + p.Format }>
+        <div class={ "cellContent " + p.Format }>
+             <div class="icon checkbox"> </div>
+        </div>
     </div>
 }

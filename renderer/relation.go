@@ -7,7 +7,7 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
-	"strings"
+	"path/filepath"
 	"time"
 )
 
@@ -21,139 +21,213 @@ type RelationRenderParams struct {
 	IsEmpty         string
 	Format          string
 	Value           templ.Component
+	IsSystem        bool
 }
 
-func (r *Renderer) MakeRelationRenderParams(b *model.Block) (params *RelationRenderParams) {
+func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParams {
 	relationBlock := b.GetRelation()
 	color := b.GetBackgroundColor()
-	params = &RelationRenderParams{
+
+	params := &RelationRenderParams{
 		Id: b.Id,
 	}
-	params.BackgroundColor = strings.Join([]string{"bgColor", "bgColor-" + color}, " ")
-	key := relationBlock.GetKey()
-	relation, _ := bundle.GetRelation(domain.RelationKey(key))
-	var (
-		name    string
-		format  model.RelationFormat
-		founded bool
-	)
-	if relation == nil {
-		for _, sn := range r.CachedPbFiles {
-			if sn.SbType != model.SmartBlockType_STRelation {
-				continue
-			}
-			uniqueKey := sn.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeyUniqueKey.String()]
-			if uniqueKey != nil && uniqueKey.GetStringValue() == key {
-				name = sn.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeyName.String()].GetStringValue()
-				format = model.RelationFormat(int32(sn.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeyRelationFormat.String()].GetNumberValue()))
-				founded = true
-				break
-			}
-		}
-	} else {
-		name = relation.Name
-		format = relation.Format
-		founded = true
+
+	if color != "" {
+		params.BackgroundColor = fmt.Sprintf("bgColor bgColor-%s", color)
 	}
+
+	relationKey := domain.RelationKey(relationBlock.GetKey())
+	relation, _ := bundle.GetRelation(relationKey)
+
+	name, format, isSystem, found := r.fetchRelationMetadata(relation, relationKey)
 	if name == "" {
 		name = defaultName
 	}
-	if founded {
+
+	params.Name = name
+	params.IsSystem = isSystem
+
+	if !found {
 		params.IsDeleted = "isDeleted"
 		params.IsEmpty = "isEmpty"
-		return
+		return params
 	}
-	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[key]
+
+	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[relationBlock.GetKey()]
 	if relationValue == nil {
 		params.IsEmpty = "isEmpty"
-		return
+		return params
 	}
+
+	r.populateRelationValue(params, format, relationValue)
+	return params
+}
+
+func (r *Renderer) fetchRelationMetadata(relation *model.Relation, relationKey domain.RelationKey) (string, model.RelationFormat, bool, bool) {
+	if relation != nil {
+		return relation.Name, relation.Format, true, true
+	}
+
+	for _, snapshot := range r.UberSp.PbFiles {
+		sn, err := readJsonpbSnapshot(snapshot)
+		if err != nil || sn.SbType != model.SmartBlockType_STRelation {
+			continue
+		}
+
+		fields := sn.GetSnapshot().GetData().GetDetails().GetFields()
+		if uniqueKey := fields[bundle.RelationKeyUniqueKey.String()]; uniqueKey != nil && uniqueKey.GetStringValue() == relationKey.URL() {
+			name := fields[bundle.RelationKeyName.String()].GetStringValue()
+			format := model.RelationFormat(int32(fields[bundle.RelationKeyRelationFormat.String()].GetNumberValue()))
+			return name, format, false, true
+		}
+	}
+	return "", model.RelationFormat_longtext, false, false
+}
+
+func (r *Renderer) populateRelationValue(params *RelationRenderParams, format model.RelationFormat, relationValue *types.Value) {
 	switch format {
-	case model.RelationFormat_shorttext:
-		params.Format = "c-shortText"
+	case model.RelationFormat_shorttext, model.RelationFormat_longtext:
+		params.Format = r.getFormatClass(format)
 		params.Value = BasicTemplate(params, relationValue.GetStringValue())
-	case model.RelationFormat_longtext:
-		params.Format = "c-longText"
-		params.Value = BasicTemplate(params, relationValue.GetStringValue())
+
 	case model.RelationFormat_number:
 		params.Format = "c-number"
-		number := fmt.Sprintf("%f", relationValue.GetNumberValue())
-		params.Value = BasicTemplate(params, number)
+		params.Value = BasicTemplate(params, fmt.Sprintf("%f", relationValue.GetNumberValue()))
+
 	case model.RelationFormat_status, model.RelationFormat_tag:
 		params.Format = "c-select"
-		var (
-			elements       []templ.Component
-			relationValues = relationValue.GetListValue().Values
-		)
-		if len(relationValues) == 0 {
-			relationValues = []*types.Value{relationValue}
-		}
-		for _, value := range relationValues {
-			if tag, ok := r.CachedPbFiles[value.GetStringValue()]; ok {
-				name := tag.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeyName.String()].GetStringValue()
-				elements = append(elements, ListElement(name))
-			}
-		}
-		params.Value = ListTemplate(elements)
+		params.Value = r.generateSelectOptions(params, format, relationValue)
+
 	case model.RelationFormat_object:
 		params.Format = "c-object"
-		spaceId := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeySpaceId.String()]
-		var elements []templ.Component
-		for _, value := range relationValue.GetListValue().Values {
-			link := fmt.Sprintf(linkTemplate, value, spaceId)
-			elements = append(elements, ListElement(link))
-		}
-		params.Value = ListTemplate(elements)
+		params.Value = r.generateObjectLinks(params, relationValue)
+
 	case model.RelationFormat_file:
 		params.Format = "c-file"
-		var elements []templ.Component
-		for _, value := range relationValue.GetListValue().Values {
-			url, err := r.getFileUrl(value.GetStringValue())
-			if err != nil {
-				continue
-			}
-			fileBlock, err := r.getFileBlock(value.GetStringValue())
-			if err != nil {
-				continue
-			}
-			switch fileBlock.GetType() {
-			case model.BlockContentFile_Audio:
-				elements = append(elements, AudioIconTemplate(url))
-			case model.BlockContentFile_Image:
-				elements = append(elements, ImageIconTemplate(url, fileBlock.GetName()))
-			case model.BlockContentFile_Video:
-				elements = append(elements, VideoIconTemplate(url, fileBlock.GetName()))
-			default:
-				elements = append(elements, FileIconTemplate(url))
-			}
-		}
-	case model.RelationFormat_phone:
-		params.Format = "c-phone"
+		params.Value = r.generateFileIcons(params, relationValue)
+
+	case model.RelationFormat_phone, model.RelationFormat_email, model.RelationFormat_url:
+		params.Format = r.getFormatClass(format)
 		params.Value = BasicTemplate(params, relationValue.GetStringValue())
-	case model.RelationFormat_email:
-		params.Format = "c-email"
-		params.Value = BasicTemplate(params, relationValue.GetStringValue())
-	case model.RelationFormat_url:
-		params.Format = "c-url"
-		params.Value = BasicTemplate(params, relationValue.GetStringValue())
+
 	case model.RelationFormat_date:
 		params.Format = "c-date"
-		date := time.Unix(0, int64(relationValue.GetNumberValue()))
-		params.Value = BasicTemplate(params, date.Format("02 Jan 2006"))
+		params.Value = BasicTemplate(params, r.formatDate(relationValue.GetNumberValue()))
+
 	case model.RelationFormat_checkbox:
 		params.Format = "c-checkbox"
-		if relationValue.GetBoolValue() {
-			params.Value = ActiveCheckBoxTemplate(params)
-		} else {
-			params.Value = DisabledCheckBoxTemplate(params)
-		}
+		params.Value = r.generateCheckbox(params, relationValue.GetBoolValue())
+
 	default:
 		params.Format = "c-longText"
 		params.Value = BasicTemplate(params, relationValue.GetStringValue())
 	}
-	return
-
 }
+
+func (r *Renderer) getFormatClass(format model.RelationFormat) string {
+	switch format {
+	case model.RelationFormat_shorttext:
+		return "c-shortText"
+	case model.RelationFormat_longtext:
+		return "c-longText"
+	case model.RelationFormat_phone:
+		return "c-phone"
+	case model.RelationFormat_email:
+		return "c-email"
+	case model.RelationFormat_url:
+		return "c-url"
+	default:
+		return ""
+	}
+}
+
+func (r *Renderer) formatDate(timestamp float64) string {
+	if timestamp == 0 {
+		return ""
+	}
+	return time.Unix(int64(timestamp), 0).Format("02 Jan 2006")
+}
+
+func (r *Renderer) generateCheckbox(params *RelationRenderParams, checked bool) templ.Component {
+	if checked {
+		return ActiveCheckBoxTemplate(params)
+	}
+	return DisabledCheckBoxTemplate(params)
+}
+
+func (r *Renderer) generateSelectOptions(params *RelationRenderParams, format model.RelationFormat, relationValue *types.Value) templ.Component {
+	var elements []templ.Component
+	relationType := "isSelect"
+	if format == model.RelationFormat_tag {
+		relationType = "isMultiSelect"
+	}
+
+	for _, value := range r.extractRelationValues(relationValue) {
+		tag, err := r.ReadJsonpbSnapshot(filepath.Join("relationsOptions", value.GetStringValue()+".pb"))
+		if err != nil {
+			continue
+		}
+
+		fields := tag.GetSnapshot().GetData().GetDetails().GetFields()
+		name := fields[bundle.RelationKeyName.String()].GetStringValue()
+		color := fields[bundle.RelationKeyRelationOptionColor.String()].GetStringValue()
+		elements = append(elements, OptionElement(name, color, relationType))
+	}
+
+	return ListTemplate(params, elements)
+}
+
+func (r *Renderer) extractRelationValues(relationValue *types.Value) []*types.Value {
+	if relationValue.GetListValue() != nil {
+		return relationValue.GetListValue().Values
+	}
+	return []*types.Value{relationValue}
+}
+
+func (r *Renderer) generateObjectLinks(params *RelationRenderParams, relationValue *types.Value) templ.Component {
+	var elements []templ.Component
+	spaceId := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
+
+	for _, value := range r.extractRelationValues(relationValue) {
+		link := fmt.Sprintf(linkTemplate, value.GetStringValue(), spaceId)
+		elements = append(elements, BasicListElement(link))
+	}
+	return ListTemplate(params, elements)
+}
+
+func (r *Renderer) generateFileIcons(params *RelationRenderParams, relationValue *types.Value) templ.Component {
+	var elements []templ.Component
+
+	for _, value := range r.extractRelationValues(relationValue) {
+		url, err := r.getFileUrl(value.GetStringValue())
+		if err != nil {
+			continue
+		}
+		fileBlock, err := r.getFileBlock(value.GetStringValue())
+		if err != nil {
+			continue
+		}
+
+		elements = append(elements, r.createFileIcon(url, fileBlock))
+	}
+	return ListTemplate(params, elements)
+}
+
+func (r *Renderer) createFileIcon(url string, fileBlock *model.BlockContentFile) templ.Component {
+	filename := filepath.Base(url)
+
+	switch fileBlock.GetType() {
+	case model.BlockContentFile_Audio:
+		return AudioIconTemplate(filename)
+	case model.BlockContentFile_Image:
+		return ImageIconTemplate(url, filename)
+	case model.BlockContentFile_Video:
+		return VideoIconTemplate(url, filename)
+	default:
+		return FileIconTemplate(filename)
+	}
+}
+
 func (r *Renderer) RenderRelations(b *model.Block) templ.Component {
 	params := r.MakeRelationRenderParams(b)
 	return RelationTemplate(params)
