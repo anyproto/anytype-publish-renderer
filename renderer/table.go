@@ -26,6 +26,8 @@ type RenderTableRowCellParams struct {
 	TextComp templ.Component
 }
 
+const DEFAULT_COLUMN_WIDTH = 140
+
 func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTableParams) {
 
 	var columnSizes []string
@@ -35,6 +37,9 @@ func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTablePar
 		col := r.BlocksById[colId]
 		fields := col.GetFields()
 		width := pbtypes.GetInt64(fields, "width")
+		if width == 0 {
+			width = DEFAULT_COLUMN_WIDTH
+		}
 		columnSizes = append(columnSizes, fmt.Sprintf("%dpx", width))
 	}
 
@@ -46,7 +51,7 @@ func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTablePar
 	}
 	params = &RenderTableParams{
 		Classes:     classes,
-		Id:          "",
+		Id:          b.Id,
 		Rows:        rows,
 		Columns:     columns,
 		ColumnSizes: strings.Join(columnSizes, " "),

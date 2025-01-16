@@ -5,7 +5,7 @@ templ TableTemplate(r *Renderer, p *RenderTableParams) {
 	<div id={"block-" + p.Id} class="block blockTable">
 		<div class={"wrapContent " + p.Classes}>
 			<div class="inner">
-				<div id="table" class="table">
+				<div id={"table-" + p.Id} class="table">
 					<div class="rows">
 						for _, rowId := range p.Rows.ChildrenIds {
 							@TableRowTemplate(r, rowId, p)

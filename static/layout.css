@@ -1685,6 +1685,13 @@ markuplatex {
     border-top: 1px solid var(--color-shape-primary);
 }
 
+.blocks .block.blockTable .cell .block.blockText {
+   font-size: var(--font-size-common);
+   line-height: var(--line-height-common);
+   letter-spacing: var(--letter-spacing-common);
+}
+
+
 .blocks .block.blockTable .cell .block  {
     padding: 9px 9px 9px 9px;
     margin: 0px;
