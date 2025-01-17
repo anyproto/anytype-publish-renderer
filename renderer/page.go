@@ -15,14 +15,19 @@ type RenderPageParams struct {
 	Classes string
 }
 
-func (r *Renderer) hasIconAndCover() bool {
+func (r *Renderer) hasPageIcon() bool {
 	fields := r.Sp.Snapshot.Data.GetDetails()
-	coverId := pbtypes.GetString(fields, "coverId")
-	if coverId == "" {
+	iconEmoji := pbtypes.GetString(fields, "iconEmoji")
+	if iconEmoji != "" {
+		return true
+	}
+
+	iconImageId := pbtypes.GetString(fields, "iconImage")
+	if iconImageId == "" {
 		return false
 	}
 
-	_, err := r.getFileUrl(coverId)
+	_, err := r.getFileUrl(iconImageId)
 
 	return (err == nil)
 
@@ -30,8 +35,8 @@ func (r *Renderer) hasIconAndCover() bool {
 
 func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	var classes string
-	if r.hasIconAndCover() {
-		classes = "withIconAndCover"
+	if r.hasPageIcon() {
+		classes = "hasPageIcon"
 	}
 	return &RenderPageParams{
 		Classes: classes,

@@ -1,14 +1,30 @@
 package renderer
 
-templ CoverTemplate(r *Renderer, p *CoverRenderParams) {
+templ CoverImageTemplate(r *Renderer, p *CoverRenderParams) {
 	<div id={"block-" + p.Id } class="block blockCover align1 index0 noPlus">
 		<div class="content">
 			<div class="wrap">
 				<img id="cover" src={ p.Src }
-								class={"cover " + p.Classes}
+								class="cover type1"
 								style="opacity: 1; height: auto; width: 100%; transform: translate3d(0%, -25%, 0px);"
 				 />
 			</div>
+		</div>
+	</div>
+}
+
+templ CoverColorTemplate(r *Renderer, p *CoverRenderParams) {
+	<div id={"block-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
+		<div class="wrap">
+			<div class={"cover type2", p.Classes}></div>
+		</div>
+	</div>
+}
+
+templ CoverGradientTemplate(r *Renderer, p *CoverRenderParams) {
+	<div id={"block-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
+		<div class="wrap">
+			<div class={"cover type3", p.Classes}></div>
 		</div>
 	</div>
 }
@@ -28,7 +44,7 @@ templ UnsplashReferral() {
 }
 
 templ IconImageTemplate(r *Renderer, p *IconImageRenderParams) {
-	<div class="block blockIconPage align1 index0 noPlus">
+	<div class="block blockIconPage align0 index0 noPlus">
 		<div class="wrapContent">
 			<div id="block-icon" class="iconObject c96 isPage withImage">
 				<div class="iconEmoji" style="line-height: 56px;">

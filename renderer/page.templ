@@ -30,9 +30,12 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 						<a href={r.joinSpaceLink()} target="blank">Join Space</a>
 					</div>
 				}
-				@r.RenderPageCover()
+				<div class="coverWrapper">
+					@r.RenderPageCover()
+				</div>
  			    @r.RenderRoot()
 				<div class={"blocks " + p.Classes }>
+
  					@r.RenderPageIconImage()
 					<div>
 						for _, childId := range r.Root.ChildrenIds {
