@@ -1685,6 +1685,13 @@ markuplatex {
     border-top: 1px solid var(--color-shape-primary);
 }
 
+.blocks .block.blockTable .cell .block.blockText {
+   font-size: var(--font-size-common);
+   line-height: var(--line-height-common);
+   letter-spacing: var(--letter-spacing-common);
+}
+
+
 .blocks .block.blockTable .cell .block  {
     padding: 9px 9px 9px 9px;
     margin: 0px;
@@ -2048,7 +2055,7 @@ a {
     position: fixed;
     bottom: 10px;
     right: 10px;
-    padding: 12px;
+    padding: 10px;
     border-radius: 8px;
     background: var(--color-shape-tertiary);
 }
@@ -2057,7 +2064,7 @@ a {
     color: var(--color-text-primary);
     font-size: var(--font-size-small);
     font-weight: 500;
-    margin-top: -4px;
+    margin-top: -2px;
     padding-left: 7px;
 }
 
