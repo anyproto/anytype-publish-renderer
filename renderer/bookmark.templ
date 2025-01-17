@@ -1,0 +1,38 @@
+package renderer
+
+templ BookmarkTempl(p *BookmarkRendererParams) {
+    <div id={"block-" + p.Id } class={ "block blockBookmark align0" }>
+        <div class="wrapContent">
+            <div class="selectionTarget">
+                <div class="dropTarget">
+                    <div class="focusable">
+                        if !p.IsEmpty {
+                            <div class={"inner withImage data-href=" + p.Url }>
+                                <div class="side left">
+                                    <div class="link">
+                                        <img src={ p.Favicon } class="fav"> { p.Url }
+                                    </div>
+                                    <div class="name"> { p.Name } </div>
+                                    <div class="descr"> { p.Description } </div>
+                                </div>
+                                 <div class="side right">
+                                    <img src={ p.Image } class="img">
+                                 </div>
+                            </div>
+                        } else {
+                            <div class="inputWithFile resizable noFile">
+                                <div class="icon bookmark">
+                                </div>
+                                <div class="inputWithFile-inner">
+                                    <form class="form">
+                                        <span class="urlToggle">Paste a link</span>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

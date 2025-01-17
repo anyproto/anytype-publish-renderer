@@ -1890,6 +1890,268 @@ a {
   display: block;
   height: 2px;
 }
+
+.blocks .block.blockBookmark {
+  padding: 6px 0px;
+}
+.blocks .block.blockBookmark .focusable {
+  border-radius: 4px;
+}
+.blocks .block.blockBookmark .loaderWrapper {
+  border-radius: 4px;
+  border: solid 1px var(--color-shape-secondary);
+  height: 48px;
+  width: 100%;
+}
+.blocks .block.blockBookmark .deleted {
+  display: flex;
+  gap: 0px 6px;
+  align-items: center;
+  color: var(--color-control-active);
+}
+.blocks .block.blockBookmark .deleted .icon.ghost {
+  width: 24px;
+  height: 24px;
+}
+.blocks .block.blockBookmark .deleted .name {
+  display: inline-block;
+  vertical-align: top;
+  max-width: calc(100% - 26px);
+  position: relative;
+  margin: 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.blocks .block.blockBookmark .inner {
+  display: flex;
+  border: 1px solid var(--color-shape-secondary);
+  transition: border-color 0.3s;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
+}
+.blocks .block.blockBookmark .inner::after {
+  content: '';
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  border-radius: inherit;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.03);
+  transition: all 0.3s;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+}
+.blocks .block.blockBookmark .inner:hover {
+  border-color: var(--color-shape-primary);
+}
+.blocks .block.blockBookmark .inner:hover::after {
+  opacity: 1;
+}
+.blocks .block.blockBookmark .inner.bgColor {
+  border: 0px;
+}
+.blocks .block.blockBookmark .inner .side.left {
+  width: 100%;
+  padding: 16px;
+  position: relative;
+}
+.blocks .block.blockBookmark .inner .side.right {
+  border-radius: 0px 8px 8px 0px;
+  overflow: hidden;
+  display: none;
+}
+.blocks .block.blockBookmark .inner .name {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.blocks .block.blockBookmark .inner .descr {
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.blocks .block.blockBookmark .inner .archive {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 1;
+}
+.blocks .block.blockBookmark .inner.isVertical {
+  display: flex;
+  flex-direction: column;
+}
+.blocks .block.blockBookmark .inner.isVertical .side.left {
+  width: 100%;
+  border-radius: 0px;
+}
+.blocks .block.blockBookmark .inner.isVertical .side.right {
+  aspect-ratio: 7 / 3;
+  width: 100%;
+  border-radius: 0px;
+}
+.blocks .block.blockBookmark .inner.isVertical .link,
+.blocks .block.blockBookmark .inner.isVertical .name {
+  margin-bottom: 4px;
+}
+.blocks .block.blockBookmark .inner.isVertical .descr {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.blocks .block.blockBookmark .inner.withImage .sides {
+  align-items: stretch;
+}
+.blocks .block.blockBookmark .inner.withImage .side.left {
+  width: calc(100% - 28%);
+  padding: 16px 12px 16px 16px;
+}
+.blocks .block.blockBookmark .inner.withImage .side.right {
+  width: 28%;
+  min-height: 90px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 7 / 3;
+  max-height: 122px;
+}
+.blocks .block.blockBookmark .inner.withImage .side.right .img {
+  width: calc(100% - 16px);
+  height: calc(100% - 32px);
+  position: static;
+  left: auto;
+  top: auto;
+  border-radius: 4px;
+}
+.blocks .block.blockBookmark .inner.withImage:not(.isVertical) .side.left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.blocks .block.blockBookmark .inner.withImage.isVertical .side.left {
+  width: 100%;
+}
+.blocks .block.blockBookmark .inner.withImage.isVertical .side.right {
+  width: 100%;
+  padding: 0px 16px;
+  margin-bottom: 16px;
+  max-height: unset;
+}
+.blocks .block.blockBookmark .inner.withImage.isVertical .side.right .img {
+  width: 100%;
+  height: 100%;
+}
+.blocks .block.blockBookmark .link {
+  /* Placeholder for @include text-small */
+  font-size: 14px;
+  height: 18px;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+  /* Placeholder for @include text-overflow-nw */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  gap: 0px 6px;
+  align-items: center;
+}
+.blocks .block.blockBookmark .img {
+  position: absolute;
+  width: calc(100% + 4px);
+  top: 0px;
+  left: -2px;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.blocks .block.blockBookmark .fav {
+  width: 14px;
+  height: 14px;
+  object-fit: cover;
+}
+.blocks .block.blockBookmark > .wrapContent {
+  border-radius: 6px;
+}
+.blocks .block.blockBookmark > .wrapContent > .selectionTarget > .dropTarget {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.blocks .block.blockBookmark > .wrapContent > .selectionTarget.isSelectionSelected::after {
+  left: 0px;
+  width: 100%;
+  border-radius: 8px;
+}
+.blocks .block.blockBookmark.withContent > .wrapContent > .selectionTarget.isSelectionSelected::after {
+  border-radius: 8px;
+}
+
+.inputWithFile {
+  padding: 11px 13px;
+  border-radius: 8px;
+  border: solid 1px var(--color-shape-secondary);
+  color: var(--color-control-active);
+  /* Placeholder for @include text-common */
+  font-size: 16px; /* Adjust based on your common text style */
+  transition: border 0.3s; /* Replace $transitionCommon with a standard duration */
+  overflow: hidden;
+  line-height: 20px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0px 6px;
+  white-space: nowrap;
+}
+
+.inputWithFile .inputWithFile-inner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  width: calc(100% - 26px);
+}
+
+.inputWithFile .urlToggle {
+  cursor: text;
+  display: inline-block;
+}
+.inputWithFile .form {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.inputWithFile .icon.bookmark {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMCAxNUwxNi41IDE4VjRDMTYuNSAyLjg5NTQzIDE1LjYwNDYgMiAxNC41IDJINS41QzQuMzk1NDMgMiAzLjUgMi44OTU0MyAzLjUgNFYxOEwxMCAxNVpNNSAxNS42NTU2TDEwIDEzLjM0NzlMMTUgMTUuNjU1NlY0QzE1IDMuNzIzODYgMTQuNzc2MSAzLjUgMTQuNSAzLjVINS41QzUuMjIzODYgMy41IDUgMy43MjM4NiA1IDRWMTUuNjU1NloiIGZpbGw9IiNiNmI2YjYiLz4KPC9zdmc+);
+}
+
+.inputWithFile.noFile .urlToggle {
+  width: 100%;
+}
+.inputWithFile.noFile .form {
+  width: 100%;
+}
+
+.inputWithFile .icon {
+  width: 20px;
+  height: 20px;
+  transition: none;
+  flex-shrink: 0;
+}
+
 .tagItem {
   padding: 0px 4px;
   font-size: var(--font-size-common);
