@@ -1739,6 +1739,7 @@ markuplatex {
     display: grid;
     position: relative;
     border-right: 1px solid var(--color-shape-primary);
+    grid-auto-rows: 50px;
 }
 
 .blocks .block.blockTable .row:nth-child(2) {
