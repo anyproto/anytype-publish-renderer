@@ -7,7 +7,6 @@ import (
 )
 
 type IconImageRenderParams struct {
-	Id  string
 	Src string
 }
 
@@ -19,7 +18,6 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 		code := []rune(iconEmoji)[0]
 		emojiSrc := r.GetEmojiUrl(code)
 		params = &IconImageRenderParams{
-			Id:  "emoji",
 			Src: emojiSrc,
 		}
 
@@ -34,7 +32,6 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 	}
 
 	params = &IconImageRenderParams{
-		Id:  iconImageId,
 		Src: src,
 	}
 
