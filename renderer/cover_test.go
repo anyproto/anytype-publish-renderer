@@ -22,4 +22,38 @@ func TestMakeRenderCoverParams(t *testing.T) {
 			assert.Equal(t, expected.Src, actual.Src)
 		}
 	})
+
+	t.Run("solid color cover", func(t *testing.T) {
+		r := getTestRenderer("test-solid-color-cover")
+		expected := &CoverRenderParams{
+			Id:        "red",
+			Classes:   "red",
+			CoverType: CoverType_Color,
+		}
+
+		actual, err := r.MakeRenderPageCoverParams()
+		if assert.NoError(t, err) {
+			assert.Equal(t, expected.Id, actual.Id)
+			assert.Equal(t, expected.Classes, actual.Classes)
+			assert.Equal(t, expected.CoverType, actual.CoverType)
+		}
+	})
+
+	t.Run("gradient cover", func(t *testing.T) {
+		r := getTestRenderer("test-gradient-cover")
+		expected := &CoverRenderParams{
+			Id:        "blue",
+			Classes:   "blue",
+			CoverType: CoverType_Gradient,
+		}
+
+		actual, err := r.MakeRenderPageCoverParams()
+		if assert.NoError(t, err) {
+			assert.Equal(t, expected.Id, actual.Id)
+			assert.Equal(t, expected.Classes, actual.Classes)
+			assert.Equal(t, expected.CoverType, actual.CoverType)
+		}
+
+	})
+
 }

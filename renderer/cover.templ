@@ -1,11 +1,11 @@
 package renderer
 
-templ CoverTemplate(r *Renderer, p *CoverRenderParams) {
+templ CoverImageTemplate(r *Renderer, p *CoverRenderParams) {
 	<div id={"block-" + p.Id } class="block blockCover align1 index0 noPlus">
 		<div class="content">
 			<div class="wrap">
 				<img id="cover" src={ p.Src }
-								class={"cover " + p.Classes}
+								class="cover type1"
 								style="opacity: 1; height: auto; width: 100%; transform: translate3d(0%, -25%, 0px);"
 				 />
 			</div>
@@ -13,8 +13,24 @@ templ CoverTemplate(r *Renderer, p *CoverRenderParams) {
 	</div>
 }
 
+templ CoverColorTemplate(r *Renderer, p *CoverRenderParams) {
+	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
+		<div class="wrap">
+			<div class={"cover type2", p.Classes}></div>
+		</div>
+	</div>
+}
+
+templ CoverGradientTemplate(r *Renderer, p *CoverRenderParams) {
+	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
+		<div class="wrap">
+			<div class={"cover type3", p.Classes}></div>
+		</div>
+	</div>
+}
+
 templ EmptyCoverTemplate(id string) {
-	<div id={"block-" + id } >
+	<div id={"block-cover-" + id } >
 	    <div class="empty" style="width: 100%; height: 72px; margin: 0px auto; line-height: 16px; opacity: 0;"> </div>
 	</div>
 }
@@ -25,16 +41,4 @@ templ UnsplashReferral() {
 		<a href="https://unsplash.com/@santesson89?utm_source=Anytype&amp;utm_medium=referral">Andrea De Santis</a> on <a href="https://unsplash.com/?utm_source=Anytype&amp;utm_medium=referral">Unsplash</a>
 	</div>
 
-}
-
-templ IconImageTemplate(r *Renderer, p *IconImageRenderParams) {
-	<div class="block blockIconPage align1 index0 noPlus">
-		<div class="wrapContent">
-			<div id="block-icon" class="iconObject c96 isPage withImage">
-				<div class="iconEmoji" style="line-height: 56px;">
-					<img src={ p.Src } class="iconImage c56" />
-				</div>
-			</div>
-		</div>
-	</div>
 }
