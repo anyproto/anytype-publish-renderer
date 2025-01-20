@@ -14,7 +14,7 @@ templ CoverImageTemplate(r *Renderer, p *CoverRenderParams) {
 }
 
 templ CoverColorTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
+	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
 		<div class="wrap">
 			<div class={"cover type2", p.Classes}></div>
 		</div>
@@ -22,7 +22,7 @@ templ CoverColorTemplate(r *Renderer, p *CoverRenderParams) {
 }
 
 templ CoverGradientTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
+	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
 		<div class="wrap">
 			<div class={"cover type3", p.Classes}></div>
 		</div>
@@ -30,7 +30,7 @@ templ CoverGradientTemplate(r *Renderer, p *CoverRenderParams) {
 }
 
 templ EmptyCoverTemplate(id string) {
-	<div id={"block-" + id } >
+	<div id={"block-cover-" + id } >
 	    <div class="empty" style="width: 100%; height: 72px; margin: 0px auto; line-height: 16px; opacity: 0;"> </div>
 	</div>
 }
