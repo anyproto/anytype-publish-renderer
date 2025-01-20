@@ -551,6 +551,12 @@ main {
     max-width: 100% !important;
     background: #fff;
 }
+.blockEmbed iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0px;
+    display: block;
+}
 .blocks .block.blockIconPage {
     padding: 0px 0px 16px 0px;
 }
