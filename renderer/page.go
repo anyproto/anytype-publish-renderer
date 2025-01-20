@@ -65,6 +65,7 @@ func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
 	case *model.BlockContentOfLatex:
 		return r.RenderEmbed(b)
 	case *model.BlockContentOfBookmark:
+		return r.RenderBookmark(b)
 	case *model.BlockContentOfLink:
 		return r.RenderLink(b)
 	case *model.BlockContentOfSmartblock:
