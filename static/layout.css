@@ -2057,12 +2057,10 @@ a {
   height: 100%;
 }
 .blocks .block.blockBookmark .link {
-  /* Placeholder for @include text-small */
   font-size: 14px;
   height: 18px;
   line-height: 18px;
   color: var(--color-text-secondary);
-  /* Placeholder for @include text-overflow-nw */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2105,9 +2103,8 @@ a {
   border-radius: 8px;
   border: solid 1px var(--color-shape-secondary);
   color: var(--color-control-active);
-  /* Placeholder for @include text-common */
-  font-size: 16px; /* Adjust based on your common text style */
-  transition: border 0.3s; /* Replace $transitionCommon with a standard duration */
+  font-size: 16px;
+  transition: border 0.3s;
   overflow: hidden;
   line-height: 20px;
   text-align: left;
