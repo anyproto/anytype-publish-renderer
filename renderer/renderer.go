@@ -155,10 +155,6 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 		return
 	}
 
-	var snapshotJson []byte
-	snapshotJson, err = json.Marshal(snapshot)
-	os.WriteFile("./snapshot.json", snapshotJson, 0644)
-
 	if snapshot.SbType != model.SmartBlockType_Page {
 		log.Error("published snaphost is not Page", zap.Int("type", int(snapshot.SbType)))
 		return
