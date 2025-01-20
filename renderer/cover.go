@@ -27,7 +27,7 @@ const (
 
 func ToCoverType(val int64) (CoverType, error) {
 	if val < 1 || val > 4 {
-		return -1, fmt.Errorf("Unknown cover type: %d", val)
+		return -1, fmt.Errorf("unknown cover type: %d", val)
 	}
 
 	return CoverType(val), nil
@@ -103,49 +103,4 @@ func (r *Renderer) RenderPageCover() templ.Component {
 	log.Warn("cover rendering failed: unknown cover type", zap.Int("coverType", int(params.CoverType)))
 	return EmptyCoverTemplate(bson.NewObjectId().Hex())
 
-}
-
-type IconImageRenderParams struct {
-	Id  string
-	Src string
-}
-
-func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParams, err error) {
-	fields := r.Sp.Snapshot.Data.GetDetails()
-	iconEmoji := pbtypes.GetString(fields, "iconEmoji")
-	if iconEmoji != "" {
-		log.Debug("icon emoji", zap.String("id", iconEmoji))
-		code := []rune(iconEmoji)[0]
-		emojiSrc := r.GetEmojiUrl(code)
-		params = &IconImageRenderParams{
-			Id:  "emoji",
-			Src: emojiSrc,
-		}
-
-		return
-	}
-
-	iconImageId := pbtypes.GetString(fields, "iconImage")
-	src, err := r.getFileUrl(iconImageId)
-	if err != nil {
-		log.Warn("cover image rendering failed", zap.Error(err))
-		return
-	}
-
-	params = &IconImageRenderParams{
-		Id:  iconImageId,
-		Src: src,
-	}
-
-	return
-
-}
-
-func (r *Renderer) RenderPageIconImage() templ.Component {
-	params, err := r.MakeRenderPageIconImageParams()
-	if err != nil {
-		return NoneTemplate("")
-	}
-
-	return IconImageTemplate(r, params)
 }
