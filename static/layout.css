@@ -1365,7 +1365,7 @@ markuplatex {
 /* Column */
 .block.blockLayout.layoutColumn {
   padding: 0px;
-  margin: 0px;
+  margin: 5px;
   flex-grow: 1;
 }
 
