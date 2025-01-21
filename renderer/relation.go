@@ -21,7 +21,6 @@ type RelationRenderParams struct {
 	IsEmpty         string
 	Format          string
 	Value           templ.Component
-	IsSystem        bool
 }
 
 func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParams {
@@ -39,13 +38,12 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParam
 	relationKey := domain.RelationKey(relationBlock.GetKey())
 	relation, _ := bundle.GetRelation(relationKey)
 
-	name, format, isSystem, found := r.fetchRelationMetadata(relation, relationKey)
+	name, format, found := r.fetchRelationMetadata(relation, relationKey)
 	if name == "" {
 		name = defaultName
 	}
 
 	params.Name = name
-	params.IsSystem = isSystem
 
 	if !found {
 		params.IsDeleted = "isDeleted"
@@ -63,9 +61,9 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParam
 	return params
 }
 
-func (r *Renderer) fetchRelationMetadata(relation *model.Relation, relationKey domain.RelationKey) (string, model.RelationFormat, bool, bool) {
+func (r *Renderer) fetchRelationMetadata(relation *model.Relation, relationKey domain.RelationKey) (string, model.RelationFormat, bool) {
 	if relation != nil {
-		return relation.Name, relation.Format, true, true
+		return relation.Name, relation.Format, true
 	}
 
 	for _, snapshot := range r.UberSp.PbFiles {
@@ -78,10 +76,10 @@ func (r *Renderer) fetchRelationMetadata(relation *model.Relation, relationKey d
 		if uniqueKey := fields[bundle.RelationKeyUniqueKey.String()]; uniqueKey != nil && uniqueKey.GetStringValue() == relationKey.URL() {
 			name := fields[bundle.RelationKeyName.String()].GetStringValue()
 			format := model.RelationFormat(int32(fields[bundle.RelationKeyRelationFormat.String()].GetNumberValue()))
-			return name, format, false, true
+			return name, format, true
 		}
 	}
-	return "", model.RelationFormat_longtext, false, false
+	return "", model.RelationFormat_longtext, false
 }
 
 func (r *Renderer) populateRelationValue(params *RelationRenderParams, format model.RelationFormat, relationValue *types.Value) {
