@@ -3,6 +3,7 @@ package renderer
 import (
 	"cmp"
 	"fmt"
+	"html"
 	"slices"
 	"strconv"
 	"strings"
@@ -30,6 +31,7 @@ func cmpMarks(a, b *model.BlockContentTextMark) int {
 }
 
 func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string {
+	s = html.EscapeString(s)
 	switch mark.Type {
 	case model.BlockContentTextMark_Strikethrough:
 		return "<markupstrike>" + s + "</markupstrike>"
@@ -77,6 +79,7 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 //     add props from each of this ranges to this range
 func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockContentTextMark) string {
 	if len(marks) == 0 {
+		text = html.EscapeString(text)
 		return text
 	}
 
@@ -128,32 +131,8 @@ func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockCont
 		}
 		log.Debug("final marked part", zap.String("m", markedPart))
 		markedText.WriteString(markedPart)
-
 	}
 
-	return markedText.String()
-}
-
-func (r *Renderer) applyMarks(text string, marks []*model.BlockContentTextMark) string {
-	if len(marks) == 0 {
-		return text
-	}
-	var markedText strings.Builder
-	var lastPos int32
-	rText := []rune(text)
-	slices.SortFunc(marks, cmpMarks)
-	for _, mark := range marks {
-		log.Debug("Marks:",
-			zap.Int("len", len(rText)),
-			zap.String("text", text), zap.String("pos", fmt.Sprintf("%d: %d-%d", lastPos, mark.Range.From, mark.Range.To)))
-
-		before := rText[lastPos:mark.Range.From]
-		markedText.WriteString(string(before))
-
-		markedPart := rText[mark.Range.From:mark.Range.To]
-		markedText.WriteString(r.applyMark(string(markedPart), mark))
-		lastPos = mark.Range.To
-	}
 	return markedText.String()
 }
 
@@ -177,7 +156,6 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	} else {
 		fields := b.GetFields()
 		lang := pbtypes.GetString(fields, "lang")
-
 		textComp = TextCodeTemplate(text, lang)
 	}
 
