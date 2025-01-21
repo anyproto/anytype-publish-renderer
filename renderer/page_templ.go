@@ -121,7 +121,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" target=\"blank\">Join Space</a></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" target=\"blank\"><span id=\"joinSpaceLink\">Join Space</span></a></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -178,7 +178,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><a href=\"https://anytype.io/\" target=\"blank\"><div class=\"madeInAnytype\"><div class=\"container\"><div class=\"anyIcon\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 14 14\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M11 3V0H3V3H11ZM11 3V14H14V3H11ZM4.5 14C6.98528 14 9 11.9853 9 9.5C9 7.01472 6.98528 5 4.5 5C2.01472 5 0 7.01472 0 9.5C0 11.9853 2.01472 14 4.5 14Z\" fill=\"black\"></path></svg></div><div class=\"madeInText\">Made in Anytype</div></div></div></a></main>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><a href=\"https://anytype.io/\" target=\"blank\"><div class=\"madeInAnytype\" id=\"madeInAnytypeLink\"><div class=\"container\"><div class=\"anyIcon\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 14 14\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M11 3V0H3V3H11ZM11 3V14H14V3H11ZM4.5 14C6.98528 14 9 11.9853 9 9.5C9 7.01472 6.98528 5 4.5 5C2.01472 5 0 7.01472 0 9.5C0 11.9853 2.01472 14 4.5 14Z\" fill=\"black\"></path></svg></div><div class=\"madeInText\">Made in Anytype</div></div></div></a></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
