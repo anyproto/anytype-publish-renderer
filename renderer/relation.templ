@@ -2,32 +2,34 @@ package renderer
 
 templ RelationTemplate(p *RelationRenderParams) {
 	<div id={"block-" + p.Id} class={"block blockRelation " + p.BackgroundColor}>
-		<div class={ "wrap " + p.IsDeleted } >
-            <div class="sides">
-            if p.IsDeleted != "" {
-                <div class={"info noValue"}>
-                    <div class="name"> { p.Name } </div>
-                </div>
-            } else {
-                <div class="info">
-                     if p.IsSystem {
-                          <div class="icon lock"></div>
-                     }
-                     if p.IsEmpty != "" {
-                         <div class="cell">
-                             <div class={ "cellContent " + p.IsEmpty }>
-                                <div class="empty"></div>
+	    <div class="wrapContent">
+            <div class="selectionTarget">
+                <div class="dropTarget">
+                    <div class={ "wrap focusable" + p.IsDeleted } >
+                        <div class="sides">
+                        if p.IsDeleted != "" {
+                            <div class={"info noValue"}>
                                 <div class="name"> { p.Name } </div>
-                             </div>
-                         </div>
-                     } else {
-                        <div class="name"> { p.Name } </div>
-                        @p.Value
-                     }
-                </div>
-            }
-		    </div>
-		</div>
+                            </div>
+                        } else {
+                            <div class="info">
+                                 <div class="name"> { p.Name } </div>
+                            </div>
+                                if p.IsEmpty != "" {
+                                     <div class="cell">
+                                         <div class={ "cellContent " + p.IsEmpty }>
+                                            <div class="empty"></div>
+                                         </div>
+                                     </div>
+                                 } else {
+                                    @p.Value
+                                 }
+                        }
+                        </div>
+                    </div>
+                 </div>
+             </div>
+         </div>
 	</div>
 }
 

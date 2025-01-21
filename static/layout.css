@@ -1828,9 +1828,7 @@ a {
 .blocks .block.blockRelation > .wrapContent > .selectionTarget > .dropTarget {
   padding: 0px;
 }
-.blocks .block.blockRelation .icon.edit {
-  display: none;
-}
+
 .blocks .block.blockRelation .icon.checkbox {
   width: 20px;
   height: 20px;
@@ -1857,7 +1855,6 @@ a {
 .blocks .block.blockRelation .info {
   padding: 6px 2px;
   line-height: 20px;
-  width: 100%;
   min-width: 40px;
   flex-shrink: 0;
   white-space: nowrap;
@@ -1877,48 +1874,29 @@ a {
   font-size: var(--font-size-common);
   line-height: var(--line-height-common);
   letter-spacing: var(--letter-spacing-common);
-  line-height: 20px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--color-text-secondary);
+  width: 100%;
 }
-.blocks .block.blockRelation .info .icon.lock {
-  width: 8px;
-  height: 20px;
-  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDggMTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0wIDYuMDMxMjVDMCA1LjQ3ODk3IDAuNDQ3NzE1IDUuMDMxMjUgMSA1LjAzMTI1SDdDNy41NTIyOCA1LjAzMTI1IDggNS40Nzg5NyA4IDYuMDMxMjVWMTFDOCAxMS41NTIzIDcuNTUyMjggMTIgNyAxMkgxQzAuNDQ3NzE1IDEyIDAgMTEuNTUyMyAwIDExVjYuMDMxMjVaIiBmaWxsPSIjYjZiNmI2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNiA4VjNDNiAxLjg5NTQzIDUuMTA0NTcgMSA0IDFDMi44OTU0MyAxIDIgMS44OTU0MyAyIDNWOEMyIDkuMTA0NTcgMi44OTU0MyAxMCA0IDEwQzUuMTA0NTcgMTAgNiA5LjEwNDU3IDYgOFpNNCAwQzIuMzQzMTUgMCAxIDEuMzQzMTUgMSAzVjhDMSA5LjY1Njg1IDIuMzQzMTUgMTEgNCAxMUM1LjY1Njg1IDExIDcgOS42NTY4NSA3IDhWM0M3IDEuMzQzMTUgNS42NTY4NSAwIDQgMFoiIGZpbGw9IiNiNmI2YjYiLz4KPC9zdmc+);
-  flex-shrink: 0;
-  display: inline-block;
-  vertical-align: middle;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  background-position: center center;
-  transition: all 0.1s cubic-bezier(0.22, 1, 0.36, 1);
-  position: relative;
-}
-.blocks .block.blockRelation .info .icon.ghost {
-  width: 20px;
-  height: 20px;
-}
+
 .blocks .block.blockRelation .wrap.isDeleted .info .name {
   color: var(--color-text-secondary);
 }
-.blocks .block.blockRelation .cellContent.canEdit .empty {
-  display: block;
-}
+
 .blocks .block.blockRelation .cell {
   font-size: var(--font-size-common);
   line-height: var(--line-height-common);
   letter-spacing: var(--letter-spacing-common);
   width: 70%;
   position: relative;
+  padding: 5px 8px;
   border-radius: 4px;
   transition: background 0.1s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.blocks .block.blockRelation .cell.canEdit:hover {
-  background: var(--color-shape-highlight-light);
-}
 .blocks .block.blockRelation .cell.c-select {
+  padding: 6px 8px;
   line-height: 18px;
 }
 .blocks .block.blockRelation .cell.c-select .empty {
@@ -1929,63 +1907,11 @@ a {
 .blocks .block.blockRelation .cell.c-file .over {
   flex-wrap: wrap;
 }
-.blocks .block.blockRelation .cell.isEditing {
-  padding: 0px;
-}
-.blocks .block.blockRelation .cell.isEditing .cellContent {
-  position: relative;
-  height: auto !important;
-  min-height: 32px;
-  border-radius: 4px;
-}
-.blocks .block.blockRelation .cell.isEditing .cellContent.isName .input {
-  height: 20px;
-  line-height: 20px;
-  width: calc(100% - 24px);
-}
-.blocks .block.blockRelation .cell.isEditing .icon.clear {
-  right: 8px;
-}
-.blocks .block.blockRelation .cell.isEditing #entry {
-  line-height: 18px;
-  height: 18px;
-  vertical-align: top;
-  display: inline-block;
-}
-.blocks .block.blockRelation .cell.isEditing.c-select .cellContent, .blocks .block.blockRelation .cell.isEditing.c-select .placeholder {
-  padding: 6px 8px 4px 8px;
-}
-.blocks .block.blockRelation .cell.isEditing.c-select.isSelect .over {
-  width: calc(100% - 26px);
-}
-.blocks .block.blockRelation .cell.isEditing.c-shortText .cellContent,
-.blocks .block.blockRelation .cell.isEditing.c-number .cellContent,
-.blocks .block.blockRelation .cell.isEditing.c-url .cellContent,
-.blocks .block.blockRelation .cell.isEditing.c-phone .cellContent,
-.blocks .block.blockRelation .cell.isEditing.c-email .cellContent {
-  padding: 5px 8px !important;
-}
-.blocks .block.blockRelation .cell.isEditing.c-date .cellContent {
-  padding: 5px 8px 4px 8px !important;
-}
+
 .blocks .block.blockRelation .cell.c-object .element {
   background: none !important;
 }
-.blocks .block.blockRelation .cell.isEditing.c-object .cellContent, .blocks .block.blockRelation .cell.isEditing.c-object .placeholder {
-  padding: 5px 8px 1px 8px !important;
-}
-.blocks .block.blockRelation .cell.isEditing.c-file .cellContent, .blocks .block.blockRelation .cell.isEditing.c-file .placeholder {
-  padding: 5px 8px !important;
-}
-.blocks .block.blockRelation .cell.isEditing.c-longText .cellContent {
-  box-shadow: 0px 0px;
-  visibility: hidden;
-  border: 0px;
-  padding: 5px 8px;
-}
-.blocks .block.blockRelation .cell.isEditing.c-longText .cellContent span:empty {
-  height: 22px;
-}
+
 .blocks .block.blockRelation > .wrapContent > .dropTarget.targetBot {
   display: block;
   height: 2px;
@@ -2383,8 +2309,13 @@ a {
   text-overflow: ellipsis;
 }
 
+.cellContent.c-object {
+  vertical-align: top;
+  width: 100%;
+  gap: 4px 8px;
+  align-items: flex-start;
+}
 .cellContent.c-select .over,
-.cellContent.c-object .over,
 .cellContent.c-file .over {
   display: inline-flex;
   vertical-align: top;
