@@ -27,7 +27,11 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			<main>
 				if r.joinSpaceLink() != "" {
 					<div class="joinSpace">
-						<a href={r.joinSpaceLink()} target="blank">Join Space</a>
+						<a href={r.joinSpaceLink()} target="blank">
+							<span id="joinSpaceLink">
+								Join Space
+							</span>
+						</a>
 					</div>
 				}
 				<div class="coverWrapper">
@@ -44,7 +48,7 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 					</div>
 				</div>
 				<a href="https://anytype.io/" target="blank">
- 					<div class="madeInAnytype">
+ 					<div class="madeInAnytype" id="madeInAnytypeLink">
 						<div class="container">
 							<div class="anyIcon">
 								<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
