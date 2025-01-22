@@ -5,6 +5,7 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
+	"go.uber.org/zap"
 )
 
 const linkTemplate = "anytype://object?objectId=%s&spaceId=%s"
@@ -138,53 +139,86 @@ func getArchiveClass(details *types.Struct) string {
 
 func (r *Renderer) getIconParams(b *model.Block, details *types.Struct) (icon, iconClass, iconStyle string) {
 	iconClass = "c20"
+
 	if b.GetLink().GetIconSize() == model.BlockContentLink_SizeNone {
 		return
 	}
+
 	layout := model.ObjectTypeLayout(details.GetFields()[bundle.RelationKeyLayout.String()].GetNumberValue())
-	if layout == model.ObjectType_todo && b.GetLink().GetIconSize() != model.BlockContentLink_SizeNone {
-		iconStyle = "iconCheckbox c20 icon checkbox unset"
-		if doneValue := details.GetFields()[bundle.RelationKeyDone.String()]; doneValue != nil && doneValue.GetBoolValue() {
-			iconStyle = "iconCheckbox c20 icon checkbox set"
-		}
+
+	if layout == model.ObjectType_todo {
+		iconStyle = r.getTodoIconStyle(details)
 		return
 	}
-	if b.GetLink().GetIconSize() != model.BlockContentLink_SizeNone {
-		iconStyle = "smileImage c20"
+	iconStyle, iconClass = r.getDefaultIconStyle(b, iconClass)
+
+	icon, iconClass = r.getIconFromDetails(details, iconClass)
+
+	if icon == "" {
+		iconStyle = r.getFallbackIconStyle(b, layout)
 	}
+	return
+}
+
+func (r *Renderer) getTodoIconStyle(details *types.Struct) string {
+	iconStyle := "iconCheckbox c20 icon checkbox unset"
+	if doneValue := details.GetFields()[bundle.RelationKeyDone.String()]; doneValue != nil && doneValue.GetBoolValue() {
+		iconStyle = "iconCheckbox c20 icon checkbox set"
+	}
+	return iconStyle
+}
+
+func (r *Renderer) getDefaultIconStyle(b *model.Block, iconClass string) (iconStyle, updatedIconClass string) {
+	iconStyle = "smileImage c20"
+	updatedIconClass = iconClass
+
 	if b.GetLink().GetCardStyle() == model.BlockContentLink_Card {
-		if b.GetLink().GetIconSize() == model.BlockContentLink_SizeMedium {
+		switch b.GetLink().GetIconSize() {
+		case model.BlockContentLink_SizeMedium:
 			iconStyle = "smileImage c28"
-			iconClass = "c48"
-		} else if b.GetLink().GetIconSize() == model.BlockContentLink_SizeSmall {
+			updatedIconClass = "c48"
+		case model.BlockContentLink_SizeSmall:
 			iconStyle = "smileImage c20"
 		}
 	}
-	iconValue := details.GetFields()[bundle.RelationKeyIconEmoji.String()]
-	if iconValue != nil && iconValue.GetStringValue() != "" {
-		emojiRune := []rune(iconValue.GetStringValue())[0]
+	return iconStyle, updatedIconClass
+}
+
+func (r *Renderer) getIconFromDetails(details *types.Struct, iconClass string) (icon, updatedIconClass string) {
+	emojiField := details.GetFields()[bundle.RelationKeyIconEmoji.String()]
+	if emojiField != nil && emojiField.GetStringValue() != "" {
+		emojiRune := []rune(emojiField.GetStringValue())[0]
 		icon = r.GetEmojiUrl(emojiRune)
-		iconClass += " withIcon"
+		return icon, iconClass + " withIcon"
 	}
-	if iconValue == nil || iconValue.GetStringValue() == "" {
-		iconValue = details.GetFields()[bundle.RelationKeyIconImage.String()]
-		if iconValue != nil && iconValue.GetStringValue() != "" {
-			icon, _ = r.getFileUrl(iconValue.GetStringValue())
-			iconClass += " withImage"
+
+	imageField := details.GetFields()[bundle.RelationKeyIconImage.String()]
+	if imageField != nil && imageField.GetStringValue() != "" {
+		icon, err := r.getFileUrl(imageField.GetStringValue())
+		if err != nil {
+			log.Error("Failed to get file URL for icon", zap.Error(err))
+			return "", iconClass
 		}
+		return icon, iconClass + " withImage"
 	}
-	if icon == "" && b.GetLink().GetIconSize() != model.BlockContentLink_SizeNone {
-		iconSize := "c20"
-		if b.GetLink().GetIconSize() == model.BlockContentLink_SizeMedium {
-			iconSize = "c28"
-		}
-		if layout == model.ObjectType_collection || layout == model.ObjectType_set {
-			iconStyle = "iconCommon icon collection " + iconSize
-		} else if layout != model.ObjectType_note && layout != model.ObjectType_profile && layout != model.ObjectType_participant {
-			iconStyle = "iconCommon icon page " + iconSize
-		}
+
+	return "", iconClass
+}
+
+func (r *Renderer) getFallbackIconStyle(b *model.Block, layout model.ObjectTypeLayout) string {
+	iconSize := "c20"
+	if b.GetLink().GetIconSize() == model.BlockContentLink_SizeMedium {
+		iconSize = "c28"
 	}
-	return
+
+	switch layout {
+	case model.ObjectType_collection, model.ObjectType_set:
+		return "iconCommon icon collection " + iconSize
+	case model.ObjectType_note, model.ObjectType_profile, model.ObjectType_participant:
+		return ""
+	default:
+		return "iconCommon icon page " + iconSize
+	}
 }
 
 func (r *Renderer) getAdditionalParams(b *model.Block, details *types.Struct) (objectTypeName string, coverParams *CoverRenderParams, coverClass string) {
