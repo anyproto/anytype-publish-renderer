@@ -62,15 +62,15 @@ function initGraphviz() {
 }
 
 function initAnalyticsEvents() {
-    document.getElementById("madeInAnytypeLink").addEventListener("click", (e) => {
+    document.getElementById("madeInAnytypeLink")?.addEventListener("click", (e) => {
         setTimeout(_ => {
-            window.fathom.trackEvent("PublishSiteClick");
+            window.fathom?.trackEvent("PublishSiteClick");
         })
     });
 
-    document.getElementById("joinSpaceLink").addEventListener("click", (e) => {
+    document.getElementById("joinSpaceLink")?.addEventListener("click", (e) => {
         setTimeout(_ => {
-            window.fathom.trackEvent("PublishJoinSpaceClick");
+            window.fathom?.trackEvent("PublishJoinSpaceClick");
         })
     });
 
