@@ -1,0 +1,67 @@
+package renderer
+
+templ LinkTempl(p *LinkRenderParams) {
+    <div id={"block-" + p.Id } class={ "block blockLink " + p.LinkTypeClass }>
+        <div class="wrapContent">
+            <div class="selectionTarget">
+                <div class="dropTarget">
+                    <div class={ "focusable " + p.IsArchived }>
+                    if p.IsDeleted {
+                        <div class="deleted">
+                            <div id="" draggable="false" class="icon ghost"></div>
+                            <div class="name">Non-existent object</div>
+                        </div>
+                    } else {
+                            <div class={ "linkCard " + p.IconClass + " " + p.LayoutClass + " " + p.CoverClass }>
+                                <div class="sides">
+                                    <div class="side left">
+                                        <div class="cardName">
+                                            if p.Icon != "" {
+                                                <div class={ "iconObject " + p.LayoutClass }>
+                                                    <div class="iconEmoji">
+                                                        <img src={ p.Icon } class={ p.IconStyle }>
+                                                    </div>
+                                                </div>
+                                            } else {
+                                                if p.IconStyle != "" {
+                                                    <div class={ "iconObject " + p.LayoutClass }>
+                                                        <div class={ p.IconStyle }> </div>
+                                                    </div>
+                                                }
+                                            }
+                                            <div class="name">  { p.Name }  </div>
+                                            if p.IsArchived != "" {
+                                                <div class="tagItem isMultiSelect archive">Deleted</div>
+                                            }
+                                        </div>
+                                        <div class="relationItem cardDescription">
+                                            <div class="description"> { p.Description } </div>
+                                        </div>
+                                        if p.Type != "" {
+                                            <div class="relationItem cardType">
+                                                 <div class="item"> { p.Type } </div>
+                                            </div>
+                                        }
+                                    </div>
+                                    if p.CoverParams != nil {
+                                         <div class="side right">
+                                         if p.CoverParams.CoverType == 1 {
+                                            <div class={ "cover type1 " + p.CoverParams.Classes }></div>
+                                         }
+                                         if p.CoverParams.CoverType == 2 {
+                                            <div class={ "cover type2 " + p.CoverParams.Classes }></div>
+                                         }
+                                         if p.CoverParams.CoverType == 3 {
+                                            <div class={ "cover type3 " + p.CoverParams.Classes }></div>
+                                         }
+                                         </div>
+                                    }
+                                </div>
+                            </div>
+                    }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
