@@ -31,7 +31,6 @@ func cmpMarks(a, b *model.BlockContentTextMark) int {
 }
 
 func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string {
-	s = html.EscapeString(s)
 	switch mark.Type {
 	case model.BlockContentTextMark_Strikethrough:
 		return "<markupstrike>" + s + "</markupstrike>"
@@ -125,6 +124,7 @@ func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockCont
 			zap.String("markedPart", markedPart),
 			zap.Int32("from", curRange.From),
 			zap.Int32("to", curRange.To))
+		markedPart = html.EscapeString(markedPart)
 		for _, m := range marksToApply {
 			markedPart = r.applyMark(markedPart, m)
 			log.Debug("apply mark", zap.String("markedPart", markedPart), zap.Int32("from", m.Range.From), zap.Int32("to", m.Range.To))
