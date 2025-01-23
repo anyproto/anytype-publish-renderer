@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"unicode/utf16"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -71,6 +72,10 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 	return "<markupobject>" + s + "</markupobject>"
 }
 
+func StrToUTF16(str string) []uint16 {
+	return utf16.Encode([]rune(str))
+}
+
 // - make borders
 //   - make set from ranges, from-to
 //   - sort
@@ -82,7 +87,7 @@ func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockCont
 		return text
 	}
 
-	rText := []rune(text)
+	rText := utf16.Decode(StrToUTF16(text))
 	root := &markintervaltree.MarkIntervalTreeNode{
 		Mark:        marks[0],
 		MaxUpperVal: marks[0].Range.To,
@@ -119,6 +124,7 @@ func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockCont
 		}
 		marksToApply := make([]*model.BlockContentTextMark, 0)
 		markintervaltree.SearchOverlaps(root, curRange, &marksToApply)
+
 		markedPart := string(rText[curRange.From:curRange.To])
 		log.Debug("apply marks",
 			zap.String("markedPart", markedPart),

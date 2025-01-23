@@ -66,6 +66,9 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 
 			</main>
 			@templ.Raw(r.Config.AnalyticsCode)
+			<span id="publishFilesPath" style="display: none">
+				{ r.Config.PublishFilesPath }
+			</span>
         </body>
     </html>
 }
