@@ -1,3 +1,4 @@
+SNAPSHOTS_DIR:=./test_snapshots
 # SNAPSHOT_PATH:=./test_snapshots/test-uploaded-image-cover
 # SNAPSHOT_PATH:=./test_snapshots/test-solid-color-cover
 # SNAPSHOT_PATH:=./test_snapshots/test-gradient-cover
@@ -32,3 +33,9 @@ test: setup-go
 render: build
 	templ generate -lazy
 	$(EXEC) $(SNAPSHOT_PATH) > index.html
+
+render-all:
+	templ generate -lazy
+	for p in $(shell ls $(SNAPSHOTS_DIR)); do \
+		$(EXEC) $(SNAPSHOTS_DIR)/$$p > $$p.html; \
+	done
