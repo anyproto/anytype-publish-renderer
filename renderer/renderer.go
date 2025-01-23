@@ -181,7 +181,7 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 		blocksById[block.Id] = block
 	}
 
-	debugJsonSnapshot(snapshot)
+	// debugJsonSnapshot(snapshot)
 
 	r = &Renderer{
 		Sp:            &snapshot,
