@@ -4,7 +4,9 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 	<!DOCTYPE html>
     <html lang="en">
         <head>
+			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 			<title>{ r.titleText() }</title>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 			<link rel="apple-touch-icon" sizes="180x180" href="https://anytype.io/apple-touch-icon.png" />
 			<link rel="icon" type="image/png" sizes="32x32" href="https://anytype.io/favicon-32x32.png" />
 			<link rel="icon" type="image/png" sizes="16x16" href="https://anytype.io/favicon-16x16.png" />
@@ -18,7 +20,7 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			<script defer src=" https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js" integrity="sha512-vnRdmX8ZxbU+IhA2gLhZqXkX1neJISG10xy0iP0WauuClu3AIMknxyDjYHEpEhi8fTZPyOCWgqUCnEafDB/jVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js" integrity="sha512-1zKK2bG3QY2JaUPpfHZDUMe3dwBwFdCDwXQ01GrKSd+/l0hqPbF+aak66zYPUZtn+o2JYi1mjXAqy5mW04v3iA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-		 <meta charset="UTF-8">
+
         </head>
 		<body>
 			<script src={ r.GetPrismJsUrl("/components/prism-core.min.js") }></script>
@@ -27,7 +29,11 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			<main>
 				if r.joinSpaceLink() != "" {
 					<div class="joinSpace">
-						<a href={r.joinSpaceLink()} target="blank">Join Space</a>
+						<a href={r.joinSpaceLink()} target="blank">
+							<span id="joinSpaceLink">
+								Join Space
+							</span>
+						</a>
 					</div>
 				}
 				<div class="coverWrapper">
@@ -44,7 +50,7 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 					</div>
 				</div>
 				<a href="https://anytype.io/" target="blank">
- 					<div class="madeInAnytype">
+ 					<div class="madeInAnytype" id="madeInAnytypeLink">
 						<div class="container">
 							<div class="anyIcon">
 								<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -52,7 +58,7 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 								</svg>
 							</div>
 							<div class="madeInText">
-								Made in Anytype
+								Crafted with Anytype
 							</div>
 						</div>
 					</div>
@@ -60,6 +66,9 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 
 			</main>
 			@templ.Raw(r.Config.AnalyticsCode)
+			<span id="publishFilesPath" style="display: none">
+				{ r.Config.PublishFilesPath }
+			</span>
         </body>
     </html>
 }

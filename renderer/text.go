@@ -3,9 +3,12 @@ package renderer
 import (
 	"cmp"
 	"fmt"
+	"html"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
+	"unicode/utf16"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -70,6 +73,10 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 	return "<markupobject>" + s + "</markupobject>"
 }
 
+func StrToUTF16(str string) []uint16 {
+	return utf16.Encode([]rune(str))
+}
+
 // - make borders
 //   - make set from ranges, from-to
 //   - sort
@@ -77,10 +84,11 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 //     add props from each of this ranges to this range
 func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockContentTextMark) string {
 	if len(marks) == 0 {
+		text = html.EscapeString(text)
 		return text
 	}
 
-	rText := []rune(text)
+	rText := utf16.Decode(StrToUTF16(text))
 	root := &markintervaltree.MarkIntervalTreeNode{
 		Mark:        marks[0],
 		MaxUpperVal: marks[0].Range.To,
@@ -117,44 +125,28 @@ func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockCont
 		}
 		marksToApply := make([]*model.BlockContentTextMark, 0)
 		markintervaltree.SearchOverlaps(root, curRange, &marksToApply)
+
 		markedPart := string(rText[curRange.From:curRange.To])
 		log.Debug("apply marks",
 			zap.String("markedPart", markedPart),
 			zap.Int32("from", curRange.From),
 			zap.Int32("to", curRange.To))
+		markedPart = html.EscapeString(markedPart)
 		for _, m := range marksToApply {
 			markedPart = r.applyMark(markedPart, m)
 			log.Debug("apply mark", zap.String("markedPart", markedPart), zap.Int32("from", m.Range.From), zap.Int32("to", m.Range.To))
 		}
 		log.Debug("final marked part", zap.String("m", markedPart))
 		markedText.WriteString(markedPart)
-
 	}
 
 	return markedText.String()
 }
 
-func (r *Renderer) applyMarks(text string, marks []*model.BlockContentTextMark) string {
-	if len(marks) == 0 {
-		return text
-	}
-	var markedText strings.Builder
-	var lastPos int32
-	rText := []rune(text)
-	slices.SortFunc(marks, cmpMarks)
-	for _, mark := range marks {
-		log.Debug("Marks:",
-			zap.Int("len", len(rText)),
-			zap.String("text", text), zap.String("pos", fmt.Sprintf("%d: %d-%d", lastPos, mark.Range.From, mark.Range.To)))
-
-		before := rText[lastPos:mark.Range.From]
-		markedText.WriteString(string(before))
-
-		markedPart := rText[mark.Range.From:mark.Range.To]
-		markedText.WriteString(r.applyMark(string(markedPart), mark))
-		lastPos = mark.Range.To
-	}
-	return markedText.String()
+func replaceNewlineBr(text string) string {
+	r := regexp.MustCompile(`\r?\n`)
+	text = r.ReplaceAllString(text, "<br>")
+	return text
 }
 
 func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParams) {
@@ -173,11 +165,12 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	if style != model.BlockContentText_Code {
 		marks := blockText.GetMarks().Marks
 		text = r.applyNonOverlapingMarks(text, marks)
+		text = replaceNewlineBr(text)
 		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
 		fields := b.GetFields()
 		lang := pbtypes.GetString(fields, "lang")
-
+		text = replaceNewlineBr(text)
 		textComp = TextCodeTemplate(text, lang)
 	}
 

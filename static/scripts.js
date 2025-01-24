@@ -61,10 +61,25 @@ function initGraphviz() {
     })
 }
 
+function initAnalyticsEvents() {
+    document.getElementById("madeInAnytypeLink")?.addEventListener("click", (e) => {
+        setTimeout(_ => {
+            window.fathom?.trackEvent("PublishSiteClick");
+        })
+    });
+
+    document.getElementById("joinSpaceLink")?.addEventListener("click", (e) => {
+        setTimeout(_ => {
+            window.fathom?.trackEvent("PublishJoinSpaceClick");
+        })
+    });
+
+}
+
 window.svgSrc = {}
 
 document.addEventListener("DOMContentLoaded", function() {
-    const initFns = [initToggles, initLatex, initMermaid, initGraphviz]
+    const initFns = [initAnalyticsEvents, initToggles, initLatex, initMermaid, initGraphviz]
     initFns.forEach(f => {
         setTimeout(_ => {
             try {
