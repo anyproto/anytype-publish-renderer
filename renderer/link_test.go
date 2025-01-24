@@ -3,6 +3,7 @@ package renderer
 import (
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"path/filepath"
 	"testing"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
@@ -15,7 +16,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 	tests := []struct {
 		name     string
 		block    *model.Block
-		details  []*pb.DependantDetail
+		pbFiles  map[string]*pb.SnapshotWithType
 		expected *LinkRenderParams
 	}{
 		{
@@ -27,7 +28,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details:  nil,
 			expected: &LinkRenderParams{IsDeleted: true},
 		},
 		{
@@ -39,15 +39,15 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "deleted-id",
-					Details: &types.Struct{
-						Fields: map[string]*types.Value{
-							bundle.RelationKeyId.String():        pbtypes.String("deleted-id"),
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "deleted-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():        pbtypes.String("deleted-id.pb"),
 							bundle.RelationKeyIsDeleted.String(): pbtypes.Bool(true),
-						},
-					},
+						}},
+					}},
 				},
 			},
 			expected: &LinkRenderParams{IsDeleted: true},
@@ -61,16 +61,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "archived-id",
-					Details: &types.Struct{
-						Fields: map[string]*types.Value{
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "archived-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
 							bundle.RelationKeyId.String():         pbtypes.String("archived-id"),
 							bundle.RelationKeyIsArchived.String(): pbtypes.Bool(true),
 							bundle.RelationKeyName.String():       pbtypes.String("Archived Block"),
-						},
-					},
+						}},
+					}},
 				},
 			},
 			expected: &LinkRenderParams{
@@ -91,16 +91,18 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "emoji-icon-id",
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():        pbtypes.String("emoji-icon-id"),
-						bundle.RelationKeyName.String():      pbtypes.String("Emoji Icon Block"),
-						bundle.RelationKeyIconEmoji.String(): pbtypes.String("😊"),
-					},
-					},
-				}},
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "emoji-icon-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():        pbtypes.String("emoji-icon-id"),
+							bundle.RelationKeyName.String():      pbtypes.String("Emoji Icon Block"),
+							bundle.RelationKeyIconEmoji.String(): pbtypes.String("😊"),
+						}},
+					}},
+				},
+			},
 			expected: &LinkRenderParams{
 				LayoutClass:   "isPage",
 				Name:          "Emoji Icon Block",
@@ -121,16 +123,17 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "default-icon-id",
-					Details: &types.Struct{
-						Fields: map[string]*types.Value{
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "default-icon-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
 							bundle.RelationKeyId.String():   pbtypes.String("default-icon-id"),
 							bundle.RelationKeyName.String(): pbtypes.String("Default Icon Block"),
-						},
-					},
-				}},
+						}},
+					}},
+				},
+			},
 			expected: &LinkRenderParams{
 				Name:          "Default Icon Block",
 				IconStyle:     "iconCommon icon page c28",
@@ -149,15 +152,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "collection-id",
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():     pbtypes.String("collection-id"),
-						bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_collection)),
-						bundle.RelationKeyName.String():   pbtypes.String("Collection Block")},
-					},
-				},
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "collection-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():     pbtypes.String("collection-id"),
+							bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_collection)),
+							bundle.RelationKeyName.String():   pbtypes.String("Collection Block")},
+						}},
+					}},
 			},
 			expected: &LinkRenderParams{
 				Name:          "Collection Block",
@@ -177,13 +181,15 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "todo-id",
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():     pbtypes.String("todo-id"),
-						bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
-						bundle.RelationKeyName.String():   pbtypes.String("Todo"),
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "todo-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():     pbtypes.String("todo-id"),
+							bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
+							bundle.RelationKeyName.String():   pbtypes.String("Todo"),
+						}},
 					}},
 				},
 			},
@@ -205,14 +211,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "todo-id",
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():     pbtypes.String("todo-id"),
-						bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
-						bundle.RelationKeyName.String():   pbtypes.String("Todo"),
-						bundle.RelationKeyDone.String():   pbtypes.Bool(true),
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "todo-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():     pbtypes.String("todo-id"),
+							bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
+							bundle.RelationKeyName.String():   pbtypes.String("Todo"),
+							bundle.RelationKeyDone.String():   pbtypes.Bool(true),
+						}},
 					}},
 				},
 			},
@@ -234,14 +242,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "test-id",
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():          pbtypes.String("test-id"),
-						bundle.RelationKeyLayout.String():      pbtypes.Float64(float64(model.ObjectType_profile)),
-						bundle.RelationKeyName.String():        pbtypes.String("Test"),
-						bundle.RelationKeyDescription.String(): pbtypes.String("description"),
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "test-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():          pbtypes.String("test-id"),
+							bundle.RelationKeyLayout.String():      pbtypes.Float64(float64(model.ObjectType_profile)),
+							bundle.RelationKeyName.String():        pbtypes.String("Test"),
+							bundle.RelationKeyDescription.String(): pbtypes.String("description"),
+						}},
 					}},
 				},
 			},
@@ -264,14 +274,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "test-id",
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():      pbtypes.String("test-id"),
-						bundle.RelationKeyLayout.String():  pbtypes.Float64(float64(model.ObjectType_participant)),
-						bundle.RelationKeyName.String():    pbtypes.String("Test"),
-						bundle.RelationKeySnippet.String(): pbtypes.String("snippet"),
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "test-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("test-id"),
+							bundle.RelationKeyLayout.String():  pbtypes.Float64(float64(model.ObjectType_participant)),
+							bundle.RelationKeyName.String():    pbtypes.String("Test"),
+							bundle.RelationKeySnippet.String(): pbtypes.String("snippet"),
+						}},
 					}},
 				},
 			},
@@ -293,15 +305,17 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "test-id",
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():        pbtypes.String("test-id"),
-						bundle.RelationKeyLayout.String():    pbtypes.Float64(float64(model.ObjectType_set)),
-						bundle.RelationKeyName.String():      pbtypes.String("Test"),
-						bundle.RelationKeyCoverType.String(): pbtypes.Int64(2),
-						bundle.RelationKeyCoverId.String():   pbtypes.String("gray"),
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "test-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():        pbtypes.String("test-id"),
+							bundle.RelationKeyLayout.String():    pbtypes.Float64(float64(model.ObjectType_set)),
+							bundle.RelationKeyName.String():      pbtypes.String("Test"),
+							bundle.RelationKeyCoverType.String(): pbtypes.Int64(2),
+							bundle.RelationKeyCoverId.String():   pbtypes.String("gray"),
+						}},
 					}},
 				},
 			},
@@ -329,23 +343,25 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					},
 				},
 			},
-			details: []*pb.DependantDetail{
-				{
-					Id: "test-id",
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():     pbtypes.String("test-id"),
-						bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_set)),
-						bundle.RelationKeyName.String():   pbtypes.String("Test"),
-						bundle.RelationKeyType.String():   pbtypes.String("type")},
-					},
-				},
-				{
-					Id: "type",
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():   pbtypes.String("type"),
-						bundle.RelationKeyName.String(): pbtypes.String("Type")},
-					},
-				},
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "test-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():     pbtypes.String("test-id"),
+							bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_set)),
+							bundle.RelationKeyName.String():   pbtypes.String("Test"),
+							bundle.RelationKeyType.String():   pbtypes.String("type")},
+						}},
+					}},
+				filepath.Join("types", "type.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():   pbtypes.String("type"),
+							bundle.RelationKeyName.String(): pbtypes.String("Type")},
+						}},
+					}},
 			},
 			expected: &LinkRenderParams{
 				Name:          "Test",
@@ -360,7 +376,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
-			r.Sp.DependantDetails = tt.details
+			r.CachedPbFiles = tt.pbFiles
 			result := r.MakeLinkRenderParams(tt.block)
 			assert.Equal(t, tt.expected, result)
 		})

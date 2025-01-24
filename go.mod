@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	github.com/a-h/templ v0.2.793
-	github.com/anyproto/anytype-heart v0.39.0-rc1.0.20250122222430-0087afeae7db
+	github.com/anyproto/anytype-heart v0.36.10
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/gogo/protobuf v1.3.2
 	github.com/spf13/cobra v1.8.1
@@ -42,7 +42,6 @@ require (
 	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/Graylog2/go-gelf.v2 v2.0.0-20180125164251-1832d8546a9f // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.3.0 // indirect
 )

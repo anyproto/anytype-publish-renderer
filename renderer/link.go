@@ -6,6 +6,7 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
+	"path/filepath"
 )
 
 const linkTemplate = "anytype://object?objectId=%s&spaceId=%s"
@@ -63,12 +64,12 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 }
 
 func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
-	for _, detail := range r.Sp.GetDependantDetails() {
-		if detail.Id == targetObjectId {
-			return detail.Details
-		}
+	snapshot, err := r.ReadJsonpbSnapshot(filepath.Join("objects", targetObjectId+".pb"))
+	if err != nil {
+		log.Error("failed to read jsonpb snapshot", zap.Error(err))
+		return nil
 	}
-	return nil
+	return snapshot.GetSnapshot().GetData().GetDetails()
 }
 
 func getLinkTypeClass(b *model.Block) string {
@@ -214,7 +215,9 @@ func (r *Renderer) getFallbackIconStyle(b *model.Block, layout model.ObjectTypeL
 	switch layout {
 	case model.ObjectType_collection, model.ObjectType_set:
 		return "iconCommon icon collection " + iconSize
-	case model.ObjectType_note, model.ObjectType_profile, model.ObjectType_participant:
+	case model.ObjectType_profile, model.ObjectType_participant:
+		return "iconImage " + iconSize
+	case model.ObjectType_note:
 		return ""
 	default:
 		return "iconCommon icon page " + iconSize
@@ -225,12 +228,12 @@ func (r *Renderer) getAdditionalParams(b *model.Block, details *types.Struct) (o
 	for _, relation := range b.GetLink().GetRelations() {
 		if relation == bundle.RelationKeyType.String() {
 			objectType := details.GetFields()[bundle.RelationKeyType.String()].GetStringValue()
-			for _, detail := range r.Sp.GetDependantDetails() {
-				if detail.Id == objectType {
-					objectTypeName = detail.Details.GetFields()[bundle.RelationKeyName.String()].GetStringValue()
-					break
-				}
+			snapshot, err := r.ReadJsonpbSnapshot(filepath.Join("types", objectType+".pb"))
+			if err != nil {
+				log.Error("failed to read jsonpb snapshot", zap.Error(err))
+				continue
 			}
+			objectTypeName = snapshot.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeyName.String()].GetStringValue()
 		}
 		if relation == "cover" {
 			var err error
