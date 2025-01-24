@@ -3,6 +3,7 @@ package renderer
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -21,6 +22,16 @@ type JsSVGString struct {
 	Content string `json:"content,omitempty"`
 }
 
+func removeIframeWidthHeight(text string) string {
+	if !strings.HasPrefix(text, "<iframe") {
+		return text
+	}
+
+	r := regexp.MustCompile(`width="[0-9]*"|height="[0-9]*"`)
+	text = r.ReplaceAllString(text, "")
+	return text
+}
+
 func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 	style := b.GetLatex().Processor.String()
 	embedClass := "is" + style
@@ -32,6 +43,8 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 	}
 
 	content := b.GetLatex().Text
+	content = removeIframeWidthHeight(content)
+
 	if b.GetLatex().Processor == model.BlockContentLatex_Mermaid {
 		content = fmt.Sprintf(`<pre class="mermaid">%s</pre>`, content)
 	}

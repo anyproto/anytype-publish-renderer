@@ -140,6 +140,21 @@ func readUberSnapshot(path string) (uberSnapshot PublishingUberSnapshot, err err
 	return
 
 }
+func debugJsonSnapshot(snapshot pb.SnapshotWithType) error {
+	var snapshotJson []byte
+	snapshotJson, err := json.Marshal(snapshot)
+	if err != nil {
+		log.Error("failed to render snapshot.json", zap.Error(err))
+		return err
+	}
+
+	err = os.WriteFile("./snapshot.json", snapshotJson, 0644)
+	if err != nil {
+		log.Error("failed to write snapshot.json", zap.Error(err))
+		return err
+	}
+	return nil
+}
 
 func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	uberSnapshot, err := readUberSnapshot(config.PublishFilesPath)
@@ -165,6 +180,8 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	for _, block := range blocks {
 		blocksById[block.Id] = block
 	}
+
+	// debugJsonSnapshot(snapshot)
 
 	r = &Renderer{
 		Sp:            &snapshot,
