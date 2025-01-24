@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"fmt"
 	"html"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -142,6 +143,12 @@ func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockCont
 	return markedText.String()
 }
 
+func replaceNewlineBr(text string) string {
+	r := regexp.MustCompile(`\r?\n`)
+	text = r.ReplaceAllString(text, "<br>")
+	return text
+}
+
 func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParams) {
 	blockText := b.GetText()
 	style := blockText.GetStyle()
@@ -158,10 +165,12 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	if style != model.BlockContentText_Code {
 		marks := blockText.GetMarks().Marks
 		text = r.applyNonOverlapingMarks(text, marks)
+		text = replaceNewlineBr(text)
 		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
 		fields := b.GetFields()
 		lang := pbtypes.GetString(fields, "lang")
+		text = replaceNewlineBr(text)
 		textComp = TextCodeTemplate(text, lang)
 	}
 
