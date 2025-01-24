@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	"github.com/anyproto/anytype-heart/pb"
@@ -140,8 +141,32 @@ func readUberSnapshot(path string) (uberSnapshot PublishingUberSnapshot, err err
 	return
 
 }
+func debugJsonSnapshot(snapshot pb.SnapshotWithType) error {
+	var snapshotJson []byte
+	snapshotJson, err := json.Marshal(snapshot)
+	if err != nil {
+		log.Error("failed to render snapshot.json", zap.Error(err))
+		return err
+	}
+
+	err = os.WriteFile("./snapshot.json", snapshotJson, 0644)
+	if err != nil {
+		log.Error("failed to write snapshot.json", zap.Error(err))
+		return err
+	}
+	return nil
+}
 
 func NewRenderer(config RenderConfig) (r *Renderer, err error) {
+	defer func() {
+		if p := recover(); p != nil {
+			stack := string(debug.Stack())
+			err = fmt.Errorf("panic: %v, stack: %s", p, stack)
+			log.Error("panic recover", zap.String("where", "NewRenderer()"), zap.Error(err), zap.String("stack", stack))
+			return
+		}
+	}()
+
 	uberSnapshot, err := readUberSnapshot(config.PublishFilesPath)
 	if err != nil {
 		log.Error("Error reading config.PublishFilesPath ubersnapshot", zap.Error(err))
@@ -165,6 +190,8 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	for _, block := range blocks {
 		blocksById[block.Id] = block
 	}
+
+	// debugJsonSnapshot(snapshot)
 
 	r = &Renderer{
 		Sp:            &snapshot,
@@ -198,6 +225,14 @@ func (r *Renderer) GetPrismJsUrl(filepath string) string {
 }
 
 func (r *Renderer) Render(writer io.Writer) (err error) {
+	defer func() {
+		if p := recover(); p != nil {
+			stack := string(debug.Stack())
+			err = fmt.Errorf("panic: %v, stack: %s", p, stack)
+			log.Error("panic recover", zap.String("where", "Render()"), zap.Error(err), zap.String("stack", stack))
+		}
+	}()
+
 	err = r.RootComp.Render(context.Background(), writer)
 	if err != nil {
 		return
