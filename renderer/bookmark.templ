@@ -7,7 +7,7 @@ templ BookmarkTempl(p *BookmarkRendererParams) {
                 <div class="dropTarget">
                     <div class="focusable">
                         if !p.IsEmpty {
-                            <div class={"inner withImage data-href=" + p.Url }>
+                        <a href={ p.SafeUrl } style="text-decoration: none" class="inner withImage">
                                 <div class="side left">
                                     <div class="link">
                                         <img src={ p.Favicon } class="fav"> { p.Url }
@@ -18,7 +18,7 @@ templ BookmarkTempl(p *BookmarkRendererParams) {
                                  <div class="side right">
                                     <img src={ p.Image } class="img">
                                  </div>
-                            </div>
+                        </a>
                         } else {
                             <div class="inputWithFile resizable noFile">
                                 <div class="icon bookmark">
