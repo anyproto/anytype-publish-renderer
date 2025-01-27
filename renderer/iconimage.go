@@ -19,9 +19,8 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 	fields := r.Sp.Snapshot.Data.GetDetails()
 	iconEmoji := pbtypes.GetString(fields, "iconEmoji")
 
-	// TODO: how to get layout align? hack around via title block now:
-	titleBlock := r.BlocksById["title"]
-	align := "align" + strconv.Itoa(int(titleBlock.GetAlign()))
+	layoutAlign := pbtypes.GetInt64(fields, "layoutAlign")
+	align := "align" + strconv.Itoa(int(layoutAlign))
 	classes := []string{align}
 
 	params = &IconImageRenderParams{
