@@ -1851,9 +1851,11 @@ a {
   display: flex;
   width: 100%;
 }
+
 .blocks .block.blockRelation .info {
   padding: 6px 2px;
   line-height: 20px;
+  width: 30%;
   min-width: 40px;
   flex-shrink: 0;
   white-space: nowrap;
@@ -1904,7 +1906,9 @@ a {
 .blocks .block.blockRelation .cell.c-select .over,
 .blocks .block.blockRelation .cell.c-object .over,
 .blocks .block.blockRelation .cell.c-file .over {
-  flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    display: inline-flex;
 }
 
 .blocks .block.blockRelation .cell.c-object .element {
@@ -2747,6 +2751,9 @@ a {
 .cellContent.c-object .element .iconObject {
   margin: 0px !important;
 }
+.flex {
+    display: flex;
+}
 .cellContent.c-object .element .flex {
   align-items: center;
   gap: 0px 4px;
@@ -2764,6 +2771,8 @@ a {
   width: 100%;
   gap: 4px 8px;
   align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
 }
 .cellContent.c-select .over,
 .cellContent.c-file .over {

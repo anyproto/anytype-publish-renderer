@@ -125,6 +125,26 @@ templ BasicListElement(value string) {
     </div>
 }
 
+templ ObjectsListElement(layout, icon, class, name string, url templ.SafeURL) {
+    <div class="element">
+        <div class="flex">
+            if icon != "" {
+				<div class={ "iconObject c20 " + layout }>
+
+                    <img src={ icon } class={ class + " smileImage c18" } />
+				</div>
+			}
+			<div class="name">
+				<a href={ url } style="text-decoration: none">
+					{ name }
+				</a>
+			</div>
+
+		</div>
+
+    </div>
+}
+
 templ OptionElement(value, color, relationType string) {
     <div class="element">
         <div class="flex">
