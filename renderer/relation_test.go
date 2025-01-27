@@ -43,6 +43,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 	})
 
 	t.Run("Block with background color", func(t *testing.T) {
+		// given
 		block := &model.Block{
 			Id:              "test-block-id",
 			BackgroundColor: "red",
@@ -53,8 +54,10 @@ func TestMakeRelationRenderParams(t *testing.T) {
 			},
 		}
 
+		// when
 		params := renderer.MakeRelationRenderParams(block)
 
+		// then
 		assert.Equal(t, "bgColor bgColor-red", params.BackgroundColor)
 	})
 
