@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/core/domain"
+	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
+	"go.uber.org/zap"
 	"path/filepath"
 	"time"
 )
@@ -184,13 +186,41 @@ func (r *Renderer) extractRelationValues(relationValue *types.Value) []*types.Va
 
 func (r *Renderer) generateObjectLinks(params *RelationRenderParams, relationValue *types.Value) templ.Component {
 	var elements []templ.Component
-	spaceId := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
-
 	for _, value := range r.extractRelationValues(relationValue) {
-		link := fmt.Sprintf(linkTemplate, value.GetStringValue(), spaceId)
-		elements = append(elements, BasicListElement(link))
+		objectId := value.GetStringValue()
+		snapshot := r.getObjectSnapshot(objectId)
+		details := snapshot.GetSnapshot().GetData().GetDetails()
+		if details == nil || len(details.GetFields()) == 0 {
+			continue
+		}
+		spaceId := details.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
+		name := details.GetFields()[bundle.RelationKeyName.String()].GetStringValue()
+		if name == "" {
+			name = defaultName
+		}
+		icon, class := r.getIconFromDetails(details, "c20")
+		layoutClass := getLayoutClass(details)
+		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
+		elements = append(elements, ObjectsListElement(layoutClass, icon, class, name, templ.SafeURL(link)))
 	}
 	return ListTemplate(params, elements)
+}
+
+func (r *Renderer) getObjectSnapshot(objectId string) *pb.SnapshotWithType {
+	directories := []string{"objects", "relations", "types", "templates", "filesObjects"}
+	var (
+		snapshot *pb.SnapshotWithType
+		err      error
+	)
+	for _, dir := range directories {
+		path := filepath.Join(dir, objectId+".pb")
+		snapshot, err = r.ReadJsonpbSnapshot(path)
+		if err == nil {
+			return snapshot
+		}
+	}
+	log.Error("failed to get snapshot for object", zap.String("objectId", objectId), zap.Error(err))
+	return nil
 }
 
 func (r *Renderer) generateFileIcons(params *RelationRenderParams, relationValue *types.Value) templ.Component {

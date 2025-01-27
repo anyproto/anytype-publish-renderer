@@ -69,9 +69,8 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 }
 
 func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
-	snapshot, err := r.ReadJsonpbSnapshot(filepath.Join("objects", targetObjectId+".pb"))
-	if err != nil {
-		log.Error("failed to read jsonpb snapshot", zap.Error(err))
+	snapshot := r.getObjectSnapshot(targetObjectId)
+	if snapshot == nil {
 		return nil
 	}
 	return snapshot.GetSnapshot().GetData().GetDetails()

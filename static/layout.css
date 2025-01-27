@@ -2737,7 +2737,7 @@ a {
 }
 
 .cellContent.c-object .element {
-  display: inline-block;
+  display: flex;
   vertical-align: top;
   max-width: 100%;
   line-height: 20px;
@@ -2764,6 +2764,8 @@ a {
   width: 100%;
   gap: 4px 8px;
   align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
 }
 .cellContent.c-select .over,
 .cellContent.c-file .over {
