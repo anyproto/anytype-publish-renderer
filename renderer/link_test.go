@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"path/filepath"
@@ -79,6 +80,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Archived Block",
 				IconClass:     "c20",
 				LinkTypeClass: "text",
+				Url:           templ.SafeURL("anytype://object?objectId=archived-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 		{
@@ -110,6 +112,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				IconClass:     "c20 withIcon",
 				IconStyle:     "smileImage c20",
 				LinkTypeClass: "text",
+				Url:           templ.SafeURL("anytype://object?objectId=emoji-icon-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 		{
@@ -140,6 +143,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				IconClass:     "c48",
 				LinkTypeClass: "card",
 				LayoutClass:   "isPage",
+				Url:           templ.SafeURL("anytype://object?objectId=default-icon-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 		{
@@ -169,6 +173,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				IconStyle:     "iconCommon icon collection c20",
 				IconClass:     "c20",
 				LinkTypeClass: "text",
+				Url:           templ.SafeURL("anytype://object?objectId=collection-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 		{
@@ -199,6 +204,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				IconStyle:     "iconCheckbox c20 icon checkbox unset",
 				IconClass:     "c20",
 				LinkTypeClass: "text",
+				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 		{
@@ -230,6 +236,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				IconStyle:     "iconCheckbox c20 icon checkbox set",
 				IconClass:     "c20",
 				LinkTypeClass: "text",
+				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 		{
@@ -261,6 +268,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Description:   "description",
 				LinkTypeClass: "text",
 				IconClass:     "c20",
+				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 		{
@@ -293,6 +301,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Description:   "snippet",
 				LinkTypeClass: "card",
 				IconClass:     "c20",
+				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 		{
@@ -331,6 +340,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					Classes:   "gray",
 					CoverType: 2,
 				},
+				Url: templ.SafeURL("anytype://object?objectId=test-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 		{
@@ -369,6 +379,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				IconClass:     "c20",
 				LinkTypeClass: "text",
 				Type:          "Type",
+				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
 			},
 		},
 	}

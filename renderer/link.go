@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"fmt"
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -25,6 +26,7 @@ type LinkRenderParams struct {
 	LinkTypeClass string
 	CoverClass    string
 	CoverParams   *CoverRenderParams
+	Url           templ.SafeURL
 }
 
 func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
@@ -47,6 +49,8 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 
 	objectTypeName, coverParams, coverClass := r.getAdditionalParams(b, targetDetails)
 
+	spaceId := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
+	link := fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
 	return &LinkRenderParams{
 		Id:            b.GetId(),
 		LayoutClass:   layoutClass,
@@ -60,6 +64,7 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 		LinkTypeClass: linkTypeClass,
 		CoverClass:    coverClass,
 		CoverParams:   coverParams,
+		Url:           templ.SafeURL(link),
 	}
 }
 
