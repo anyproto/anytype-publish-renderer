@@ -1,12 +1,14 @@
 package renderer
 
 import (
+	"html"
+	"net/url"
+	"path/filepath"
+
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"go.uber.org/zap"
-	"net/url"
-	"path/filepath"
 )
 
 type BookmarkRendererParams struct {
@@ -65,8 +67,8 @@ func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkR
 		Id:          b.Id,
 		Url:         parsedUrl.Host,
 		Favicon:     favicon,
-		Name:        name,
-		Description: description,
+		Name:        html.UnescapeString(name),
+		Description: html.UnescapeString(description),
 		Image:       image,
 		SafeUrl:     templ.SafeURL(bookmark.GetUrl()),
 	}
