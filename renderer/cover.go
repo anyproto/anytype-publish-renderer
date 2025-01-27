@@ -27,6 +27,7 @@ const (
 )
 
 func ToCoverType(val int64) (CoverType, error) {
+	// TODO: cover type 0, no cover
 	if val < 1 || val > 4 {
 		return -1, fmt.Errorf("unknown cover type: %d", val)
 	}

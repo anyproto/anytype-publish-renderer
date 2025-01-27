@@ -1,13 +1,15 @@
 package renderer
 
 templ IconImageTemplate(r *Renderer, p *IconImageRenderParams) {
-	<div class="block blockIconPage align0 index0 noPlus">
+	<div id={"block-" + p.Id } class={"block blockIconPage index0 noPlus " + p.Classes}>
 		<div class="wrapContent">
-			<div id="block-icon" class="iconObject c96 isPage withImage">
-				<div class="iconEmoji" style="line-height: 56px;">
-					<img src={ p.Src } class="iconImage c56" />
+			if p.Src != "" {
+				<div id="block-icon" class={"iconObject isPage withImage " + p.IconClasses}>
+					<div class="iconEmoji">
+						<img src={ p.Src } class="iconImage" />
+					</div>
 				</div>
-			</div>
+			}
 		</div>
 	</div>
 }
