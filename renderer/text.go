@@ -160,6 +160,10 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		classes = append(classes, "bgColor", "bgColor-"+bgColor)
 	}
 
+	if color := blockText.GetColor(); color != "" {
+		classes = append(classes, "textColor", "textColor-"+color)
+	}
+
 	text := blockText.Text
 	var textComp templ.Component
 	if style != model.BlockContentText_Code {
