@@ -1368,9 +1368,13 @@ markuplatex {
 }
 
 /* Column */
+.block.blockLayout.layoutColumn:first-child {
+    margin-left: 0px;
+}
+
 .block.blockLayout.layoutColumn {
   padding: 0px;
-  margin: 5px;
+  margin-left: 48px;
   flex-grow: 1;
 }
 
