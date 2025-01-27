@@ -11,9 +11,10 @@ import (
 )
 
 type IconImageRenderParams struct {
-	Id      string
-	Src     string
-	Classes string
+	Id          string
+	Src         string
+	Classes     string
+	IconClasses string
 }
 
 func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParams, err error) {
@@ -24,38 +25,49 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 	align := "align" + strconv.Itoa(int(layoutAlign))
 	classes := []string{align}
 
-	params = &IconImageRenderParams{}
-
+	// TODO: refactoring GO-4950/support-all-layouts
 	switch layoutType {
 	case model.ObjectType_basic:
 		// if basic, then we get emoji or image, if emoji is not set
 		iconEmoji := pbtypes.GetString(fields, "iconEmoji")
+		iconClasses := []string{"c96"}
 		if iconEmoji != "" {
 			log.Debug("icon emoji", zap.String("id", iconEmoji))
 			code := []rune(iconEmoji)[0]
 			emojiSrc := r.GetEmojiUrl(code)
+
 			params = &IconImageRenderParams{
-				Classes: strings.Join(classes, " "),
-				Src:     emojiSrc,
+				IconClasses: strings.Join(iconClasses, " "),
+				Classes:     strings.Join(classes, " "),
+				Src:         emojiSrc,
 			}
-			return
+			return params, nil
 		} else {
 			iconImageId := pbtypes.GetString(fields, "iconImage")
 			src, errIcon := r.getFileUrl(iconImageId)
 			if errIcon != nil {
 				log.Warn("cover image rendering failed", zap.Error(err))
-				// TODO: just don't show an icon here? check in client
-				return nil, errIcon
+				params = &IconImageRenderParams{
+					Classes: strings.Join(classes, " "),
+				}
+				return params, nil
 			}
 			params = &IconImageRenderParams{
-				Classes: strings.Join(classes, " "),
-				Src:     src,
+				IconClasses: strings.Join(iconClasses, " "),
+				Classes:     strings.Join(classes, " "),
+				Src:         src,
 			}
 			return
 		}
 	case model.ObjectType_profile:
 		// if profile, then we get image or userSvg, and add isHuman class
 		iconImageId := pbtypes.GetString(fields, "iconImage")
+		iconClasses := []string{"c128", "isHuman"}
+		params = &IconImageRenderParams{
+			IconClasses: strings.Join(iconClasses, " "),
+			Classes:     strings.Join(classes, " "),
+		}
+
 		if iconImageId == "" {
 			// TODO: no image user svg: https://github.com/anyproto/anytype-ts/blob/main/src/ts/component/util/iconObject.tsx#L269
 			return params, nil
@@ -63,20 +75,21 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 		src, errIcon := r.getFileUrl(iconImageId)
 
 		if errIcon != nil {
-			log.Warn("cover image rendering failed", zap.Error(err))
+			log.Warn("profile image rendering failed", zap.String("iconImageId", iconImageId), zap.Error(err))
 			return nil, errIcon
 		}
-		classes = append(classes, "isHuman")
+
+		params.Src = src
+		return params, nil
+	default:
+		// TODО: GO-4950/support-all-layouts
 		params = &IconImageRenderParams{
 			Classes: strings.Join(classes, " "),
-			Src:     src,
 		}
 
-		return params, nil
+		return
 
 	}
-
-	return
 
 }
 
