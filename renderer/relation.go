@@ -117,10 +117,6 @@ func (r *Renderer) populateRelationValue(params *RelationRenderParams, format mo
 	case model.RelationFormat_checkbox:
 		params.Format = "c-checkbox"
 		params.Value = r.generateCheckbox(params, relationValue.GetBoolValue())
-
-	default:
-		params.Format = "c-longText"
-		params.Value = BasicTemplate(params, relationValue.GetStringValue())
 	}
 }
 
