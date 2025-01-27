@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"github.com/gogo/protobuf/types"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
@@ -36,6 +37,10 @@ func ToCoverType(val int64) (CoverType, error) {
 
 func (r *Renderer) MakeRenderPageCoverParams() (*CoverRenderParams, error) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
+	return r.getCoverParams(fields)
+}
+
+func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, error) {
 	coverType, err := ToCoverType(pbtypes.GetInt64(fields, "coverType"))
 	if err != nil {
 		log.Warn("cover rendering failed", zap.Error(err))

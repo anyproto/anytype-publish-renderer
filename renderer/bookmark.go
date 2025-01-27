@@ -1,7 +1,12 @@
 package renderer
 
 import (
+	"html"
+	"net/url"
+	"path/filepath"
+
 	"github.com/a-h/templ"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"go.uber.org/zap"
 )
@@ -14,6 +19,7 @@ type BookmarkRendererParams struct {
 	Name        string
 	Description string
 	Image       string
+	SafeUrl     templ.SafeURL
 }
 
 func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkRendererParams) {
@@ -21,21 +27,50 @@ func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkR
 	if bookmark.GetUrl() == "" {
 		return &BookmarkRendererParams{IsEmpty: true}
 	}
-	favicon, err := r.getFileUrl(bookmark.GetFaviconHash())
+	targetObjectId := bookmark.GetTargetObjectId()
+	targetBookmark, err := r.ReadJsonpbSnapshot(filepath.Join("objects", targetObjectId+".pb"))
 	if err != nil {
-		log.Error("Failed to get bookmark favicon url", zap.Error(err))
+		return &BookmarkRendererParams{IsEmpty: true}
 	}
-	image, err := r.getFileUrl(bookmark.GetImageHash())
+	details := targetBookmark.GetSnapshot().GetData().GetDetails()
+	if details == nil || len(details.GetFields()) == 0 {
+		return &BookmarkRendererParams{IsEmpty: true}
+	}
+	var (
+		favicon, image, description, name string
+	)
+	if icon := details.Fields[bundle.RelationKeyIconImage.String()]; icon != nil && icon.GetStringValue() != "" {
+		favicon, err = r.getFileUrl(icon.GetStringValue())
+		if err != nil {
+			log.Error("failed to get bookmark favicon url", zap.Error(err))
+		}
+	}
+	if picture := details.Fields[bundle.RelationKeyPicture.String()]; picture != nil && picture.GetStringValue() != "" {
+		image, err = r.getFileUrl(picture.GetStringValue())
+		if err != nil {
+			log.Error("failed to get bookmark image url", zap.Error(err))
+		}
+	}
+	if descriptionValue := details.Fields[bundle.RelationKeyDescription.String()]; descriptionValue != nil && descriptionValue.GetStringValue() != "" {
+		description = descriptionValue.GetStringValue()
+	}
+	if nameValue := details.Fields[bundle.RelationKeyName.String()]; nameValue != nil && nameValue.GetStringValue() != "" {
+		name = nameValue.GetStringValue()
+	}
+
+	parsedUrl, err := url.Parse(bookmark.GetUrl())
 	if err != nil {
-		log.Error("Failed to get bookmark favicon url", zap.Error(err))
+		log.Error("failed to parse bookmark url", zap.Error(err))
+		return &BookmarkRendererParams{IsEmpty: true}
 	}
 	return &BookmarkRendererParams{
 		Id:          b.Id,
-		Url:         bookmark.GetUrl(),
+		Url:         parsedUrl.Host,
 		Favicon:     favicon,
-		Name:        bookmark.GetTitle(),
-		Description: bookmark.GetDescription(),
+		Name:        html.UnescapeString(name),
+		Description: html.UnescapeString(description),
 		Image:       image,
+		SafeUrl:     templ.SafeURL(bookmark.GetUrl()),
 	}
 }
 

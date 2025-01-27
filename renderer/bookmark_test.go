@@ -1,72 +1,114 @@
 package renderer
 
 import (
-	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-heart/pb"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/gogo/protobuf/types"
+	"path/filepath"
 	"testing"
 
+	"github.com/a-h/templ"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
+	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/stretchr/testify/assert"
 )
 
-const testId = "testId"
-
 func TestMakeBookmarkRendererParams(t *testing.T) {
-	t.Run("empty bookmark", func(t *testing.T) {
-		// given
-		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
-		bookmark := &model.Block{Id: testId, Content: &model.BlockContentOfBookmark{Bookmark: &model.BlockContentBookmark{}}}
+	tests := []struct {
+		name     string
+		block    *model.Block
+		pbFiles  map[string]*pb.SnapshotWithType
+		expected *BookmarkRendererParams
+	}{
+		{
+			name: "valid bookmark",
+			block: &model.Block{
+				Id: "block1",
+				Content: &model.BlockContentOfBookmark{
+					Bookmark: &model.BlockContentBookmark{
+						Url:            "https://example.com",
+						TargetObjectId: "object1",
+					},
+				},
+			},
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "object1.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyIconImage.String():   pbtypes.String("favicon1"),
+							bundle.RelationKeyPicture.String():     pbtypes.String("image1"),
+							bundle.RelationKeyDescription.String(): pbtypes.String("description1"),
+							bundle.RelationKeyName.String():        pbtypes.String("name1"),
+						}},
+					}},
+				},
+			},
+			expected: &BookmarkRendererParams{
+				Id:          "block1",
+				Url:         "example.com",
+				Name:        "name1",
+				Description: "description1",
+				SafeUrl:     templ.SafeURL("https://example.com"),
+			},
+		},
+		{
+			name: "missing details",
+			block: &model.Block{
+				Id: "block2",
+				Content: &model.BlockContentOfBookmark{
+					Bookmark: &model.BlockContentBookmark{
+						Url:            "https://example.com",
+						TargetObjectId: "object12",
+					},
+				},
+			},
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "object12.pb"): {
+					SbType:   model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{}},
+				},
+			},
+			expected: &BookmarkRendererParams{
+				IsEmpty: true,
+			},
+		},
+		{
+			name: "invalid URL",
+			block: &model.Block{
+				Id: "block3",
+				Content: &model.BlockContentOfBookmark{
+					Bookmark: &model.BlockContentBookmark{
+						Url:            "::::",
+						TargetObjectId: "object3",
+					},
+				},
+			},
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "object3.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyIconImage.String():   pbtypes.String("favicon3"),
+							bundle.RelationKeyPicture.String():     pbtypes.String("image3"),
+							bundle.RelationKeyDescription.String(): pbtypes.String("description3"),
+							bundle.RelationKeyName.String():        pbtypes.String("name3"),
+						}},
+					}},
+				},
+			},
+			expected: &BookmarkRendererParams{
+				IsEmpty: true,
+			},
+		},
+	}
 
-		// when
-		params := r.MakeBookmarkRendererParams(bookmark)
-
-		// then
-		assert.NotNil(t, params)
-		assert.True(t, params.IsEmpty)
-		assert.Empty(t, params.Url)
-	})
-
-	t.Run("non empty bookmark", func(t *testing.T) {
-		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
-		bookmark := &model.Block{Id: testId, Content: &model.BlockContentOfBookmark{Bookmark: &model.BlockContentBookmark{
-			Url:         "https://example.com",
-			FaviconHash: "bafyreighh5qn3qr4wcpq4n6k7imawkaytrxksg7te4gpxqrlruwmezhjii",
-			ImageHash:   "bafyreighh5qn3qr4wcpq4n6k7imawkaytrxksg7te4gpxqrlruwmezhjii",
-			Title:       "Example",
-			Description: "An example bookmark",
-		}}}
-
-		// when
-		params := r.MakeBookmarkRendererParams(bookmark)
-
-		// then
-		assert.NotNil(t, params)
-		assert.False(t, params.IsEmpty)
-		assert.Equal(t, "https://example.com", params.Url)
-		assert.Equal(t, "../test_snapshots/Anytype.WebPublish.20241217.112212.67/files/img_5296.jpeg", params.Favicon)
-		assert.Equal(t, "Example", params.Name)
-		assert.Equal(t, "An example bookmark", params.Description)
-		assert.Equal(t, "../test_snapshots/Anytype.WebPublish.20241217.112212.67/files/img_5296.jpeg", params.Image)
-	})
-
-	t.Run("Favicon and Image Errors", func(t *testing.T) {
-		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
-		bookmark := &model.Block{Id: testId, Content: &model.BlockContentOfBookmark{Bookmark: &model.BlockContentBookmark{
-			Url:         "https://example.com",
-			FaviconHash: "favicon_hash",
-			ImageHash:   "image_hash",
-			Title:       "Example",
-			Description: "An example bookmark",
-		}}}
-
-		// when
-		params := r.MakeBookmarkRendererParams(bookmark)
-
-		// then
-		assert.NotNil(t, params)
-		assert.False(t, params.IsEmpty)
-		assert.Equal(t, "https://example.com", params.Url)
-		assert.Equal(t, "", params.Favicon)
-		assert.Equal(t, "Example", params.Name)
-		assert.Equal(t, "An example bookmark", params.Description)
-		assert.Equal(t, "", params.Image)
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
+			r.CachedPbFiles = tt.pbFiles
+			result := r.MakeBookmarkRendererParams(tt.block)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
 }
