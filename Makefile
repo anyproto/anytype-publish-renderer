@@ -34,8 +34,14 @@ render: build
 	templ generate -lazy
 	$(EXEC) $(SNAPSHOT_PATH) > index.html
 
-render-all:
+render-all: build
 	templ generate -lazy
 	for p in $(shell ls $(SNAPSHOTS_DIR)); do \
+		$(EXEC) $(SNAPSHOTS_DIR)/$$p > $$p.html; \
+	done
+
+render-all-layout: build
+	templ generate -lazy
+	for p in $(shell ls $(SNAPSHOTS_DIR) | grep layout); do \
 		$(EXEC) $(SNAPSHOTS_DIR)/$$p > $$p.html; \
 	done
