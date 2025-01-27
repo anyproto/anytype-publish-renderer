@@ -90,7 +90,7 @@ func IconImageTemplate(r *Renderer, p *IconImageRenderParams) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Src)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/iconimage.templ`, Line: 10, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/iconimage.templ`, Line: 9, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
