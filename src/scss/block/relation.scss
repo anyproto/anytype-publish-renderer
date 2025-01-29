@@ -1,0 +1,58 @@
+@import "~scss/_mixins";
+
+.blocks {
+	.block.blockRelation { @include text-common; }
+	.block.blockRelation > .wrapContent > .selectionTarget > .dropTarget { padding: 0px; }
+
+	.block.blockRelation {
+		.icon.edit { display: none; }
+		.icon.checkbox { width: 20px; height: 20px; vertical-align: top; background-image: url('~img/icon/dataview/checkbox0.svg'); }
+		.icon.checkbox.active { background-image: url('~img/icon/dataview/checkbox1.svg'); }
+
+		.input { @include text-common; line-height: 22px; vertical-align: top; display: inline-block; height: 22px; padding: 0px; }
+
+		.sides { display: flex; width: 100%; }
+
+		.info {
+			padding: 6px 2px; line-height: 20px; width: 30%; min-width: 40px; flex-shrink: 0; @include text-overflow-nw;
+			display: flex; align-items: flex-start; gap: 0px 6px;
+		}
+		.info.noValue { width: 100%; color: var(--color-text-tertiary); }
+
+		.info {
+			.name {
+				display: inline-block; vertical-align: top; @include text-common; line-height: 20px; @include text-overflow-nw;
+				color: var(--color-text-secondary); width: 100%;
+			}
+			.icon.lock { width: 8px; height: 20px; background-image: url('~img/icon/lock.svg'); flex-shrink: 0; }
+			.icon.ghost { width: 20px; height: 20px; }
+		}
+
+		.wrap.isDeleted {
+			.info .name { color: var(--color-text-secondary); }
+		}
+
+		.cellContent.canEdit {
+			.empty { display: block; }
+		}
+
+		.cell { @include text-common; width: 70%; position: relative; padding: 5px 8px; border-radius: 4px; transition: background $transitionCommon; }
+
+		.cell.c-select { padding: 6px 8px; line-height: 18px; }
+		.cell.c-select {
+			.empty { line-height: 18px; }
+		}
+
+		.cell.c-select,
+		.cell.c-object,
+		.cell.c-file {
+			.over { flex-wrap: wrap; gap: 4px 8px; display: inline-flex; }
+		}
+		.cell.c-object {
+			.element { background: none !important; display: inline-block; }
+		}
+
+	}
+
+	.block.blockRelation > .wrapContent > .dropTarget.targetBot { display: block; height: 2px; }
+}

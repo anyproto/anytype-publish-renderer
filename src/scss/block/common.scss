@@ -1,6 +1,10 @@
 @import "~scss/_mixins";
 
+.blocks.hasPageIcon { margin-top: -76px; }
+
 .blocks {
+
+
 	.block { @include text-paragraph; word-break: break-word; position: relative; margin: 0px 0px 2px 0px; align-items: stretch; }
 	.block.isHidden {
 		.wrapMenu, .wrapContent { display: none; }
@@ -118,5 +122,6 @@
 @import './link.scss';
 @import './media.scss';
 @import './markup.scss';
+@import './relation.scss';
 @import './table.scss';
 @import './text.scss';
