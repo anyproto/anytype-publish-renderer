@@ -1,0 +1,44 @@
+@import "~scss/_mixins";
+
+.menus {
+
+	.menu.menuDataviewText {
+		#input { 
+			-webkit-user-modify: read-write-plaintext-only; white-space: normal; z-index: 1; @include text-common; overflow: auto; height: 100%; width: 100%;
+			user-select: text;
+		}
+	}
+
+	.menu.menuDataviewText:not(.fromFeatured) { box-shadow: 0px 0px; background: transparent; }
+	.menu.menuDataviewText:not(.fromFeatured) {
+		.content { overflow: visible !important; max-height: none; height: 100%; transition: $transitionAllCommon; padding: 0px; }
+		.editableWrap { height: 100%; }
+
+		#input { border-radius: 4px; padding: 13px 14px; background: var(--color-bg-primary); }
+		#placeholder { padding: 13px 14px; }
+	}
+
+	.menu.menuDataviewText.isInline {
+		#input, #placeholder { padding: 9px 14px; }
+	}
+
+	.menu.menuDataviewText.fromBlock {
+		#input, #placeholder { padding: 5px 8px; }
+	}
+
+	.menu.menuDataviewText.show:not(.fromFeatured) {
+		#input { box-shadow: 0px 0px 0px 2px var(--color-system-accent-50); }
+	}
+
+	.menu.menuDataviewText.fromFeatured {
+		.content { padding: 8px 14px; }
+	}
+}
+
+html.platformWindows {
+	.menus {
+		.menu.menuDataviewText {
+			#input { overflow: overlay; }
+		}
+	}
+}

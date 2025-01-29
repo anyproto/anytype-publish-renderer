@@ -1,0 +1,48 @@
+@import "~scss/_mixins";
+
+.listObject {
+	.table { display: grid; margin: 0px 0px 10px 0px; }
+	.table {
+		.selectionTarget { display: grid; grid-template-columns: minmax(0, 1fr) 30% 30%; }
+		
+		.row.isHead { display: grid; grid-template-columns: minmax(0, 1fr) 30% 30%; color: var(--color-control-active); }
+		.row.isHead {
+			.cell { 
+				text-align: left; padding: 9px 0px 9px 14px; white-space: nowrap; font-weight: 400; line-height: 20px; position: relative; 
+				@include text-overflow-nw;
+			}
+			.cell {
+				.name { display: inline-block; line-height: 20px; height: 20px; vertical-align: top; width: 100%; @include text-overflow-nw; }
+			}
+
+			.icon.sortArrow { width: 20px; height: 20px; margin: 0px; background-image: url('~img/icon/sortArrow.svg'); }
+			.icon.sortArrow.c1 { transform: rotateZ(180deg); }
+		}
+
+		.row { border-bottom: 1px solid var(--color-shape-secondary); }
+
+		.row.isArchived *, .row.isDeleted * { text-decoration: line-through; color: var(--color-control-active); }
+		.row.isSelectionSelected::after { display: none; }
+		.row.isSelectionSelected { background-color: var(--color-system-selection); }
+
+		.row {
+			.cell { padding: 9px 14px; vertical-align: top; position: relative; word-break: break-word; }
+			.cell:first-child { padding-left: 0px; }
+			.cell:last-child { padding-right: 0px; }
+			.cell.empty { line-height: 20px; }
+
+			.cellContent { width: 100%; overflow: hidden; height: 20px; line-height: 20px; }
+			.cellContent {
+				.more { vertical-align: top; }
+				.empty { display: block; }
+			}
+
+			.cellContent.c-object {
+				.wrap { white-space: nowrap; }
+			}
+			.cellContent.c-select {
+				.tagItem { margin-bottom: 0px; }
+			}
+		}
+	}
+}

@@ -1,0 +1,41 @@
+@import "~scss/_mixins";
+
+.menus {
+	.menu.menuBlockLink { width: var(--menu-width-large); }
+	.menu.menuBlockLink {
+		.content { transition: none; padding: 0px; max-height: var(--menu-width-large); padding: 4px 0px 0px 0px; }
+		.content.initial {
+			.filter {
+				.line { display: none; }
+			}
+		}
+
+		.wrap { height: 100%; display: flex; flex-direction: column; }
+		.wrap.withLabel {
+			.ReactVirtualized__List { padding-top: 0px; }
+		}
+
+		.items { height: 100%; }
+
+		.filter { flex-shrink: 0; }
+		.filter {
+			.icon.clear { opacity: 1; }
+		}
+
+		.item { display: flex; }
+		.item {
+			.name { @include text-overflow-nw; width: 100%; }
+		}
+
+		.item.withDescription {
+			.iconMain { background-size: 24px; }
+			.iconMain, .iconObject:not(.isTask) { background-color: var(--color-shape-highlight-medium); border-radius: 10px; }
+			.info { padding: 0px; }
+		}
+		.item.withDescription.withIcon {
+			.info { padding-left: 52px; }
+		}
+
+		.item.add { color: var(--color-text-primary); }
+	}
+}

@@ -1,0 +1,24 @@
+@import "~scss/_mixins";
+
+.menus {
+	.menu.menuBlockStyle, .menu.menuBlockAction, .menu.menuObject {
+		.item.empty { @include text-small; padding-top: 8px; }
+	}
+
+	.menu.menuBlockAction { width: var(--menu-width-icon); }
+	.menu.menuBlockAction {
+		.content { padding-top: 12px; }
+	}
+
+	.menu.menuObject { width: var(--menu-width-icon); }
+	.menu.menuObject {
+		.content { overflow: visible !important; max-height: unset; }
+		.item { display: flex; }
+		.item {
+			.name { @include text-overflow-nw; }
+		}
+		.item:hover::before { background: var(--color-shape-highlight-medium); }
+
+		.item.isReadonly::before { opacity: 0 !important; }
+	}
+}

@@ -2,10 +2,6 @@ package renderer
 
 templ LayoutTemplate(r *Renderer, p *LayoutRenderParams) {
 	<div id={"block-" + p.Id } class={ "block blockLayout " + p.Classes }>
-        <div class="content">
-            // this is for template wrapping, actual block children processed below
-			// { children... }
-        </div>
 		<div class="children">
 			for _, childId := range p.ChildrenIds {
 				@r.RenderBlock(r.BlocksById[childId])

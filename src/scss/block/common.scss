@@ -1,0 +1,125 @@
+@import "~scss/_mixins";
+
+.blocks {
+	.block {
+		@include text-paragraph; word-break: break-word; display: flex; flex-direction: row; flex: auto;
+		position: relative; margin: 0px 0px 2px 0px; align-items: stretch;
+	}
+	.block.isHidden {
+		.wrapMenu, .wrapContent { display: none; }
+	}
+
+	.block.diffNone {
+		> .wrapMenu {
+			.iconObject { display: block; }
+		}
+	}
+
+	.block {
+		.wrapMenu { width: 48px; text-align: right; position: relative; flex-shrink: 0; z-index: 1; flex-basis: 48px; }
+		.wrapContent { width: calc(100% - 48px); position: relative; flex-grow: 1; }
+		.wrapContent.bgColor { border-radius: 2px; }
+
+		.wrapContent > .dropTarget.targetTop, .wrapContent > .dropTarget.targetBot {
+			padding: 0px; width: 100%; position: absolute; left: 0px; border-radius: 0px !important; pointer-events: none;
+		}
+		.wrapContent > .dropTarget.targetBot { height: 2px; bottom: 0px; }
+
+		.wrapMenu {
+			.iconObject { position: absolute; top: 4px; right: 2px; display: none; }
+		}
+
+		.flex { position: relative; z-index: 2; }
+		.icon.dnd {
+			width: 12px; height: 100%; background-size: 2px 12px; opacity: 0; cursor: grab; position: absolute; right: 6px; top: 0px;
+			border: 1px solid var(--color-shape-secondary); border-radius: 6px;
+		}
+		.icon.dnd:hover {
+			background-color: var(--color-shape-tertiary); border-color: var(--color-shape-tertiary); background-image: url('~img/icon/block/menu.svg');
+		}
+
+		.inputWithFile { position: relative; }
+
+		.colResize { width: 0px; position: relative; opacity: 0; z-index: 10; flex: 0; }
+		.colResize.active { opacity: 1; }
+		.colResize {
+			.inner { position: absolute; left: 22px; top: -15px; width: 8px; height: calc(100% + 30px); cursor: col-resize; z-index: 2; }
+			.line {
+				height: 100%; width: 2px; background: var(--color-shape-secondary); position: absolute; left: 50%; top: 0px; margin-left: -1px;
+				border-radius: 2px;
+			}
+		}
+
+		.focusable { border-radius: inherit; }
+
+		.emptyToggle {
+			display: none; margin-left: 28px; color: var(--color-control-active); position: relative; z-index: 2;
+			@include text-overflow-nw;
+		}
+		.emptyToggle:hover { color: var(--color-text-primary); }
+	}
+
+	.block {
+		> .wrapContent {
+			> .selectionTarget { position: relative; }
+		}
+	}
+
+	.block.isReadonly {
+		.colResize { display: none; }
+	}
+	.block.isReadonly > .wrapMenu > .icon.dnd { display: none; }
+
+	.block.align0 > .wrapContent { text-align: left; }
+	.block.align1 > .wrapContent { text-align: center; }
+	.block.align2 > .wrapContent { text-align: right; }
+	.block.align3 > .wrapContent { text-align: justify; }
+
+	.block.isResizing { user-select: none; }
+	.block.isResizing {
+		.icon.dnd { opacity: 1; }
+	}
+
+	.block.isAdding.top::before {
+		content: ""; display: block; width: calc(100% - 48px); height: 2px; background: var(--color-control-accent); position: absolute; right: 0px; top: -2px;
+	}
+
+	.block.isAdding.bottom::after {
+		content: ""; display: block; width: calc(100% - 48px); height: 2px; background: var(--color-control-accent); position: absolute; right: 0px; bottom: -2px;
+	}
+
+	.block:hover > .wrapMenu > .icon.dnd { opacity: 1; }
+	.block.showMenu > .wrapMenu > .icon.dnd { opacity: 1; }
+
+	.block.isAdding.top > .wrapContent > .selectionTarget > .dropTarget { border-radius: 0px 0px 4px 4px !important; }
+	.block.isAdding.bottom > .wrapContent > .selectionTarget > .dropTarget { border-radius: 4px 4px 0px 0px !important; }
+
+	.block > .wrapContent > .children.canToggle { display: none; }
+	.block.isToggled > .wrapContent > .children { display: block; }
+	.block.isToggled > .wrapContent > .emptyToggle { display: block; }
+	.block.isToggled > .wrapContent > .selectionTarget > .dropTarget > .flex > .markers > .marker.toggle { transform: rotateZ(90deg); }
+
+	.block.blockIconPage > .wrapMenu { visibility: hidden; }
+	.block.blockIconUser > .wrapMenu { visibility: hidden; }
+}
+
+#dragProvider.isDragging {
+	.block > .wrapContent > .selectionTarget.isSelectionSelected::after { display: none; }
+	.block > .wrapMenu > .icon.dnd { opacity: 1; }
+}
+
+@import './block.scss';
+@import './bookmark.scss';
+@import './cover.scss';
+@import './div.scss';
+@import './embed.scss';
+@import './file.scss';
+@import './iconPage.scss';
+@import './iconUser.scss';
+@import './latex.scss';
+@import './layout.scss';
+@import './link.scss';
+@import './media.scss';
+@import './markup.scss';
+@import './table.scss';
+@import './text.scss';

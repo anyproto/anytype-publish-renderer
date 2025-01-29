@@ -1,0 +1,40 @@
+@import "~scss/_mixins";
+
+.select { 
+	border-radius: 4px; border: solid 1px var(--color-shape-primary); display: inline-block; vertical-align: middle;
+	transition: $transitionAllCommon; position: relative; font-family: 'Inter';
+	white-space: nowrap; padding: 3px 20px 3px 6px; line-height: 20px !important;
+}
+.select:hover, .select.hover, .select.isFocused { background: var(--color-shape-tertiary); }
+
+.select {
+	.icon { transition: none; }
+	.icon.arrow {
+		margin: -10px 0px 0px 0px !important; right: 0px !important; width: 20px !important; height: 20px !important; position: absolute !important; top: 50%;
+		background-image: url('~img/arrow/select/dark.svg') !important; 
+	}
+	.icon.arrow.light { background-image: url('~img/arrow/select/light.svg') !important; }
+
+	.item { display: flex; background: none !important; padding: 0px !important; overflow: hidden; }
+	.item {
+		.icon, .iconObject { transition: none; margin-right: 6px; flex-shrink: 0; }
+		.name { width: 100%; @include text-overflow-nw; }
+		.caption, .note { display: none; }
+	}
+	.item::before { display: none; }
+
+	.clickable { display: flex; width: 100%; }
+}
+
+.select.big { padding: 9px 26px 9px 12px; border-radius: 10px; }
+.select.big {
+	.icon.arrow { right: 4px !important; }
+	.item {
+		.name { line-height: 22px; font-weight: 600; }
+	}
+}
+
+.select.isReadonly { cursor: default; }
+.select.isReadonly {
+	.icon.arrow { display: none; }
+}

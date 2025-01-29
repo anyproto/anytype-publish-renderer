@@ -1,0 +1,16 @@
+@import "~scss/_mixins";
+
+.menus {
+	.menu.menuBlockLinkSettings { width: var(--menu-width-icon); }
+	.menu.menuBlockLinkSettings {
+		.item {
+			.name { @include text-overflow-nw; width: calc(100% - 58px); }
+			.switch { position: absolute; right: 14px; top: 50%; margin-top: -8px; }
+			.icon.arrow { background-image: url('~img/arrow/select/medium.svg'); }
+		}
+
+		.item.withCaption {
+			.caption { @include text-common; line-height: 20px; width: 80px; padding-right: 14px; }
+		}
+	}
+}

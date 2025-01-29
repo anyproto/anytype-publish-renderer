@@ -20,6 +20,8 @@ setup-go:
 	@go mod download
 
 build: setup-go deps
+	npm run build
+	cp -r dist/* static/
 	templ generate -lazy
 	go build -o $(EXEC) .
 

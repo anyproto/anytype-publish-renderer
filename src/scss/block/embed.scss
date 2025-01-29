@@ -1,0 +1,153 @@
+@import "~scss/_mixins";
+
+.blocks {
+	.block.blockEmbed { padding: 6px 0px; }
+	.block.blockEmbed.isResizing * { cursor: nwse-resize; }
+	.block.blockEmbed.isResizing {
+		.dimmer { display: block; }
+	}
+
+	.block.blockEmbed { 
+		> .wrapContent { border-radius: 8px; }
+		> .wrapContent {
+			.selectionTarget.isSelectionSelected::after { left: 0px; width: 100%; border-radius: 8px; }
+		}
+
+		.wrap { padding: 2px 0px; display: flex; flex-direction: column; }
+		.wrap.isEditing { padding: 8px; background-color: var(--color-shape-highlight-light); border-radius: 8px; }
+		.wrap.isEditing {
+			.empty { padding: 0px 0px 16px 0px; }
+			.preview { display: none; }
+			.editableWrap, .icon.source { display: block; }
+			.select { display: inline-block; }
+		}
+		.wrap.withPreview {
+			.preview { display: block; }
+		}
+		.wrap.isEmpty {
+			.preview, .icon.source { display: none; }
+			.editableWrap { margin: 0px; }
+		}
+
+		.empty { padding: 6px 8px; }
+
+		.selectWrap { text-align: left; }
+		.selectWrap {
+			.select { 
+				border: 0px; color: var(--color-text-secondary); @include text-common; border-radius: 0px; padding: 0px 20px 0px 0px; display: none; 
+				margin-bottom: 8px; 
+			}
+			.select {
+				.name { overflow: visible; }
+				.icon.arrow.light { background-image: url('~img/arrow/select/secondary.svg') !important; }
+			}
+			.select:hover, .select.active { background: none; }
+		}
+
+		.valueWrap { position: relative; width: 100%; }
+		.dimmer { position: absolute; z-index: 1; width: 100%; height: 100%; left: 0px; top: 0px; display: none; }
+		.preview { 
+			display: none; position: relative; aspect-ratio: 16/9; background-color: var(--color-shape-highlight-light); border-radius: 4px; 
+			background-size: 60px; background-repeat: no-repeat; background-position: center; background-image: url('~img/icon/block/embed/default.svg');
+		}
+		.preview {
+			.label { color: #d4d4d4; position: absolute; bottom: 12px; left: 0px; width: 100%; text-align: center; @include text-small; }
+		}
+		.preview.isLatex { background-image: url('~img/icon/block/embed/latex.svg'); }
+		.preview.isMermaid { background-image: url('~img/icon/block/embed/mermaid.svg'); }
+		.preview.isChart { background-image: url('~img/icon/block/embed/chart.svg'); }
+		.preview.isYoutube { background-image: url('~img/icon/block/embed/youtube.svg'); }
+		.preview.isVimeo { background-image: url('~img/icon/block/embed/vimeo.svg'); }
+		.preview.isSoundcloud { background-image: url('~img/icon/block/embed/soundcloud.svg'); }
+		.preview.isGoogleMaps { background-image: url('~img/icon/block/embed/googleMaps.svg'); }
+		.preview.isMiro { background-image: url('~img/icon/block/embed/miro.svg'); }
+		.preview.isFigma { background-image: url('~img/icon/block/embed/figma.svg'); }
+		.preview.isOpenStreetMap { background-image: url('~img/icon/block/embed/openStreetMap.svg'); }
+		.preview.isReddit { background-image: url('~img/icon/block/embed/reddit.svg'); }
+		.preview.isFacebook { background-image: url('~img/icon/block/embed/facebook.svg'); }
+		.preview.isInstagram { background-image: url('~img/icon/block/embed/instagram.svg'); }
+		.preview.isTelegram { background-image: url('~img/icon/block/embed/telegram.svg'); }
+		.preview.isGithubGist { background-image: url('~img/icon/block/embed/githubGist.svg'); }
+		.preview.isCodepen { background-image: url('~img/icon/block/embed/codepen.svg'); }
+		.preview.isBilibili { background-image: url('~img/icon/block/embed/bilibili.svg'); }
+		.preview.isExcalidraw { background-image: url('~img/icon/block/embed/excalidraw.svg'); }
+		.preview.isKroki { background-image: url('~img/icon/block/embed/kroki.svg'); }
+		.preview.isGraphviz { background-image: url('~img/icon/block/embed/graphviz.svg'); }
+		.preview.isSketchfab { background-image: url('~img/icon/block/embed/sketchfab.svg'); }
+		.preview.isImage { background-image: url('~img/icon/block/embed/image.svg'); }
+
+		#value { font-size: 20px; line-height: 20px; width: 100%; min-height: 20px; }
+		#value:empty { display: none; }
+
+		.editableWrap { display: none; margin: 8px 0px 0px 0px; width: 100%; text-align: left; }
+		.editableWrap {
+			#input { 
+				background: var(--color-bg-primary); border: 1px solid var(--color-shape-secondary); text-align: left; padding: 6px 12px; @include text-common; 
+				border-radius: 4px; border-radius: 8px;
+			}
+			#placeholder { padding: 6px 12px; }
+		}
+
+		.icon.source { 
+			position: absolute; top: 10px; right: 10px; opacity: 0; border-radius: 6px; background-color: rgba(37, 37, 37, 0.35); 
+			background-image: url('~img/icon/block/edit.svg'); transition: $transitionAllCommon;
+		}
+
+		.icon.resize { 
+			position: absolute; z-index: 1; opacity: 0; cursor: default; width: 20px; height: 20px; right: 0px; bottom: 0px; 
+			cursor: nwse-resize; background-image: url('~img/icon/resize.svg'); z-index: 2; transition: $transitionAllCommon;
+		}
+
+		iframe { width: 100%; aspect-ratio: 16/9; border: 0px; display: block; }
+	}
+
+	.block.blockEmbed:not(.isLatex) {
+		#value svg { max-width: 100% !important; background: #fff; }
+	}
+
+	.block.blockEmbed.isGraphviz {
+		#value svg { height: auto; }
+	}
+
+	.block.blockEmbed.isTwitter,
+	.block.blockEmbed.isReddit,
+	.block.blockEmbed.isImage {
+		iframe { width: 100%; aspect-ratio: unset; }
+	}
+
+	.block.blockEmbed.isReadonly {
+		.icon.resize, .icon.source { display: none; }
+	}
+
+	.block.blockEmbed.align1 { 
+		.wrap { align-items: center; }
+	}
+
+	.block.blockEmbed.align2 { 
+		.wrap { align-items: flex-end; }
+	}
+
+	.block.blockEmbed:hover {
+		.icon.source, .icon.resize { opacity: 1; }
+	}
+
+	.block.blockEmbed.isLatex {
+		> .wrapContent { border-radius: 0px; }
+		> .wrapContent {
+			.selectionTarget.isSelectionSelected::after { border-radius: 0px; }
+		}
+
+		.katex-display { margin: 0px; text-align: inherit; }
+		.katex { line-height: 1.5em; text-align: inherit; }
+		.katex > .katex-html { white-space: normal; }
+		.katex .base { margin-top: 2px; margin-bottom: 2px; }
+	}
+}
+
+html.isSelecting {
+	.blocks {
+		.block.blockEmbed {
+			.dimmer { display: block; }
+		}
+	}
+}

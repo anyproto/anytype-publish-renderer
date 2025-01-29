@@ -1,0 +1,77 @@
+@import "~scss/_mixins";
+
+.menus {
+	.menu.menuDataviewViewList { width: var(--menu-width-set); }
+	.menu.menuDataviewViewList {
+		.content { overflow: hidden; padding: 0px; }
+		.wrap { height: 100%; display: flex; flex-direction: column; }
+		.items { flex-grow: 1; }
+
+		.item { display: flex; align-items: center; gap: 0px 10px; padding-right: 10px; }
+		.item {
+			.icon.dnd { height: 20px; background-size: 20px; vertical-align: middle; }
+			.buttons {
+				.icon { vertical-align: middle; }
+			}
+
+			.clickable { width: calc(100% - 22px); display: flex; align-items: center; }
+		}
+		.item.hover {
+			.clickable { width: calc(100% - 52px); }
+		}
+
+		.bottom {  padding: 0px 0px 8px 0px; flex-shrink: 0; }
+		.bottom {
+			.line { margin-top: 0px; }
+		}
+	}
+
+	.menu.menuDataviewViewSettings {
+		.filter.isName { margin-bottom: 4px; }
+	}
+
+	.menu.menuDataviewViewLayout {
+		.layouts { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 8px; padding: 0px 16px 4px 16px; }
+		.layouts {
+			.layout {
+				width: 104px; height: 88px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+				border: 1px solid var(--color-shape-secondary); border-radius: 8px;
+			}
+			.layout.active { border: 2px solid var(--color-system-accent-100); }
+
+			.layout {
+				.label { @include text-small; color: var(--color-text-secondary); }
+				.icon.view { width: 56px; height: 56px; }
+				.icon.view.c0 { background-image: url('~img/icon/dataview/layout/grid0.svg'); }
+				.icon.view.c1 { background-image: url('~img/icon/dataview/layout/list0.svg'); }
+				.icon.view.c2 { background-image: url('~img/icon/dataview/layout/gallery0.svg'); }
+				.icon.view.c3 { background-image: url('~img/icon/dataview/layout/kanban0.svg'); }
+				.icon.view.c4 { background-image: url('~img/icon/dataview/layout/calendar0.svg'); }
+				.icon.view.c5 { background-image: url('~img/icon/dataview/layout/graph0.svg'); }
+			}
+			.layout.active {
+				.label { font-weight: 500; color: var(--color-system-accent-100); }
+				.icon.view.c0 { background-image: url('~img/icon/dataview/layout/grid1.svg'); }
+				.icon.view.c1 { background-image: url('~img/icon/dataview/layout/list1.svg'); }
+				.icon.view.c2 { background-image: url('~img/icon/dataview/layout/gallery1.svg'); }
+				.icon.view.c3 { background-image: url('~img/icon/dataview/layout/kanban1.svg'); }
+				.icon.view.c4 { background-image: url('~img/icon/dataview/layout/calendar1.svg'); }
+				.icon.view.c5 { background-image: url('~img/icon/dataview/layout/graph1.svg'); }
+			}
+
+			.layout:not(.isReadonly):hover { background-color: var(--color-shape-highlight-light); }
+		}
+	}
+
+	.menu.menuDataviewViewEdit,
+	.menu.menuDataviewViewSettings,
+	.menu.menuDataviewViewLayout { width: var(--menu-width-set); }
+	.menu.menuDataviewViewEdit,
+	.menu.menuDataviewViewSettings,
+	.menu.menuDataviewViewLayout {
+		.content { max-height: 450px; }
+		.item.withCaption {
+			.caption { @include text-common; line-height: 20px; width: 150px; padding-right: 16px; }
+		}
+	}
+}

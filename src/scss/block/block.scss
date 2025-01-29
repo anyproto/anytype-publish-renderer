@@ -1,0 +1,43 @@
+@import "~scss/_mixins";
+
+.wrapContent {
+    width: 100%;
+}
+.blocks { margin: 0px auto; padding: 0px 0px 80px 0px; }
+@media (orientation: portrait) {
+    .blocks {
+        width: 100%;
+    }
+}
+
+@media (orientation: landscape) {
+    .blocks {
+        width: 60%;
+    }
+}
+
+.blocks {
+    .block  {
+        > .content { padding-top: 2px; padding-bottom: 2px; }
+    }
+
+    .block.bgColor { border-radius: 2px; }
+    .block.bgColor {
+        > .content { padding-left: 8px; padding-right: 8px; }
+    }
+
+    .block.align0 {
+        .wrapContent { text-align: left; }
+        .content { text-align: left; }
+    }
+
+    .block.align1 {
+        .wrapContent { text-align: center; }
+        .content { text-align: center; }
+    }
+
+    .block.align2 {
+        .wrapContent { text-align: right; }
+        .content { text-align: right; }
+    }
+}

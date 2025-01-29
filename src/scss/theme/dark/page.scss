@@ -1,0 +1,82 @@
+@import "~scss/_mixins";
+
+/* PageMainGraph */
+
+.pageMainGraph {
+    .wrapper {
+        .side.right {
+            .filter { background: none; }
+        }
+    }
+}
+
+/* PageMainType */
+
+.pageMainType {
+    .wrapper {
+        .section.template {
+			.btn {
+				.icon.plus { background-image: url('#{$themePath}/icon/plus/template0.svg'); }
+			}
+
+			.btn:hover {
+				.icon.plus { background-image: url('#{$themePath}/icon/plus/template1.svg'); }
+			}
+
+			.listPreviewObject {
+				.icon.arrow.left { left: -32px; }
+				.icon.arrow.right { right: -32px; }
+			}
+		}
+
+        .section.relation {
+			.item.add {
+				.clickable:hover {
+					.icon.plus { background-image: url('~img/icon/plus/menu0.svg'); }
+				}
+			}
+        }
+    }
+}
+
+/* PageMainNavigation */
+
+.pageMainNavigation {
+    .items {
+        .item {
+			.iconObject.isTask { background: none; }
+        }
+    }
+}
+
+/* PageMainHistory */
+
+.pageMainHistory {
+	#body {
+		> #historySideRight {
+			.section {
+				.head {
+					.icon.arrow { background-image: url('#{$themePath}/arrow/historyList.svg'); }
+				}
+			}
+
+			.item {
+				.child {
+					.icon.arrow { background-image: url('#{$themePath}/arrow/select/dark.svg'); }
+				}
+			}
+		}
+	}
+
+
+}
+
+/* PageMainArchive */
+
+.pageMainArchive {
+	.wrapper {
+		.titleWrapper {
+			.icon.archive { background-image: url('#{$themePath}/icon/archive/logo.svg'); }
+		}
+	}
+}

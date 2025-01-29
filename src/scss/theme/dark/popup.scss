@@ -1,0 +1,206 @@
+@import "~scss/_mixins";
+
+.popups {
+    /* Common */
+
+    .popup {
+        .innerWrap { box-shadow: 0px 0px 0px 1px var(--color-shape-primary); }
+		#loader { background: rgba(23, 23, 23, 0.5); }
+    }
+
+    /* PopupSettings */
+
+    .popup.popupSettings, .popup.popupSettingsOnboarding {
+		
+		.mainSides {
+			> .side.left {
+				.item {
+					.icon.logout { background-image: url('#{$themePath}/icon/popup/settings/logout.svg'); }
+				}
+			}
+		}
+
+		.side.right.tabSpaceIndex {
+			.sections {
+				.section {
+					.sectionContent {
+						.item {
+							.icon.arrow.down { background-image: url('#{$themePath}/arrow/button/black.svg'); }
+						}
+					}
+				}
+			}
+			.sections {
+				.section {
+					.sectionContent {
+						.item {
+							.icon.arrow.down { background-image: url('#{$themePath}/arrow/button/black.svg'); }
+						}
+					}
+				}
+			}
+		}
+
+		.side.right.tabSpaceIndex .sectionIntegrations .item:hover,
+		.side.right.tabPinIndex .actionItems > .item.cp:hover { background-color: rgba(166, 166, 166, 0.04) !important; }
+
+		.side.right.tabImportNotion {
+			.btn {
+				.icon.help { background-image: url('#{$themePath}/icon/popup/settings/help0.svg'); }
+			}
+			.btn:hover {
+				.icon.help { background-image: url('#{$themePath}/icon/popup/settings/help1.svg'); }
+			}
+		}
+
+		.side.right.tabImportNotion, 
+		.side.right.tabImportNotionHelp {
+			.icon.logo { background-image: url('#{$themePath}/icon/import/notion.svg'); }
+		}
+
+		.side.right.tabAppearance {
+			.btn.light { 
+				.bg { background-color: #fff; }
+			}
+
+			.btn.dark {
+				.bg { background: var(--color-bg-primary); box-shadow: 0px 0px 0px 1px var(--color-shape-primary); }
+				.icon { background-image: url('~img/icon/popup/settings/theme/dark.svg'); }
+			}
+			.btn.system {
+				.bg::before, .bg::after {
+					content: ''; position: absolute; top: 0px; width: 50%; height: 100%;
+				}
+				.bg::before { background: var(--color-control-bg); }
+				.bg::after { background: var(--color-bg-primary); box-shadow: 0px 0px 0px 1px var(--color-shape-primary); }
+				.icon { background-image: url('~img/icon/popup/settings/theme/system.svg'); }
+			}
+
+			.btn.active {
+				.bg { box-shadow: 0px 0px 0px 2px var(--color-system-accent-25); }
+			}
+			.btn.system.active {
+				.bg::before { box-shadow: 0px 0px; }
+			}
+		}
+
+		.side.right.tabImportIndex, 
+		.side.right.tabExportIndex {
+			.item:hover { border-color: var(--color-shape-primary); }
+		}
+
+		.side.right.tabMembership {
+			.slide { background: var(--color-shape-tertiary) !important; }
+			.slide.c0 {
+				.illustration { background: url('#{$themePath}/icon/payment/slide0.svg'); }
+			}
+			.slide.c1 {
+				.illustration { background: url('#{$themePath}/icon/payment/slide1.svg'); }
+			}
+			.slide.c2 {
+				.illustration { background: url('#{$themePath}/icon/payment/slide2.svg'); }
+			}
+			.slide.c3 {
+				.illustration { background: url('#{$themePath}/icon/payment/slide3.svg'); }
+			}
+			.tiers {
+				.tier { background: var(--color-shape-tertiary) !important; }
+			}
+			.actionItems {
+				.icon { background-image: url('#{$themePath}/icon/payment/hyperlink.svg'); }
+			}
+		}
+    }
+    
+    /* PopupHelp */
+
+    .popup.popupHelp {
+		.head {
+			.icon.mail { background-image: url('#{$themePath}/icon/social/mail0.svg'); }
+			.icon.mail:hover { background-image: url('#{$themePath}/icon/social/mail1.svg'); }
+		}
+
+		.highlight { color: var(--color-system-accent-100); background: var(--color-shape-highlight-medium); }
+		a:hover { color: var(--color-system-accent-100); }
+	}
+
+	/* PopupMigration */
+
+	.popup.popupMigration {
+		.qrWrap { background-color: var(--color-bg-secondary); }
+	}
+
+	/* PopupUsecase */
+
+	.popup.popupUsecase {
+		.page.pageList {
+			.categories { background: var(--color-shape-tertiary); }
+			.categories {
+				.item { border-color: var(--color-shape-primary); }
+				.item.hl { color: var(--color-text-inversion); }
+				.item:hover, .item.active { background: var(--color-control-accent); color: var(--color-text-inversion); }
+				.item:hover, .item.active {
+					.icon.heart { background-image: url('#{$themePath}/icon/popup/usecase/heart1.svg'); }
+					.icon.any { background-image: url('#{$themePath}/icon/popup/usecase/any1.svg'); }
+				}
+
+				.item {
+					.icon.heart { background-image: url('#{$themePath}/icon/popup/usecase/heart0.svg'); }
+					.icon.any { background-image: url('#{$themePath}/icon/popup/usecase/any0.svg'); }
+				}
+
+				.icon.arrow { background-image: url('#{$themePath}/arrow/usecaseCategory0.svg'); }
+				.icon.arrow:hover { background-color: var(--color-control-accent); background-image: url('#{$themePath}/arrow/usecaseCategory1.svg'); }
+			}
+		}
+
+		.page.pageItem {
+			.screenWrap {
+				.icon.arrow { background-color: var(--color-bg-secondary); background-image: url('#{$themePath}/arrow/usecase.svg'); }
+			}
+		}
+	}
+
+	/* PopupConfirm */
+
+	.popup.popupConfirm {
+		.iconWrapper { background: none; }
+		.icon.update { background-image: url('#{$themePath}/icon/popup/confirm/update.svg'); }
+		.icon.updated { background-image: url('#{$themePath}/icon/popup/confirm/updated.svg'); }
+		.icon.error { background-image: url('#{$themePath}/icon/popup/confirm/error.svg'); }
+		.icon.confirm { background-image: url('#{$themePath}/icon/popup/confirm/confirm.svg'); }
+	}
+
+	/* PopupAbout */
+
+	.popup.popupAbout {
+		.iconWrapper { background: none; }
+	}
+
+	/* PopupInviteRequest */
+
+	.popup.popupInviteRequest {
+		.iconWrapper { background: none; }
+		.icon { background-image: url('#{$themePath}/icon/popup/confirm/invite.svg'); }
+	}
+
+	/* PopupMembership */
+
+	.popup.popupMembership {
+		.sides {
+			.side.left { background: var(--color-shape-tertiary) !important; }
+			.side.left {
+				.contentList {
+					li::before { background-image: url('#{$themePath}/icon/payment/tick.svg'); }
+				}
+			}
+		}
+	}
+
+	/* PopupShare */
+
+	.popup.popupShare {
+		.content::before { display: none; }
+		.content::after { background-image: url('#{$themePath}/icon/popup/share/header.svg'); }
+	}
+}

@@ -1,0 +1,11 @@
+@import "~scss/_mixins";
+
+.menus {
+	.menu.menuHelp { width: var(--menu-width-value); position: fixed; }
+	.menu.menuHelp {
+		.shareTooltip { display: flex; position: absolute; left: auto; right: 0; top: 100%; margin-top: 8px; }
+		.shareTooltip {
+			.icon.close { display: none; }
+		}
+	}
+}

@@ -1,0 +1,76 @@
+@import "~scss/_mixins";
+
+.blocks {
+
+	.block.blockLayout {
+		> .wrapMenu { display: none; }
+		> .wrapContent {
+			> .dropTarget { display: none; }
+			> .selectionTarget {
+				> .dropTarget { display: none; }
+			}
+		}
+	}
+
+	.block.blockLayout:not(.blockLayout.layoutDiv):not(.blockLayout.layoutHeader) {
+		> .wrapContent {
+			> .children {
+				> .block.first { padding-top: 0px !important; }
+				> .block.first {
+					.colResize {
+						.inner { top: 0px; height: calc(100% + 15px); }
+					}
+				}
+
+				> .block.last { padding-bottom: 0px !important; }
+				> .block.last {
+					.colResize {
+						.inner { top: 0px; height: calc(100% + 15px); }
+					}
+				}
+
+				> .block.first.last {
+					.colResize {
+						.inner { top: 0px; height: 100%; }
+					}
+				}
+			}
+		}
+	}
+
+	/* Row */
+	.block.blockLayout.layoutRow { padding: 14px 0px; }
+	.block.blockLayout.layoutRow {
+        > .children { display: flex; flex-direction: row; align-items: stretch; width: 100%; overflow: visible; }
+		> .wrapContent {  }
+	}
+
+	/* Column */
+    .block.blockLayout.layoutColumn:first-child { margin-left: 0px; }
+
+	.block.blockLayout.layoutColumn { padding: 0px; margin-left: 48px; }
+	.block.blockLayout.layoutColumn {
+        > .content { width: 100%; display: flex; flex-flow: column;}
+        > .children { padding: 0px; width: 100%; }
+		> .children {
+			> .block.first.blockText.textHeader1 { padding-top: 0px; }
+			> .block.last.blockText.textHeader1 { padding-bottom: 0px; }
+
+			> .block.first.blockText.textHeader2 { padding-top: 0px; }
+			> .block.last.blockText.textHeader2 { padding-bottom: 0px; }
+
+			> .block.first.blockText.textHeader3 { padding-top: 0px; }
+			> .block.last.blockText.textHeader3 { padding-bottom: 0px; }
+		}
+	}
+
+	.block.blockLayout.layoutDiv,
+	.block.blockLayout.layoutHeader,
+	.block.blockLayout.layoutFooter { margin: 0px !important; }
+
+	.block.blockLayout.layoutDiv,
+	.block.blockLayout.layoutHeader,
+	.block.blockLayout.layoutFooter {
+		> .content { width: 100%; overflow: visible; }
+	}
+}
