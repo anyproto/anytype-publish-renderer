@@ -1,10 +1,7 @@
 @import "~scss/_mixins";
 
 .blocks {
-	.block {
-		@include text-paragraph; word-break: break-word; display: flex; flex-direction: row; flex: auto;
-		position: relative; margin: 0px 0px 2px 0px; align-items: stretch;
-	}
+	.block { @include text-paragraph; word-break: break-word; position: relative; margin: 0px 0px 2px 0px; align-items: stretch; }
 	.block.isHidden {
 		.wrapMenu, .wrapContent { display: none; }
 	}

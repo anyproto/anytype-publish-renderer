@@ -1,304 +1,396 @@
 @import "~scss/_mixins";
 
-.blocks {
-    .block.blockText.bgColor  {
-        > .content { padding-left: 8px; padding-right: 8px; }
-        > .content {
-            .text { min-height: var(--line-height-paragraph); flex-grow: 1; }
-        }
+.block.blockText > .content > .flex { display: flex; flex-direction: row; }
+.block.blockText > .content > .flex {
+    .markers:empty { display: none; flex-shrink: 0; }
+    .markers { display: flex; padding: 1px 0px; }
+    .markers {
+        .marker { text-align: center; display: inline-block; vertical-align: top; position: relative; width: 24px; height: 24px; line-height: 24px; margin-right: 6px; }
+        .marker .icon { display: inline-block; }
+        .marker.toggle { display: flex; align-items: center; }
+        .marker.bullet { display: flex; align-items: center; justify-content: center; }
+        .marker.bullet .markerInner { -webkit-print-color-adjust: exact; width: 6px; height: 6px; border-radius: 50%; background: var(--color-text-primary); display: block; }
+        .marker.bullet .markerInner.textColor-default { background-color: var(--color-text-primary) !important; }
+        .marker.bullet .markerInner.textColor-black { background-color: var(--color-text-primary) !important; }
+        .marker.bullet .markerInner.textColor-grey { background-color: var(--color-control-active) !important; }
+        .marker.bullet .markerInner.textColor-yellow { background-color: var(--color-yellow) !important; }
+        .marker.bullet .markerInner.textColor-orange { background-color: var(--color-orange) !important; }
+        .marker.bullet .markerInner.textColor-red { background-color: var(--color-red) !important; }
+        .marker.bullet .markerInner.textColor-pink { background-color: var(--color-pink) !important; }
+        .marker.bullet .markerInner.textColor-purple { background-color: var(--color-purple) !important; }
+        .marker.bullet .markerInner.textColor-blue { background-color: var(--color-blue) !important; }
+        .marker.bullet .markerInner.textColor-ice { background-color: var(--color-ice) !important; }
+        .marker.bullet .markerInner.textColor-teal { background-color: var(--color-teal) !important; }
+        .marker.bullet .markerInner.textColor-lime { background-color: var(--color-lime) !important; }
+        .marker.number { vertical-align: baseline; min-width: 24px; width: auto; word-break: normal; }
+        .marker.number > span { min-width: 100%; display: inline-block; text-align: center; }
+        .marker.check img, .marker.toggle img { width: 100%; height: 100%; }
     }
-	.block.blockText { @include text-paragraph; word-wrap: break-word; }
-	.block.blockText {
-		.placeholder { display: none; }
-		.disabled { color: var(--color-control-active); opacity: 1 !important; }
+    .additional { flex-shrink: 0; }
+    .text { min-height: var(--line-height-paragraph); flex-grow: 1; }
 
-		.markers { display: flex; padding: 1px 0px; }
-		.markers {
-			.marker {
-				text-align: center; display: inline-block; vertical-align: top; position: relative; width: 24px; height: 24px;
-				line-height: 24px; margin-right: 6px;
-			}
-			.marker {
-				.icon { display: inline-block; }
-			}
-
-			.marker.bullet { display: flex; align-items: center; justify-content: center; }
-			.marker.bullet {
-				.markerInner { -webkit-print-color-adjust: exact; width: 6px; height: 6px; border-radius: 50%; background: var(--color-text-primary); display: block; }
-
-				.markerInner.textColor-default { background-color: var(--color-text-primary) !important; }
-				.markerInner.textColor-black { background-color: var(--color-text-primary) !important; }
-				.markerInner.textColor-grey { background-color: var(--color-control-active) !important; }
-				.markerInner.textColor-yellow { background-color: var(--color-yellow) !important; }
-				.markerInner.textColor-orange { background-color: var(--color-orange) !important; }
-				.markerInner.textColor-red { background-color: var(--color-red) !important; }
-				.markerInner.textColor-pink { background-color: var(--color-pink) !important; }
-				.markerInner.textColor-purple { background-color: var(--color-purple) !important; }
-				.markerInner.textColor-blue { background-color: var(--color-blue) !important; }
-				.markerInner.textColor-ice { background-color: var(--color-ice) !important; }
-				.markerInner.textColor-teal { background-color: var(--color-teal) !important; }
-				.markerInner.textColor-lime { background-color: var(--color-lime) !important; }
-			}
-
-			.marker.number { vertical-align: baseline; min-width: 24px; width: auto; word-break: normal; }
-			.marker.number > span { min-width: 100%; display: inline-block; text-align: center; }
-
-			.marker.check, .marker.toggle {
-				img { width: 100%; height: 100%; }
-			}
-		}
-
-		.flex.isRtl {
-			.markers {
-				.marker { margin-right: 0px; margin-left: 6px; }
-			}
-		}
-	}
-
-	.block.blockText {
-		> .wrapContent {
-			> .selectionTarget {
-				> .dropTarget { padding: 2px 0px; }
-				> .dropTarget {
-					> .flex {
-						> .editableWrap { flex: auto; padding: 0px; width: 100%; }
-						> .editableWrap {
-							#value { width: 100%; position: relative; z-index: 2; user-select: text; padding: 1px 0px; }
-							#value * { user-select: text !important; }
-							#value.isFocused { background: none; }
-						}
-					}
-				}
-			}
-
-			> .selectionTarget.isSelectionSelected::after { z-index: 1; }
-		}
-	}
-
-	/* Readonly */
-
-	.block.blockText.isReadonly {
-		> .wrapContent {
-			.marker.check { cursor: default; }
-			#value { min-height: var(--line-height-paragraph); cursor: text !important; user-select: text !important; white-space: pre-wrap; }
-			#placeholder { display: none; }
-		}
-	}
-
-	.block.blockText.isReadonly.textTitle > .wrapContent > #value { min-height: var(--line-height-title); }
-	.block.blockText.isReadonly.textDescription > .wrapContent > #value { min-height: var(--line-height-description); }
-	.block.blockText.isReadonly.textHeader1 > .wrapContent > #value { min-height: var(--line-height-header1); }
-	.block.blockText.isReadonly.textHeader2 > .wrapContent > #value { min-height: var(--line-height-header2); }
-	.block.blockText.isReadonly.textHeader3 > .wrapContent > #value { min-height: var(--line-height-header3); }
-
-	/* IsChecked */
-
-	.block.blockText.isChecked > .wrapContent > .selectionTarget > .dropTarget * { color: var(--color-control-active) !important; }
-
-	/* Title */
-
-	.block.blockText.textTitle { padding: 6px 0px 0px 0px !important; @include text-title; }
-	.block.blockText.textTitle {
-		> .wrapMenu:hover > .icon.dnd { opacity: 1; }
-		> .wrapContent {
-			> .selectionTarget {
-				> .dropTarget { padding: 0px; }
-				> .dropTarget {
-					> .flex {
-						> .editableWrap {
-							.placeholder { color: var(--color-control-active); position: absolute; z-index: 0; left: 0px; top: 0px; display: none; width: 100%; height: 100%; cursor: text; }
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/* Description */
-
-	.block.blockText.textDescription > .wrapMenu:hover > .icon.dnd { opacity: 1; }
-
-	.block.blockText.textHeader1,
-	.block.blockText.textHeader2,
-	.block.blockText.textHeader3 {
-		markupmention {
-			.space { width: 6px; }
-		}
-	}
-
-	/* Header1 */
-
-	.block.blockText.textHeader1 { padding: 22px 0px 0px 0px; }
-	.block.blockText.textHeader1 > .wrapContent > .selectionTarget > .dropTarget { @include text-header1; padding: 3px 0px 1px 0px; }
-	.block.blockText.textHeader1 > .wrapContent > .selectionTarget > .dropTarget {
-		marukupmention {
-			name { font-weight: inherit; }
-		}
-		markupbold { font-weight: 700; }
-		markuplink, markupobject { font-weight: inherit; }
-	}
-
-	/* Header2 */
-
-	.block.blockText.textHeader2 { padding: 12px 0px 0px 0px; }
-	.block.blockText.textHeader2 > .wrapContent > .selectionTarget > .dropTarget { @include text-header2; padding: 2px 0px 1px 0px; }
-	.block.blockText.textHeader2 > .wrapContent > .selectionTarget > .dropTarget {
-		marukupmention {
-			name { font-weight: inherit; }
-		}
-		markupbold { font-weight: 700; }
-		markuplink, markupobject { font-weight: inherit; }
-	}
-
-	/* Header3 */
-
-	.block.blockText.textHeader3 { padding: 12px 0px 0px 0px; }
-	.block.blockText.textHeader3 > .wrapContent > .selectionTarget > .dropTarget { @include text-header3; padding: 1px 0px 2px 0px; }
-	.block.blockText.textHeader3 > .wrapContent > .selectionTarget > .dropTarget {
-		marukupmention {
-			name { font-weight: inherit; }
-		}
-		markupbold { font-weight: 700; }
-		markuplink, markupobject { font-weight: inherit; }
-	}
-
-	/* Quote */
-
-	.block.blockText.textQuote { padding: 6px 0px 6px 0px; }
-	.block.blockText.textQuote {
-		> .wrapContent {
-			> .selectionTarget > .dropTarget { padding: 1px 0px 2px 0px; }
-
-			> .additional {
-				> .line { width: 0px; height: 100%; position: absolute; left: 11px; top: 0px; border-left: 1.5px solid; }
-			}
-		}
-	}
-	.block.blockText.textQuote > .wrapContent > .selectionTarget > .dropTarget > .flex > .editableWrap { padding-left: 28px; }
-	.block.blockText.textQuote > .wrapContent > .selectionTarget > .dropTarget > .flex > .editableWrap > .placeholder { left: 28px; }
-
-	.block.blockText.textQuote.align2 > .wrapContent > .selectionTarget > .dropTarget > .flex > .editableWrap { padding-right: 28px; }
-	.block.blockText.textQuote.align2 > .wrapContent > .additional > .line { left: auto; right: 11px; }
-	.block.blockText.textQuote.align2 > .wrapContent > .selectionTarget > .dropTarget > .flex > .editableWrap > .placeholder { left: auto; right: 28px; }
-
-	/* Callout */
-
-	.block.blockText.textCallout { min-width: 130px; }
-	.block.blockText.textCallout {
-		> .wrapContent { border-radius: 8px; margin: 6px 0px; background-color: var(--color-shape-highlight-light); }
-		> .wrapContent {
-			> .selectionTarget { position: static; }
-			> .selectionTarget.isSelectionSelected::after { left: 0px; width: 100%; border-radius: 8px; }
-
-			> .selectionTarget {
-				> .dropTarget { padding: 16px 16px 0px 16px; }
-				> .dropTarget {
-					> .flex { gap: 0px 14px; }
-					> .flex {
-						.markers { display: none; }
-						.additional { flex-shrink: 0; }
-						.additional {
-							.iconObject { margin-top: 2px; }
-						}
-					}
-				}
-			}
-
-			> .dropTarget.targetBot { display: block; height: 16px; position: static; }
-			> .dropTarget.targetBot.isOver.bottom { box-shadow: 0px -2px 0px var(--color-system-accent-100) inset; }
-
-			> .children { padding-right: 16px; }
-		}
-	}
-	.block.blockText.textCallout.first {
-		> .wrapContent { margin-top: 0px; }
-	}
-	.block.blockText.textCallout.last {
-		> .wrapContent { margin-bottom: 0px; }
-	}
-
-	/* Code */
-
-	.block.blockText.textCode { padding: 6px 0px; }
-	.block.blockText.textCode {
-		> .wrapContent { border-radius: 8px; background-color: var(--color-shape-highlight-light); }
-		> .wrapContent {
-			> .selectionTarget { border-radius: 8px; }
-			> .selectionTarget.isSelectionSelected::after { left: 0px; width: 100%; border-radius: 8px; }
-
-			> .selectionTarget {
-				> .dropTarget { padding: 24px 0px 0px 0px; }
-				> .dropTarget {
-					.placeholder { display: none !important; }
-
-					> .flex { position: static; }
-					> .flex {
-						#value { font-family: 'Plex'; @include text-common; tab-size: 4; white-space: pre-wrap; padding: 16px; }
-						#value * { background: none; }
-
-						.additional { position: absolute; top: 9px; left: 0px; z-index: 1; display: block; padding: 0px 16px; width: 100%; }
-						.additional {
-							.select { border: 0px; color: var(--color-control-active); border-radius: 0px; padding: 0px 20px 0px 0px; }
-							.select {
-								.item { @include text-common; }
-								.name { overflow: visible; }
-							}
-							.select:hover, .select.active { background: none; }
-
-							.buttons {
-								position: absolute; right: 16px; top: 0px; display: flex; flex-direction: row; gap: 0px 8px; opacity: 0;
-								transition: $transitionAllCommon;
-							}
-							.buttons {
-								.btn {
-									padding: 0px; height: 20px; line-height: 20px; color: var(--color-control-active); @include text-common;
-									display: flex; flex-direction: row; gap: 0px 4px; align-items: center;
-								}
-								.btn {
-									.icon { flex-shrink: 0; width: 20px; height: 20px; }
-									.icon.codeWrap { background-image: url('~img/icon/menu/action/wrap0.svg'); }
-									.icon.copy { background-image: url('~img/icon/menu/action/copy0.svg'); }
-
-									.txt { line-height: 20px; vertical-align: top; }
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	.block.blockText.textCode:hover > .wrapContent > .selectionTarget > .dropTarget > .flex {
-		.additional .buttons { opacity: 1; }
-	}
-	.block.blockText.textCode.isReadonly > .wrapContent > .selectionTarget > .dropTarget > .flex {
-		.additional .buttons { display: none; }
-	}
-	.block.blockText.textCode.isUnwrapped > .wrapContent > .selectionTarget > .dropTarget > .flex {
-		#value { white-space: pre; overflow-x: scroll; }
-	}
-
-	/* DropTarget */
-
-	.block.blockText.textParagraph > .wrapContent > .dropTarget.targetBot.isOver.bottom,
-	.block.blockText.textQuote > .wrapContent > .dropTarget.targetBot.isOver.bottom,
-	.block.blockText.textBulleted > .wrapContent > .dropTarget.targetBot.isOver.bottom,
-	.block.blockText.textNumbered > .wrapContent > .dropTarget.targetBot.isOver.bottom,
-	.block.blockText.textCheckbox > .wrapContent > .dropTarget.targetBot.isOver.bottom,
-	.block.blockText.textToggle > .wrapContent > .dropTarget.targetBot.isOver.bottom
-	{ box-shadow: 0px -2px 0px var(--color-system-accent-100) inset; }
-
-	.block.blockText.textParagraph > .wrapContent.bgColor > .selectionTarget > .dropTarget,
-	.block.blockText.textHeader1 > .wrapContent.bgColor > .selectionTarget > .dropTarget,
-	.block.blockText.textHeader2 > .wrapContent.bgColor > .selectionTarget > .dropTarget,
-	.block.blockText.textHeader3 > .wrapContent.bgColor > .selectionTarget > .dropTarget
-	{ padding-left: 8px; padding-right: 8px;  }
 }
 
-.editorWrapper.isTask {
-	.blocks .block.blockText.textTitle { @include text-header1; }
-	.blocks .block.blockText.textTitle {
-		.flex { gap: 0px 8px; }
-		.marker { width: 30px; height: 30px; margin: 0px; }
-	}
+.block.blockText.textToggle.isToggled > .content > .flex .markers .marker.toggle { transform: rotateZ(90deg); }
+.block.blockText.bgColor > .content { padding-left: 8px; padding-right: 8px; }
+
+/* Title */
+.block.blockText.textTitle { padding: 6px 0px 0px 0px !important; font-size: var(--font-size-title); line-height: var(--line-height-title); letter-spacing: var(--letter-spacing-title); font-weight: var(--font-weight-title); }
+.block.blockText.textTitle {
+    > .content > .flex { gap: 0px 8px; }
+    > .content > .flex {
+        .markers { align-items: center; }
+        .markers .marker.check { width: 30px; height: 30px; margin: 0px; }
+    }
 }
+
+/* Header1 */
+.block.blockText.textHeader1 { padding: 25px 0px 0px 0px; font-size: var(--font-size-header1); line-height: var(--line-height-header1); letter-spacing: var(--letter-spacing-header1); font-weight: var(--font-weight-header1); }
+
+/* Header2 */
+.block.blockText.textHeader2 { padding: 14px 0px 0px 0px; font-size: var(--font-size-header2); line-height: var(--line-height-header2); letter-spacing: var(--letter-spacing-header2); font-weight: var(--font-weight-header2); }
+
+/* Header3 */
+.block.blockText.textHeader3 { padding: 13px 0px 2px 0px; font-size: var(--font-size-header3); line-height: var(--line-height-header3); letter-spacing: var(--letter-spacing-header3); font-weight: var(--font-weight-header3); }
+
+/* Callout */
+.block.blockText.textCallout { min-width: 130px; background-color: var(--color-shape-tertiary); border-radius: 8px; margin: 6px 0px; }
+
+.block.blockText.textCallout {
+    > .content { padding: 16px 16px 0px 16px; }
+    > .content > .flex { gap: 0px 14px; }
+    > .children { padding: 0px 16px 16px 48px; }
+}
+
+/* Code */
+.block.blockText.textCode { padding: 6px 0px; }
+.block.blockText.textCode {
+    > .content { border-radius: 8px; background-color: var(--color-shape-tertiary); }
+    > .content > .flex { flex-direction: column; padding: 16px; gap: 12px 0px; }
+    > .content > .flex {
+        .text { font-family: "Plex"; font-size: var(--font-size-common); line-height: var(--line-height-common); letter-spacing: var(--letter-spacing-common); -moz-tab-size: 4;      tab-size: 4; white-space: pre-wrap; }
+        .text * { background: none; }
+        .additional .current { color: var(--color-control-active); }
+    }
+
+    .isUnwrapped > .content > .flex .text { white-space: pre; overflow-x: scroll; }
+}
+
+
+/* Quote */
+.block.blockText.textQuote {
+    > .content { padding-left: 24px; }
+    > .additional > .line { width: 0px; height: 100%; position: absolute; left: 11px; top: 0px; border-left: 1.5px solid; }
+}
+
+/* Toggle */
+.block.blockText.textToggle.isToggled > .children { display: block; }
+.block.blockText.textToggle > .children { display: none; }
+
+
+//////
+// .blocks {
+//     .block.blockText {
+//         > .content {
+//             .text { min-height: var(--line-height-paragraph); flex-grow: 1; }
+//         }
+//     }
+
+//     .block.blockText.bgColor  {
+//         > .content { padding-left: 8px; padding-right: 8px; }
+//     }
+// 	.block.blockText { @include text-paragraph; word-wrap: break-word; }
+// 	.block.blockText {
+// 		.placeholder { display: none; }
+// 		.disabled { color: var(--color-control-active); opacity: 1 !important; }
+
+// 		.markers { display: flex; padding: 1px 0px; }
+// 		.markers {
+// 			.marker {
+// 				text-align: center; display: inline-block; vertical-align: top; position: relative; width: 24px; height: 24px;
+// 				line-height: 24px; margin-right: 6px;
+// 			}
+// 			.marker {
+// 				.icon { display: inline-block; }
+// 			}
+
+// 			.marker.bullet { display: flex; align-items: center; justify-content: center; }
+// 			.marker.bullet {
+// 				.markerInner { -webkit-print-color-adjust: exact; width: 6px; height: 6px; border-radius: 50%; background: var(--color-text-primary); display: block; }
+
+// 				.markerInner.textColor-default { background-color: var(--color-text-primary) !important; }
+// 				.markerInner.textColor-black { background-color: var(--color-text-primary) !important; }
+// 				.markerInner.textColor-grey { background-color: var(--color-control-active) !important; }
+// 				.markerInner.textColor-yellow { background-color: var(--color-yellow) !important; }
+// 				.markerInner.textColor-orange { background-color: var(--color-orange) !important; }
+// 				.markerInner.textColor-red { background-color: var(--color-red) !important; }
+// 				.markerInner.textColor-pink { background-color: var(--color-pink) !important; }
+// 				.markerInner.textColor-purple { background-color: var(--color-purple) !important; }
+// 				.markerInner.textColor-blue { background-color: var(--color-blue) !important; }
+// 				.markerInner.textColor-ice { background-color: var(--color-ice) !important; }
+// 				.markerInner.textColor-teal { background-color: var(--color-teal) !important; }
+// 				.markerInner.textColor-lime { background-color: var(--color-lime) !important; }
+// 			}
+
+// 			.marker.number { vertical-align: baseline; min-width: 24px; width: auto; word-break: normal; }
+// 			.marker.number > span { min-width: 100%; display: inline-block; text-align: center; }
+
+// 			.marker.check, .marker.toggle {
+// 				img { width: 100%; height: 100%; }
+// 			}
+// 		}
+
+// 		.flex.isRtl {
+// 			.markers {
+// 				.marker { margin-right: 0px; margin-left: 6px; }
+// 			}
+// 		}
+// 	}
+
+// 	.block.blockText {
+// 		> .wrapContent {
+// 			> .selectionTarget {
+// 				> .dropTarget { padding: 2px 0px; }
+// 				> .dropTarget {
+// 					> .flex {
+// 						> .editableWrap { flex: auto; padding: 0px; width: 100%; }
+// 						> .editableWrap {
+// 							#value { width: 100%; position: relative; z-index: 2; user-select: text; padding: 1px 0px; }
+// 							#value * { user-select: text !important; }
+// 							#value.isFocused { background: none; }
+// 						}
+// 					}
+// 				}
+// 			}
+
+// 			> .selectionTarget.isSelectionSelected::after { z-index: 1; }
+// 		}
+// 	}
+
+// 	/* Readonly */
+
+// 	.block.blockText.isReadonly {
+// 		> .wrapContent {
+// 			.marker.check { cursor: default; }
+// 			#value { min-height: var(--line-height-paragraph); cursor: text !important; user-select: text !important; white-space: pre-wrap; }
+// 			#placeholder { display: none; }
+// 		}
+// 	}
+
+// 	.block.blockText.isReadonly.textTitle > .wrapContent > #value { min-height: var(--line-height-title); }
+// 	.block.blockText.isReadonly.textDescription > .wrapContent > #value { min-height: var(--line-height-description); }
+// 	.block.blockText.isReadonly.textHeader1 > .wrapContent > #value { min-height: var(--line-height-header1); }
+// 	.block.blockText.isReadonly.textHeader2 > .wrapContent > #value { min-height: var(--line-height-header2); }
+// 	.block.blockText.isReadonly.textHeader3 > .wrapContent > #value { min-height: var(--line-height-header3); }
+
+// 	/* IsChecked */
+
+// 	.block.blockText.isChecked > .wrapContent > .selectionTarget > .dropTarget * { color: var(--color-control-active) !important; }
+
+// 	/* Title */
+
+// 	.block.blockText.textTitle { padding: 6px 0px 0px 0px !important; @include text-title; }
+// 	.block.blockText.textTitle {
+// 		> .wrapMenu:hover > .icon.dnd { opacity: 1; }
+// 		> .wrapContent {
+// 			> .selectionTarget {
+// 				> .dropTarget { padding: 0px; }
+// 				> .dropTarget {
+// 					> .flex {
+// 						> .editableWrap {
+// 							.placeholder { color: var(--color-control-active); position: absolute; z-index: 0; left: 0px; top: 0px; display: none; width: 100%; height: 100%; cursor: text; }
+// 						}
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+
+// 	/* Description */
+
+// 	.block.blockText.textDescription > .wrapMenu:hover > .icon.dnd { opacity: 1; }
+
+// 	.block.blockText.textHeader1,
+// 	.block.blockText.textHeader2,
+// 	.block.blockText.textHeader3 {
+// 		markupmention {
+// 			.space { width: 6px; }
+// 		}
+// 	}
+
+// 	/* Header1 */
+
+// 	.block.blockText.textHeader1 { padding: 22px 0px 0px 0px; }
+// 	.block.blockText.textHeader1 > .wrapContent > .selectionTarget > .dropTarget { @include text-header1; padding: 3px 0px 1px 0px; }
+// 	.block.blockText.textHeader1 > .wrapContent > .selectionTarget > .dropTarget {
+// 		marukupmention {
+// 			name { font-weight: inherit; }
+// 		}
+// 		markupbold { font-weight: 700; }
+// 		markuplink, markupobject { font-weight: inherit; }
+// 	}
+
+// 	/* Header2 */
+
+// 	.block.blockText.textHeader2 { padding: 12px 0px 0px 0px; }
+// 	.block.blockText.textHeader2 > .wrapContent > .selectionTarget > .dropTarget { @include text-header2; padding: 2px 0px 1px 0px; }
+// 	.block.blockText.textHeader2 > .wrapContent > .selectionTarget > .dropTarget {
+// 		marukupmention {
+// 			name { font-weight: inherit; }
+// 		}
+// 		markupbold { font-weight: 700; }
+// 		markuplink, markupobject { font-weight: inherit; }
+// 	}
+
+// 	/* Header3 */
+
+// 	.block.blockText.textHeader3 { padding: 12px 0px 0px 0px; }
+// 	.block.blockText.textHeader3 > .wrapContent > .selectionTarget > .dropTarget { @include text-header3; padding: 1px 0px 2px 0px; }
+// 	.block.blockText.textHeader3 > .wrapContent > .selectionTarget > .dropTarget {
+// 		marukupmention {
+// 			name { font-weight: inherit; }
+// 		}
+// 		markupbold { font-weight: 700; }
+// 		markuplink, markupobject { font-weight: inherit; }
+// 	}
+
+// 	/* Quote */
+
+// 	.block.blockText.textQuote { padding: 6px 0px 6px 0px; }
+// 	.block.blockText.textQuote {
+// 		> .wrapContent {
+// 			> .selectionTarget > .dropTarget { padding: 1px 0px 2px 0px; }
+
+// 			> .additional {
+// 				> .line { width: 0px; height: 100%; position: absolute; left: 11px; top: 0px; border-left: 1.5px solid; }
+// 			}
+// 		}
+// 	}
+// 	.block.blockText.textQuote > .wrapContent > .selectionTarget > .dropTarget > .flex > .editableWrap { padding-left: 28px; }
+// 	.block.blockText.textQuote > .wrapContent > .selectionTarget > .dropTarget > .flex > .editableWrap > .placeholder { left: 28px; }
+
+// 	.block.blockText.textQuote.align2 > .wrapContent > .selectionTarget > .dropTarget > .flex > .editableWrap { padding-right: 28px; }
+// 	.block.blockText.textQuote.align2 > .wrapContent > .additional > .line { left: auto; right: 11px; }
+// 	.block.blockText.textQuote.align2 > .wrapContent > .selectionTarget > .dropTarget > .flex > .editableWrap > .placeholder { left: auto; right: 28px; }
+
+// 	/* Callout */
+
+// 	.block.blockText.textCallout { min-width: 130px; }
+// 	.block.blockText.textCallout {
+// 		> .wrapContent { border-radius: 8px; margin: 6px 0px; background-color: var(--color-shape-highlight-light); }
+// 		> .wrapContent {
+// 			> .selectionTarget { position: static; }
+// 			> .selectionTarget.isSelectionSelected::after { left: 0px; width: 100%; border-radius: 8px; }
+
+// 			> .selectionTarget {
+// 				> .dropTarget { padding: 16px 16px 0px 16px; }
+// 				> .dropTarget {
+// 					> .flex { gap: 0px 14px; }
+// 					> .flex {
+// 						.markers { display: none; }
+// 						.additional { flex-shrink: 0; }
+// 						.additional {
+// 							.iconObject { margin-top: 2px; }
+// 						}
+// 					}
+// 				}
+// 			}
+
+// 			> .dropTarget.targetBot { display: block; height: 16px; position: static; }
+// 			> .dropTarget.targetBot.isOver.bottom { box-shadow: 0px -2px 0px var(--color-system-accent-100) inset; }
+
+// 			> .children { padding-right: 16px; }
+// 		}
+// 	}
+// 	.block.blockText.textCallout.first {
+// 		> .wrapContent { margin-top: 0px; }
+// 	}
+// 	.block.blockText.textCallout.last {
+// 		> .wrapContent { margin-bottom: 0px; }
+// 	}
+
+// 	/* Code */
+
+// 	.block.blockText.textCode { padding: 6px 0px; }
+// 	.block.blockText.textCode {
+// 		> .wrapContent { border-radius: 8px; background-color: var(--color-shape-highlight-light); }
+// 		> .wrapContent {
+// 			> .selectionTarget { border-radius: 8px; }
+// 			> .selectionTarget.isSelectionSelected::after { left: 0px; width: 100%; border-radius: 8px; }
+
+// 			> .selectionTarget {
+// 				> .dropTarget { padding: 24px 0px 0px 0px; }
+// 				> .dropTarget {
+// 					.placeholder { display: none !important; }
+
+// 					> .flex { position: static; }
+// 					> .flex {
+// 						#value { font-family: 'Plex'; @include text-common; tab-size: 4; white-space: pre-wrap; padding: 16px; }
+// 						#value * { background: none; }
+
+// 						.additional { position: absolute; top: 9px; left: 0px; z-index: 1; display: block; padding: 0px 16px; width: 100%; }
+// 						.additional {
+// 							.select { border: 0px; color: var(--color-control-active); border-radius: 0px; padding: 0px 20px 0px 0px; }
+// 							.select {
+// 								.item { @include text-common; }
+// 								.name { overflow: visible; }
+// 							}
+// 							.select:hover, .select.active { background: none; }
+
+// 							.buttons {
+// 								position: absolute; right: 16px; top: 0px; display: flex; flex-direction: row; gap: 0px 8px; opacity: 0;
+// 								transition: $transitionAllCommon;
+// 							}
+// 							.buttons {
+// 								.btn {
+// 									padding: 0px; height: 20px; line-height: 20px; color: var(--color-control-active); @include text-common;
+// 									display: flex; flex-direction: row; gap: 0px 4px; align-items: center;
+// 								}
+// 								.btn {
+// 									.icon { flex-shrink: 0; width: 20px; height: 20px; }
+// 									.icon.codeWrap { background-image: url('~img/icon/menu/action/wrap0.svg'); }
+// 									.icon.copy { background-image: url('~img/icon/menu/action/copy0.svg'); }
+
+// 									.txt { line-height: 20px; vertical-align: top; }
+// 								}
+// 							}
+// 						}
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+// 	.block.blockText.textCode:hover > .wrapContent > .selectionTarget > .dropTarget > .flex {
+// 		.additional .buttons { opacity: 1; }
+// 	}
+// 	.block.blockText.textCode.isReadonly > .wrapContent > .selectionTarget > .dropTarget > .flex {
+// 		.additional .buttons { display: none; }
+// 	}
+// 	.block.blockText.textCode.isUnwrapped > .wrapContent > .selectionTarget > .dropTarget > .flex {
+// 		#value { white-space: pre; overflow-x: scroll; }
+// 	}
+
+// 	/* DropTarget */
+
+// 	.block.blockText.textParagraph > .wrapContent > .dropTarget.targetBot.isOver.bottom,
+// 	.block.blockText.textQuote > .wrapContent > .dropTarget.targetBot.isOver.bottom,
+// 	.block.blockText.textBulleted > .wrapContent > .dropTarget.targetBot.isOver.bottom,
+// 	.block.blockText.textNumbered > .wrapContent > .dropTarget.targetBot.isOver.bottom,
+// 	.block.blockText.textCheckbox > .wrapContent > .dropTarget.targetBot.isOver.bottom,
+// 	.block.blockText.textToggle > .wrapContent > .dropTarget.targetBot.isOver.bottom
+// 	{ box-shadow: 0px -2px 0px var(--color-system-accent-100) inset; }
+
+// 	.block.blockText.textParagraph > .wrapContent.bgColor > .selectionTarget > .dropTarget,
+// 	.block.blockText.textHeader1 > .wrapContent.bgColor > .selectionTarget > .dropTarget,
+// 	.block.blockText.textHeader2 > .wrapContent.bgColor > .selectionTarget > .dropTarget,
+// 	.block.blockText.textHeader3 > .wrapContent.bgColor > .selectionTarget > .dropTarget
+// 	{ padding-left: 8px; padding-right: 8px; }
+// }
+
+// .editorWrapper.isTask {
+// 	.blocks .block.blockText.textTitle { @include text-header1; }
+// 	.blocks .block.blockText.textTitle {
+// 		.flex { gap: 0px 8px; }
+// 		.marker { width: 30px; height: 30px; margin: 0px; }
+// 	}
+// }

@@ -27,17 +27,17 @@
     }
 
     .block.align0 {
-        .wrapContent { text-align: left; }
-        .content { text-align: left; }
+        > .wrapContent { text-align: left; }
+        > .content { text-align: left; }
     }
 
     .block.align1 {
-        .wrapContent { text-align: center; }
-        .content { text-align: center; }
+        > .wrapContent { text-align: center; }
+        > .content { text-align: center; }
     }
 
     .block.align2 {
-        .wrapContent { text-align: right; }
-        .content { text-align: right; }
+        > .wrapContent { text-align: right; }
+        > .content { text-align: right; }
     }
 }
