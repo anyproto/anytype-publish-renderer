@@ -3,6 +3,7 @@
 .blocks {
 
 	.block.blockLayout {
+        > .children { padding-left: 0px;}
 		> .wrapMenu { display: none; }
 		> .wrapContent {
 			> .dropTarget { display: none; }
