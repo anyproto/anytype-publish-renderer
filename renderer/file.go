@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -30,7 +31,10 @@ func (r *Renderer) getFileUrl(id string) (url string, err error) {
 		return
 	}
 
+	// fixes GO-4975
+	source = strings.ReplaceAll(source, `\`, "%5C")
 	url = fmt.Sprintf("%s/%s", r.Config.PublishFilesPath, source)
+
 	return
 
 }
