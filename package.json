@@ -1,0 +1,28 @@
+{
+	"name": "anytype-publish-renderer",
+	"version": "1.0.0",
+	"main": "rspack.config.js",
+	"scripts": {
+		"build": "rspack --mode=production --node-env=production --config rspack.config.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/anyproto/anytype-publish-renderer.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/anyproto/anytype-publish-renderer/issues"
+	},
+	"homepage": "https://github.com/anyproto/anytype-publish-renderer#readme",
+	"description": "",
+	"dependencies": {
+		"@rsdoctor/rspack-plugin": "^0.4.13",
+		"@rspack/cli": "^1.2.2",
+		"css-loader": "^7.1.2",
+		"fork-ts-checker-webpack-plugin": "^9.0.2",
+		"sass": "^1.83.4",
+		"sass-loader": "^16.0.4",
+		"style-loader": "^4.0.0"
+	}
+}
