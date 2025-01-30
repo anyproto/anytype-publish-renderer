@@ -40,21 +40,24 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, lastCla
 	if featuredRelation == nil {
 		return cells
 	}
-	name, format, found := r.retrieveRelationInfo(featuredRelation.GetStringValue())
+	relationKey := featuredRelation.GetStringValue()
+	name, format, found := r.retrieveRelationInfo(relationKey)
 	if !found {
 		return cells
 	}
-	relationValue := details.GetFields()[featuredRelation.GetStringValue()]
+	relationValue, exists := details.GetFields()[relationKey]
 	formatClass := r.getFormatClass(format)
-	if relationValue == nil {
+
+	if !exists || relationValue == nil {
 		return append(cells, EmptyCellTemplate(name, formatClass, lastClass))
 	}
-	if formatClass == "c-object" || formatClass == "c-file" || formatClass == "c-select" {
-		cells = r.processObjectList(relationValue, format, cells, name, formatClass, lastClass)
-	} else {
-		cells = r.processOneObject(relationValue, format, cells, name, lastClass, formatClass)
+
+	switch formatClass {
+	case "c-object", "c-file", "c-select":
+		return r.processObjectList(relationValue, format, cells, name, formatClass, lastClass)
+	default:
+		return r.processOneObject(relationValue, format, cells, name, lastClass, formatClass)
 	}
-	return cells
 }
 
 func (r *Renderer) processObjectList(relationValue *types.Value, format model.RelationFormat, cells []templ.Component, name, formatClass, lastClass string) []templ.Component {

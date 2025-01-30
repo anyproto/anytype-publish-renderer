@@ -19,11 +19,7 @@ templ FeaturedRelationTemplate(p *FeaturedRelationsParams) {
 templ CellTemplate(class, last string, component templ.Component) {
     <div class={ "cell " + last }>
         <div class={ "cellContent " + class }>
-            if isEmpty {
-                <div class="name"> { value } </div>
-            } else {
-                @component
-            }
+             @component
         </div>
         <div class="bullet"></div>
     </div>
@@ -32,11 +28,7 @@ templ CellTemplate(class, last string, component templ.Component) {
 templ EmptyCellTemplate(value, class, last string) {
     <div class={ "cell " + last }>
         <div class={ "cellContent " + class }>
-            if isEmpty {
-                <div class="name"> { value } </div>
-            } else {
-                @component
-            }
+            <div class="name"> { value } </div>
         </div>
         <div class="bullet"></div>
     </div>

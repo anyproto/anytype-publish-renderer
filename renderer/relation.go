@@ -147,7 +147,7 @@ func (r *Renderer) getFormatClass(format model.RelationFormat) string {
 	case model.RelationFormat_number:
 		return "c-number"
 	default:
-		return ""
+		return "c-longText"
 	}
 }
 
