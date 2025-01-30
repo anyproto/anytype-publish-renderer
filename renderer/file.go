@@ -2,14 +2,12 @@ package renderer
 
 import (
 	"fmt"
-	"math"
-	"strconv"
-	"strings"
-
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"go.uber.org/zap"
+	"math"
+	"strconv"
 )
 
 func (r *Renderer) getFileUrl(id string) (url string, err error) {
@@ -31,8 +29,6 @@ func (r *Renderer) getFileUrl(id string) (url string, err error) {
 		return
 	}
 
-	// fixes GO-4975
-	source = strings.ReplaceAll(source, `\`, "%5C")
 	url = fmt.Sprintf("%s/%s", r.Config.PublishFilesPath, source)
 
 	return
