@@ -30,17 +30,21 @@ templ RelationTemplate(p *RelationRenderParams) {
 	</div>
 }
 
-templ BasicTemplate(p *RelationRenderParams, value string) {
-     <div class={ "cell " + p.Format }>
-         <div class={ "cellContent " + p.Format }>
-              <div class="name"> { value } </div>
-         </div>
-     </div>
+templ WrapToCellTemplate(format string, elem templ.Component) {
+    <div class={ "cell " + format }>
+        <div class={ "cellContent " + format }>
+                @elem
+        </div>
+    </div>
 }
 
-templ ListTemplate(p *RelationRenderParams, elements []templ.Component) {
-	<div class={ "cell " + p.Format }>
-		<div class={ "cellContent " + p.Format }>
+templ BasicTemplate(value string) {
+    <div class="name"> { value } </div>
+}
+
+templ ListTemplate(format string, elements []templ.Component) {
+	<div class={ "cell " + format }>
+		<div class={ "cellContent " + format }>
 			<div class="wrap">
 				<div class="over">
 					for _, elem := range elements {
@@ -146,18 +150,10 @@ templ OptionElement(value, color, relationType string) {
     </div>
 }
 
-templ ActiveCheckBoxTemplate(p *RelationRenderParams) {
-    <div class={ "cell " + p.Format }>
-        <div class={ "cellContent " + p.Format }>
-             <div class="icon checkbox active"> </div>
-        </div>
-    </div>
+templ ActiveCheckBoxTemplate() {
+    <div class="icon checkbox active"> </div>
 }
 
-templ DisabledCheckBoxTemplate(p *RelationRenderParams) {
-    <div class={ "cell " + p.Format }>
-        <div class={ "cellContent " + p.Format }>
-             <div class="icon checkbox"> </div>
-        </div>
-    </div>
+templ DisabledCheckBoxTemplate() {
+    <div class="icon checkbox"> </div>
 }

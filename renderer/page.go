@@ -69,7 +69,7 @@ func (r *Renderer) RenderBlock(blockId string) templ.Component {
 	case *model.BlockContentOfLayout:
 		return r.RenderLayout(b)
 	case *model.BlockContentOfFeaturedRelations:
-		return NoneTemplate("")
+		return r.RenderFeaturedRelations(b)
 	case *model.BlockContentOfDiv:
 		return r.RenderDiv(b)
 	case *model.BlockContentOfFile:
