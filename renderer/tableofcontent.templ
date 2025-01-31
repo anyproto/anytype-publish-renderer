@@ -1,0 +1,29 @@
+package renderer
+
+templ TableOfContentTemplate(p *TableOfContentRenderParams) {
+	<div id={"block-" + p.Id} class={"block blockTableOfContents " + p.BackgroundColor}>
+	    <div class="wrapContent">
+            <div class="selectionTarget">
+                <div class="dropTarget">
+                    <div class={ "wrap focusable" } >
+                        if p.IsEmpty {
+                            <div class="empty">Add headings to create a table of contents</div>
+                        } else {
+                            for _, item := range p.Items {
+                                @item
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+}
+
+templ FirstHeadingTemplate(name string) {
+    <div class="item" style="padding-left: 0px;"><span>{ name }</span></div>
+}
+
+templ SecondHeadingsTemplate(name string) {
+    <div class="item" style="padding-left: 24px;"><span>{ name }</span></div>
+}
