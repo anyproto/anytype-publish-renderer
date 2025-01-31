@@ -67,7 +67,7 @@ func (r *Renderer) RenderTable(b *model.Block) templ.Component {
 
 func (r *Renderer) MakeRenderTableRowCellParams(b *model.Block) (params *RenderTableRowCellParams) {
 
-	textComp := r.RenderText(b)
+	textComp := r.RenderBlock(b.Id)
 	params = &RenderTableRowCellParams{
 		Classes:  "",
 		Id:       b.Id,

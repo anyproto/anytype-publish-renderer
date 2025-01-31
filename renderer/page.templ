@@ -5,6 +5,7 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
     <html lang="en">
         <head>
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+			<meta property="PublishFilesPath" content={ r.Config.PublishFilesPath }/>
 			<title>{ r.titleText() }</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 			<link rel="apple-touch-icon" sizes="180x180" href="https://anytype.io/apple-touch-icon.png" />
@@ -25,7 +26,6 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 		<body>
 			<script src={ r.GetPrismJsUrl("/components/prism-core.min.js") }></script>
 			<script src={ r.GetPrismJsUrl("/plugins/autoloader/prism-autoloader.min.js") }></script>
-
 			<main>
 				if r.joinSpaceLink() != "" {
 					<div class="joinSpace">
@@ -44,7 +44,7 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
  					@r.RenderPageIconImage()
 					<div>
 						for _, childId := range r.Root.ChildrenIds {
-							@r.RenderBlock(r.BlocksById[childId])
+							@r.RenderBlock(childId)
 						}
 					</div>
 				</div>
@@ -65,9 +65,6 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 
 			</main>
 			@templ.Raw(r.Config.AnalyticsCode)
-			<span id="publishFilesPath" style="display: none">
-				{ r.Config.PublishFilesPath }
-			</span>
         </body>
     </html>
 }

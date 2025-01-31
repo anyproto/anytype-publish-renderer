@@ -49,7 +49,16 @@ func (r *Renderer) RenderPage() templ.Component {
 	return PageTemplate(r, params)
 }
 
-func (r *Renderer) RenderBlock(b *model.Block) templ.Component {
+func (r *Renderer) RenderBlock(blockId string) templ.Component {
+	b, ok := r.BlocksById[blockId]
+	if !ok || b == nil {
+		log.Error("unexpected nil block", zap.String("blockId", blockId))
+		return NoneTemplate(fmt.Sprintf("unexpected nil block: %s", blockId))
+	}
+	if b.Content == nil {
+		log.Error("unexpected nil block.Content")
+		return NoneTemplate(fmt.Sprintf("unexpected nil block.Content. block.id: %s", blockId))
+	}
 	log.Debug("block type",
 		zap.String("type", reflect.TypeOf(b.Content).String()),
 		zap.String("id", b.Id))
