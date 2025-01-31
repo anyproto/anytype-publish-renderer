@@ -8,7 +8,7 @@ templ LayoutTemplate(r *Renderer, p *LayoutRenderParams) {
         </div>
 		<div class="children">
 			for _, childId := range p.ChildrenIds {
-				@r.RenderBlock(r.BlocksById[childId])
+				@r.RenderBlock(childId)
 			}
 		</div>
 	</div>
