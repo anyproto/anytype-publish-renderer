@@ -1033,6 +1033,47 @@ markupcode {
   padding: 1px 4px;
 }
 
+markupbgcolor.bgColor-grey markupcode {
+  background: var(--color-shape-tertiary) !important;
+}
+
+markupbgcolor.bgColor-yellow markupcode {
+  background: #fcf8d6 !important;
+}
+
+markupbgcolor.bgColor-orange markupcode {
+  background: #fff2d7 !important;
+}
+
+markupbgcolor.bgColor-red markupcode {
+  background: #fee7e0 !important;
+}
+
+markupbgcolor.bgColor-pink markupcode {
+  background: #fbdff2 !important;
+}
+
+markupbgcolor.bgColor-purple markupcode {
+  background: #f3e7f8 !important;
+}
+
+markupbgcolor.bgColor-blue markupcode {
+  background: #e4e8fc !important;
+}
+
+markupbgcolor.bgColor-ice markupcode {
+  background: #ddf1fc !important;
+}
+
+markupbgcolor.bgColor-teal markupcode {
+  background: #d9f6f4 !important;
+}
+
+markupbgcolor.bgColor-lime markupcode {
+  background: #e5f8d6 !important;
+}
+
+
 markupemoji {
   display: inline;
   -webkit-user-select: all;
