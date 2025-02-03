@@ -174,7 +174,6 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	} else {
 		fields := b.GetFields()
 		lang := pbtypes.GetString(fields, "lang")
-		text = replaceNewlineBr(text)
 		textComp = TextCodeTemplate(text, lang)
 	}
 
