@@ -65,7 +65,7 @@ func LayoutTemplate(r *Renderer, p *LayoutRenderParams) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, childId := range p.ChildrenIds {
-			templ_7745c5c3_Err = r.RenderBlock(r.BlocksById[childId]).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = r.RenderBlock(childId).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
