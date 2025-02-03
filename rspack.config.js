@@ -4,8 +4,6 @@ const rspack = require('@rspack/core');
 const { RsdoctorRspackPlugin } = require('@rsdoctor/rspack-plugin');
 
 module.exports = (env, argv) => {
-	const port = process.env.SERVER_PORT;
-
 	return {
 		mode: 'development',
 		devtool: 'source-map',
@@ -24,6 +22,13 @@ module.exports = (env, argv) => {
 			},
 		},
 
+		 entry: './src/js/entry.js',
+
+		output: {
+			path: path.resolve(__dirname, 'static', 'js'),
+			filename: 'main.js',
+		},
+
 		resolve: {
 			alias: {
 				dist: path.resolve(__dirname, 'dist'),
@@ -35,11 +40,6 @@ module.exports = (env, argv) => {
 			]
 		},
 
-		watchOptions: {
-			ignored: /node_modules/,
-			poll: false,
-		},
-		
 		module: {
 			rules: [
 				{

@@ -1,27 +1,39 @@
+import $ from 'jquery';
+import Prism from 'prismjs';
+import mermaid from 'mermaid';
+import { instance as viz } from '@viz-js/viz';
+
+import 'katex/dist/katex.min.css';
+import 'prismjs/themes/prism.css';
 import 'scss/index.scss';
+
+const katex = require('katex');
+require('katex/dist/contrib/mhchem');
 
 window.svgSrc = {};
 
 function initToggles () {
-    const toggles = document.querySelectorAll(".textToggle");
-    toggles.forEach(t => {
-        t.addEventListener("click", function() {
-            t.classList.toggle("isToggled");
-        })
+    const blocks = $('.textToggle');
+
+    blocks.each(block => {
+		block = $(block);
+
+		block.off('click').on('click', () => {
+			block.classToggle('isToggled');
+		});
     });
 };
 
 function initLatex () {
-    const katex = window.katex;
-    const latexBlocks = document.querySelectorAll(".isLatex .content");
+    const blocks = $('.isLatex .content');
     const trustFn = context => [ '\\url', '\\href', '\\includegraphics' ].includes(context.command);
 
-    latexBlocks.forEach(b => {
-        const latexFormula = b.innerText;
+    blocks.each(block => {
+		block = $(block);
 
         let html = '';
         try {
-            html = katex.renderToString(latexFormula, {
+            html = katex.renderToString(block.text(), {
                 displayMode: true,
                 strict: false,
                 throwOnError: true,
@@ -33,14 +45,14 @@ function initLatex () {
             console.error(e);
             if (e instanceof katex.ParseError) {
                 html = `<div class="error">Error parsing LaTeX</div>`;
-            }
+            };
         };
 
-        b.innerHTML = html;
+        block.html(html);
     });
 };
 
-function initMermaid() {
+function initMermaid () {
     mermaid.initialize({ startOnLoad: true });
 }
 

@@ -1,7 +1,7 @@
 package renderer
 
 templ CoverImageTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-" + p.Id } class="block blockCover align1 index0 noPlus">
+	<div id={"block-" + p.Id } class="block blockCover align1 index0">
 		<div class="content">
 			<div class="wrap">
 				<img id="cover" src={ p.Src }
@@ -14,7 +14,7 @@ templ CoverImageTemplate(r *Renderer, p *CoverRenderParams) {
 }
 
 templ CoverColorTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
+	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0">
 		<div class="wrap">
 			<div class={"cover type2", p.Classes}></div>
 		</div>
@@ -22,7 +22,7 @@ templ CoverColorTemplate(r *Renderer, p *CoverRenderParams) {
 }
 
 templ CoverGradientTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
+	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0">
 		<div class="wrap">
 			<div class={"cover type3", p.Classes}></div>
 		</div>

@@ -1,0 +1,130 @@
+@use "../_mixins" as *;
+
+.block.blockText {
+	> .content {
+		> .flex { display: flex; flex-direction: row; }
+		> .flex {
+			.markers:empty { display: none; flex-shrink: 0; }
+			.markers { display: flex; padding: 1px 0px; }
+			.markers {
+				.marker { 
+					text-align: center; display: inline-block; vertical-align: top; position: relative; width: 24px; height: 24px; 
+					line-height: 24px; margin-right: 6px;
+				}
+				.marker {
+					.icon { display: inline-block; }
+				}
+
+				.marker.bullet { display: flex; align-items: center; justify-content: center; }
+				.marker.bullet {
+					.markerInner { -webkit-print-color-adjust: exact; width: 6px; height: 6px; border-radius: 50%; background: var(--color-text-primary); display: block; }
+
+					.markerInner.textColor-default { background-color: var(--color-text-primary) !important; }
+					.markerInner.textColor-black { background-color: var(--color-text-primary) !important; }
+					.markerInner.textColor-grey { background-color: var(--color-control-active) !important; }
+					.markerInner.textColor-yellow { background-color: var(--color-yellow) !important; }
+					.markerInner.textColor-orange { background-color: var(--color-orange) !important; }
+					.markerInner.textColor-red { background-color: var(--color-red) !important; }
+					.markerInner.textColor-pink { background-color: var(--color-pink) !important; }
+					.markerInner.textColor-purple { background-color: var(--color-purple) !important; }
+					.markerInner.textColor-blue { background-color: var(--color-blue) !important; }
+					.markerInner.textColor-ice { background-color: var(--color-ice) !important; }
+					.markerInner.textColor-teal { background-color: var(--color-teal) !important; }
+					.markerInner.textColor-lime { background-color: var(--color-lime) !important; }
+				}
+				
+				.marker.number { vertical-align: baseline; min-width: 24px; width: auto; word-break: normal; }
+				.marker.number > span { min-width: 100%; display: inline-block; text-align: center; }
+				
+				.marker.check, .marker.toggle {
+					img { width: 100%; height: 100%; }
+				}
+			}
+
+			.additional { flex-shrink: 0; }
+			.text { min-height: var(--line-height-paragraph); flex-grow: 1; }
+		}
+	}
+}
+.block.blockText.bgColor {
+	> .content { padding-left: 8px; padding-right: 8px; }
+}
+
+/* Title */
+
+.block.blockText.textTitle { padding: 6px 0px 0px 0px !important; @include text-title; }
+.block.blockText.textTitle {
+	> .content {
+		> .flex { gap: 0px 8px; }
+		> .flex {
+			.markers { align-items: center; }
+			.markers {
+				.marker.check { width: 30px; height: 30px; margin: 0px; }
+			}
+		}
+	}
+}
+
+/* Header1 */
+
+.block.blockText.textHeader1 { padding: 25px 0px 0px 0px; @include text-header1; }
+
+/* Header2 */
+
+.block.blockText.textHeader2 { padding: 14px 0px 0px 0px; @include text-header2; }
+
+/* Header3 */
+
+.block.blockText.textHeader3 { padding: 13px 0px 2px 0px; @include text-header3; }
+
+/* Callout */
+	
+.block.blockText.textCallout { min-width: 130px; background-color: var(--color-shape-tertiary); border-radius: 8px; margin: 6px 0px; }
+.block.blockText.textCallout {
+	> .content { padding: 16px 16px 0px 16px; }
+	> .content {
+		> .flex { gap: 0px 14px; }
+	}
+	> .children { padding: 0px 16px 16px 48px; }
+}
+
+/* Code */
+
+.block.blockText.textCode { padding: 6px 0px; }
+.block.blockText.textCode {
+	> .content { border-radius: 8px; background-color: var(--color-shape-tertiary); }
+	> .content {
+		> .flex { flex-direction: column; padding: 16px; gap: 12px 0px; }
+		> .flex {
+			.text { font-family: 'Plex'; @include text-common; tab-size: 4; white-space: pre-wrap; }
+			.text * { background: none; }
+
+			.additional {
+				.current { color: var(--color-control-active); }
+			}
+		}
+	}
+}
+.block.blockText.textCode.isUnwrapped {
+	> .content {
+		> .flex {
+			.text { white-space: pre; overflow-x: scroll; }
+		}
+	}
+}
+
+/* Quote */
+
+.block.blockText.textQuote { 
+	> .content { padding-left: 24px;}
+
+	> .additional {
+		> .line { width: 0px; height: 100%; position: absolute; left: 11px; top: 0px; border-left: 1.5px solid; }
+	}
+}
+
+/* Toggle */
+
+.block.blockText.textToggle {
+	> .children { display: none; }
+}

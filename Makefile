@@ -8,7 +8,7 @@ SNAPSHOTS_DIR:=./test_snapshots
 # SNAPSHOT_PATH:=./test_snapshots/Anytype.WebPublish.20241217.112212.67
 # SNAPSHOT_PATH:=./test_snapshots/test-three-column
 # SNAPSHOT_PATH:=./test_snapshots/test-angle-brackets
-SNAPSHOT_PATH:=./test_snapshots/test-column-layout
+SNAPSHOT_PATH:=./test_snapshots/test-me
 
 EXEC:=./bin/anytype-publish-renderer
 TEMPL_VER:=$(shell cat go.mod | grep templ | cut -d' ' -f2)
@@ -31,6 +31,7 @@ test: setup-go
 	go test -v ./...
 
 render: build
+	npm run build
 	templ generate -lazy
 	$(EXEC) $(SNAPSHOT_PATH) > index.html
 
