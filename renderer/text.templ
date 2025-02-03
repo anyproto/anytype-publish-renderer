@@ -25,7 +25,7 @@ templ TextTemplate(r *Renderer, p *TextRenderParams) {
 		</div>
 		<div class="children">
 			for _, childId := range p.ChildrenIds {
-				@r.RenderBlock(r.BlocksById[childId])
+				@r.RenderBlock(childId)
 			}
 		</div>
 	</div>
