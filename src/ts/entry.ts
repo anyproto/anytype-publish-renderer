@@ -2,6 +2,7 @@ import $ from 'jquery';
 import Prism from 'prismjs';
 import mermaid from 'mermaid';
 import { instance as viz } from '@viz-js/viz';
+import UtilCommon from './lib/common';
 import UtilPrism from './lib/prism';
 
 import 'katex/dist/katex.min.css';
@@ -32,10 +33,10 @@ function initToggles () {
 };
 
 function initLatex () {
-    const blocks = $('.isLatex .content');
+    const blocks = $('.block.blockEmbed.isLatex > .wrapContent > .content');
     const trustFn = context => [ '\\url', '\\href', '\\includegraphics' ].includes(context.command);
 
-    blocks.each(block => {
+    blocks.each((i, block) => {
 		block = $(block);
 
         let html = '';
@@ -59,9 +60,18 @@ function initLatex () {
     });
 };
 
+function initInlineLatex () {
+	const blocks = $('.block.blockText > .content > .flex > .text');
+	
+	blocks.each((i, block) => {
+		block = $(block);
+		block.html(UtilCommon.getLatex(block.text()));
+	});
+};
+
 function initMermaid () {
     mermaid.initialize({ startOnLoad: true });
-}
+};
 
 function initGraphviz() {
     const gphBlocks = document.querySelectorAll(".isGraphviz");
@@ -78,8 +88,8 @@ function initGraphviz() {
         } catch (e) {
             console.error("viz error:",e);
         };
-    })
-}
+    });
+};
 
 function initPrism () {
 	const blocks = $('code');
@@ -105,7 +115,15 @@ function initAnalyticsEvents () {
 };
 
 document.addEventListener("DOMContentLoaded", function() {
-    const initFns = [ initAnalyticsEvents, initToggles, initLatex, initMermaid, initGraphviz, initPrism ];
+    const initFns = [ 
+		initAnalyticsEvents, 
+		initToggles, 
+		initLatex, 
+		initMermaid, 
+		initGraphviz, 
+		initPrism, 
+		initInlineLatex,
+	];
 
     initFns.forEach(f => {
         setTimeout(_ => {
@@ -115,5 +133,5 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error(`error executing init function "${f.name}":`, e);
             };
         });
-    })
+    });
 });
