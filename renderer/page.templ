@@ -5,8 +5,10 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
     <html lang="en">
         <head>
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-			<title>{ r.titleText() }</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+			<title>{ r.titleText() }</title>
+
 			<link rel="apple-touch-icon" sizes="180x180" href="https://anytype.io/apple-touch-icon.png" />
 			<link rel="icon" type="image/png" sizes="32x32" href="https://anytype.io/favicon-32x32.png" />
 			<link rel="icon" type="image/png" sizes="16x16" href="https://anytype.io/favicon-16x16.png" />
@@ -17,17 +19,16 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			<main>
 				if r.joinSpaceLink() != "" {
 					<div class="joinSpace">
-						<a href={r.joinSpaceLink()} target="blank">
-							<span id="joinSpaceLink">
-								Join Space
-							</span>
-						</a>
+						<a href={r.joinSpaceLink()} target="_blank" class="fathom" data-event="PublishJoinSpaceClick">Join Space</a>
 					</div>
 				}
+
 				<div class="coverWrapper">
 					@r.RenderPageCover()
 				</div>
+
  			    @r.RenderRoot()
+
 				<div class={"blocks " + p.Classes }>
  					@r.RenderPageIconImage()
 					<div>
@@ -36,19 +37,10 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 						}
 					</div>
 				</div>
-				<a href="https://anytype.io/" target="blank">
- 					<div class="madeInAnytype" id="madeInAnytypeLink">
-						<div class="container">
-							<div class="anyIcon">
-								<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-									<path fill-rule="evenodd" clip-rule="evenodd" d="M11 3V0H3V3H11ZM11 3V14H14V3H11ZM4.5 14C6.98528 14 9 11.9853 9 9.5C9 7.01472 6.98528 5 4.5 5C2.01472 5 0 7.01472 0 9.5C0 11.9853 2.01472 14 4.5 14Z" fill="black"/>
-								</svg>
-							</div>
-							<div class="madeInText">
-								Crafted with Anytype
-							</div>
-						</div>
-					</div>
+
+				<a href="https://anytype.io/" target="_blank" class="madeInAnytype fathom" data-event="PublishSiteClick">
+					<div class="icon"></div>
+					<div class="text">Crafted with Anytype</div>
 				</a>
 
 			</main>

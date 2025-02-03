@@ -75,17 +75,13 @@ function initGraphviz() {
 }
 
 function initAnalyticsEvents () {
-    document.getElementById("madeInAnytypeLink")?.addEventListener("click", (e) => {
-        setTimeout(_ => {
-            window.fathom?.trackEvent("PublishSiteClick");
-        })
-    });
+	$('.fathom').each((item, i) => {
+		item = $(item);
 
-    document.getElementById("joinSpaceLink")?.addEventListener("click", (e) => {
-        setTimeout(_ => {
-            window.fathom?.trackEvent("PublishJoinSpaceClick");
-        })
-    });
+		item.off('click').on('click', () => {
+			window.fathom.trackEvent(item.data('event'));
+		});
+	});
 };
 
 document.addEventListener("DOMContentLoaded", function() {
