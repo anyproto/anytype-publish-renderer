@@ -153,11 +153,6 @@ func BookmarkTempl(p *BookmarkRendererParams) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"inputWithFile resizable noFile\"><div class=\"icon bookmark\"></div><div class=\"inputWithFile-inner\"><form class=\"form\"><span class=\"urlToggle\">Paste a link</span></form></div></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {

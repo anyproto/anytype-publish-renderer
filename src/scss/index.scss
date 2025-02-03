@@ -1,4 +1,5 @@
 @use "./_vars" as *;
 @use "./font" as *;
 @use "./common" as *;
-@use "block/index.scss" as *;
+@use "./component/index" as *;
+@use "./block/index" as *;
