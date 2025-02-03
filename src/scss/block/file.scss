@@ -1,0 +1,15 @@
+@use "../_mixins" as *;
+
+.block.blockFile {
+	> .content {
+		.name {
+			min-width: 40px; height: 24px; line-height: 24px; display: inline-block; font-weight: 500;
+			vertical-align: top; @include text-overflow-nw; margin: 0px 8px 0px 4px;
+		}
+		.size {
+			@include text-common; max-width: 100px; height: 24px; line-height: 24px; color: var(--color-control-active);
+			display: inline-block; vertical-align: top; flex-shrink: 0;
+		}
+		.iconObject { flex-shrink: 0; }
+	}
+}

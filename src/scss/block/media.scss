@@ -1,0 +1,16 @@
+@use "../_mixins" as *;
+
+.block.blockMedia.isImage {
+	> .content {
+		.wrap { max-width: 100%; position: relative; display: inline-block; overflow: hidden; }
+		.wrap > img { width: 100%; display: block; }
+		.wrap > .media { width: 100%; display: block; }
+	}
+}
+
+.block.blockMedia.isVideo {
+	> .content {
+		.wrap { max-width: 100%; position: relative; display: inline-block; overflow: hidden; }
+		.wrap > video { width: 100%; display: block; }
+	}
+}
