@@ -2,6 +2,7 @@ import $ from 'jquery';
 import Prism from 'prismjs';
 import mermaid from 'mermaid';
 import { instance as viz } from '@viz-js/viz';
+import UtilPrism from './lib/prism';
 
 import 'katex/dist/katex.min.css';
 import 'prismjs/themes/prism.css';
@@ -10,17 +11,23 @@ import 'scss/index.scss';
 const katex = require('katex');
 require('katex/dist/contrib/mhchem');
 
+for (const lang of UtilPrism.components) {
+	require(`prismjs/components/prism-${lang}.js`);
+};
+
+declare global {
+	interface Window {
+		svgSrc: any;
+		fathom: any;
+	}
+};
+
 window.svgSrc = {};
 
 function initToggles () {
-    const blocks = $('.textToggle');
-
-    blocks.each(block => {
+    $('.block.textToggle').each((i, block) => {
 		block = $(block);
-
-		block.off('click').on('click', () => {
-			block.classToggle('isToggled');
-		});
+		block.off('click').on('click', () => block.toggleClass('isToggled'));
     });
 };
 
@@ -74,6 +81,19 @@ function initGraphviz() {
     })
 }
 
+function initPrism () {
+	const blocks = $('code');
+
+	blocks.each((i, block) => {
+		block = $(block);
+
+		const lang = block.data('lang');
+		const value = block.text();
+
+		block.html(Prism.highlight(value, Prism.languages[lang], lang));
+	});
+};
+
 function initAnalyticsEvents () {
 	$('.fathom').each((item, i) => {
 		item = $(item);
@@ -85,14 +105,15 @@ function initAnalyticsEvents () {
 };
 
 document.addEventListener("DOMContentLoaded", function() {
-    const initFns = [initAnalyticsEvents, initToggles, initLatex, initMermaid, initGraphviz]
+    const initFns = [ initAnalyticsEvents, initToggles, initLatex, initMermaid, initGraphviz, initPrism ];
+
     initFns.forEach(f => {
         setTimeout(_ => {
             try {
-                f()
+                f();
             } catch (e) {
-                console.error(`error executing init function "${f.name}":`, e)
-            }
-        })
+                console.error(`error executing init function "${f.name}":`, e);
+            };
+        });
     })
 });

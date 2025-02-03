@@ -33,7 +33,7 @@ templ TextTemplate(r *Renderer, p *TextRenderParams) {
 
 templ TextCodeTemplate(code, lang string) {
 	<pre>
-		<code class={"language-"+lang}>
+		<code class={"language-"+lang} data-lang={lang}>
 			{code}
 		</code>
 	</pre>

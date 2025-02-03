@@ -20,6 +20,9 @@
 	.block.align1 > .content { text-align: center; }
 	.block.align2 > .content { text-align: right; }
 	.block.align3 > .content { text-align: justify; }
+
+	.block.isToggled > .children { display: block !important; }
+	.block.isToggled > .content > .flex > .markers > .marker.toggle { transform: rotateZ(90deg); }
 }
 
 .blocks.withIconAndCover { margin-top: -76px; }
