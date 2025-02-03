@@ -65,7 +65,7 @@ function initInlineLatex () {
 	
 	blocks.each((i, block) => {
 		block = $(block);
-		block.html(UtilCommon.getLatex(block.text()));
+		block.html(UtilCommon.getLatex(block.html()));
 	});
 };
 
