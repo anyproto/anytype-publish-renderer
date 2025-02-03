@@ -1,0 +1,9 @@
+.block.blockIcon { padding: 0px 0px 16px 0px; }
+.block.blockIcon {
+	.iconObject { 
+		position: relative; z-index: 2; display: inline-block; box-shadow: 0px 0px 0px 4px var(--color-bg-primary); 
+		background-color: var(--color-bg-primary) !important;
+	}
+}
+
+.block.blockIcon.isHuman { padding: 0px 0px 12px 0px; }
