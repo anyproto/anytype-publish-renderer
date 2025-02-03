@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+
 	"github.com/gogo/protobuf/types"
 
 	"github.com/a-h/templ"
@@ -24,11 +25,12 @@ const (
 	CoverType_Color         CoverType = 2
 	CoverType_Gradient      CoverType = 3
 	CoverType_PrebuiltImage CoverType = 4
+	CoverType_Source        CoverType = 5
 )
 
 func ToCoverType(val int64) (CoverType, error) {
 	// TODO: cover type 0, no cover
-	if val < 1 || val > 4 {
+	if val < 1 || val > 5 {
 		return -1, fmt.Errorf("unknown cover type: %d", val)
 	}
 
@@ -42,6 +44,7 @@ func (r *Renderer) MakeRenderPageCoverParams() (*CoverRenderParams, error) {
 
 func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, error) {
 	coverType, err := ToCoverType(pbtypes.GetInt64(fields, "coverType"))
+
 	if err != nil {
 		log.Warn("cover rendering failed", zap.Error(err))
 		return nil, err
@@ -51,6 +54,7 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 
 	switch coverType {
 	case CoverType_Image:
+	case CoverType_Source:
 		src, err := r.getFileUrl(coverId)
 		if err != nil {
 			log.Warn("cover rendering failed", zap.Error(err))
@@ -92,12 +96,16 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 
 func (r *Renderer) RenderPageCover() templ.Component {
 	params, err := r.MakeRenderPageCoverParams()
+
+	log.Warn("cover rendering failed: unknown cover type %+v", zap.Any("params", params))
+
 	if err != nil {
 		return EmptyCoverTemplate(bson.NewObjectId().Hex())
 	}
 
 	switch params.CoverType {
 	case CoverType_Image:
+	case CoverType_Source:
 		return CoverImageTemplate(r, params)
 	case CoverType_Color:
 		return CoverColorTemplate(r, params)
