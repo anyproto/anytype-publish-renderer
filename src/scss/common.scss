@@ -9,6 +9,30 @@ body {
 	-webkit-font-smoothing: antialiased; backface-visibility: hidden; transform-style: flat; overscroll-behavior: none; scrollbar-gutter: stable both-edges;
 }
 
+.textColor-default { color: var(--color-text-primary) !important; }
+.textColor-black { color: var(--color-text-primary) !important; }
+.textColor-grey { color: var(--color-control-active) !important; }
+.textColor-yellow { color: var(--color-yellow) !important; }
+.textColor-orange { color: var(--color-orange) !important; }
+.textColor-red { color: var(--color-red) !important; }
+.textColor-pink { color: var(--color-pink) !important; }
+.textColor-purple { color: var(--color-purple) !important; }
+.textColor-blue { color: var(--color-blue) !important; }
+.textColor-ice { color: var(--color-ice) !important; }
+.textColor-teal { color: var(--color-teal) !important; }
+.textColor-lime { color: var(--color-lime) !important; }
+
+.bgColor-grey { background: var(--color-shape-tertiary) !important; }
+.bgColor-yellow { background: #fcf8d6 !important; }
+.bgColor-orange { background: #fff2d7 !important; }
+.bgColor-red { background: #fee7e0 !important; }
+.bgColor-pink { background: #fbdff2 !important; }
+.bgColor-purple { background: #f3e7f8 !important; }
+.bgColor-blue { background: #e4e8fc !important; }
+.bgColor-ice { background: #ddf1fc !important; }
+.bgColor-teal { background: #d9f6f4 !important; }
+.bgColor-lime { background: #e5f8d6 !important; }
+
 .madeInAnytype { 
 	height: 36px; position: fixed; bottom: 10px; right: 10px; padding: 10px; border-radius: 8px; background: var(--color-shape-tertiary); 
 	display: flex; flex-direction: row; align-items: center; gap: 0px 6px;
