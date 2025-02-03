@@ -33,7 +33,7 @@ function initToggles () {
 };
 
 function initLatex () {
-    const blocks = $('.block.blockEmbed.isLatex > .wrapContent > .content');
+    const blocks = $('.block.blockEmbed.isLatex > .content');
     const trustFn = context => [ '\\url', '\\href', '\\includegraphics' ].includes(context.command);
 
     blocks.each((i, block) => {
