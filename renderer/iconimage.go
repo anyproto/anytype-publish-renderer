@@ -110,7 +110,7 @@ func (r *Renderer) RenderPageIconImage() templ.Component {
 	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 
 	props := &IconObjectProps{
-		Size: size,
+		Size: pageIconInitSize(layout),
 	}
 	params := r.MakeRenderIconObjectParams(details, props)
 	content := IconObjectTemplate(r, params)
