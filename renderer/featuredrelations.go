@@ -3,6 +3,7 @@ package renderer
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 
@@ -12,16 +13,29 @@ import (
 )
 
 type FeaturedRelationsParams struct {
-	Id       string
-	Classes  string
-	Cells    []templ.Component
+	Id             string
+	Classes        string
+	ContentClasses string
+	Cells          []templ.Component
 }
 
-func (r *Renderer) MakeFeaturedRelationsParams(block *model.Block) *FeaturedRelationsParams {
-	id := block.GetId()
+func (r *Renderer) MakeFeaturedRelationsParams(b *model.Block) *FeaturedRelationsParams {
+	id := b.GetId()
 	details := r.Sp.GetSnapshot().GetData().GetDetails()
-	align := "align" + strconv.Itoa(int(block.GetAlign()))
-	param := &FeaturedRelationsParams{ Id: id, Classes: align }
+	align := "align" + strconv.Itoa(int(b.GetAlign()))
+	bgColor := b.GetBackgroundColor()
+	classes := []string{"block", "blockFeatured", align}
+	contentClasses := []string{"content"}
+
+	if bgColor != "" {
+		contentClasses = append(contentClasses, "bgColor", "bgColor-" + bgColor)
+	}
+
+	param := &FeaturedRelationsParams{ 
+		Id: id, 
+		Classes: strings.Join(classes, " "),
+		ContentClasses: strings.Join(contentClasses, " "),
+	}
 
 	if details == nil || len(details.GetFields()) == 0 {
 		return param
@@ -35,9 +49,11 @@ func (r *Renderer) MakeFeaturedRelationsParams(block *model.Block) *FeaturedRela
 	cells := make([]templ.Component, 0, len(featuredRelationsList.Values))
 	for i, featuredRelation := range featuredRelationsList.Values {
 		var lastClass string
-		if i == len(featuredRelationsList.Values)-1 {
+
+		if i == len(featuredRelationsList.Values) - 1 {
 			lastClass = "last"
 		}
+
 		cells = r.processFeatureRelation(featuredRelation, lastClass, details, cells)
 	}
 
