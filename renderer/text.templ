@@ -16,7 +16,7 @@ templ TextTemplate(r *Renderer, p *TextRenderParams) {
 		for _, comp := range p.OuterFlex {
 			@comp
 		}
-		<div class="content">
+		<div class={"content " + p.ContentClasses}>
 			<div class="flex">
 				for _, comp := range p.InnerFlex {
 					@comp

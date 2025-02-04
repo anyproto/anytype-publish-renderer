@@ -21,11 +21,12 @@ import (
 const bulbEmoji = 0x1F4A1
 
 type TextRenderParams struct {
-	Classes     string
-	Id          string
-	InnerFlex   []templ.Component
-	OuterFlex   []templ.Component
-	ChildrenIds []string
+	Classes    		 string
+	ContentClasses	 string
+	Id         		 string
+	InnerFlex  		 []templ.Component
+	OuterFlex  		 []templ.Component
+	ChildrenIds		 []string
 }
 
 func cmpMarks(a, b *model.BlockContentTextMark) int {
@@ -155,16 +156,17 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	bgColor := b.GetBackgroundColor()
 	color := blockText.GetColor()
 	classes := []string{}
+	contentClasses := []string{}
 
 	classes = append(classes, "text" + style.String())
 	classes = append(classes, "align" + strconv.Itoa(int(b.GetAlign())))
 
 	if bgColor != "" {
-		classes = append(classes, "bgColor", "bgColor-"+bgColor)
+		contentClasses = append(classes, "bgColor", "bgColor-"+bgColor)
 	}
 
 	if color != "" {
-		classes = append(classes, "textColor", "textColor-"+color)
+		contentClasses = append(classes, "textColor", "textColor-"+color)
 	}
 
 	text := blockText.Text
@@ -218,6 +220,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	params = &TextRenderParams{
 		Id:          b.Id,
 		Classes:     strings.Join(classes, " "),
+		ContentClasses: strings.Join(contentClasses, " "),
 		ChildrenIds: b.ChildrenIds,
 		OuterFlex:   outerFlex,
 		InnerFlex:   innerFlex,
