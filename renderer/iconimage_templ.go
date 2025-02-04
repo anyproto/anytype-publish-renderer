@@ -29,7 +29,7 @@ func IconImageTemplate(r *Renderer, p *IconImageRenderParams) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{"block blockIcon index0 " + p.Classes}
+		var templ_7745c5c3_Var2 = []any{"block blockIcon " + p.Classes}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

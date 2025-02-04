@@ -29,50 +29,63 @@ func (r *Renderer) MakeTableOfContentRenderParams(block *model.Block) *TableOfCo
 		params.BackgroundColor = fmt.Sprintf("bgColor bgColor-%s", color)
 	}
 
-	blocks := r.traverseBlocks(r.BlocksById, r.Root.GetId(), false)
-	var tableOfContentItems []templ.Component
-	for _, bl := range blocks {
-		tableOfContentItems = r.retrieveTableOfContentItem(bl, tableOfContentItems)
-	}
-	params.Items = tableOfContentItems
+	params.Items = r.getList()
 	if len(params.Items) == 0 {
 		params.IsEmpty = true
 	}
 	return params
 }
 
-func (r *Renderer) retrieveTableOfContentItem(childBlock *childBlock, tableOfContentItems []templ.Component) []templ.Component {
-	if childBlock.GetText() != nil {
-		style := childBlock.GetText().GetStyle()
-		name := r.getHeadingName(childBlock.Block)
-		switch style {
-		case model.BlockContentText_Header1:
-			tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 1))
-		case model.BlockContentText_Header2:
-			tableOfContentItems = r.processSecondHeading(childBlock, tableOfContentItems, name)
-		case model.BlockContentText_Header3:
-			tableOfContentItems = r.processThirdHeading(childBlock, tableOfContentItems, name)
+func (r *Renderer) getList () []templ.Component {
+	blocks := r.traverseBlocks(r.BlocksById, r.Root.GetId(), false)
+	list := []templ.Component{}
+	styles := []model.BlockContentTextStyle{ model.BlockContentText_Header1, model.BlockContentText_Header2, model.BlockContentText_Header3 }
+
+	hasH1 := false
+	hasH2 := false
+
+	for _, bl := range blocks {
+		text := bl.GetText()
+		
+		if text == nil {
+			continue
 		}
-	}
-	return tableOfContentItems
-}
 
-func (r *Renderer) processThirdHeading(childBlock *childBlock, tableOfContentItems []templ.Component, name string) []templ.Component {
-	if childBlock.isChild {
-		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 3))
-	} else {
-		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 2))
-	}
-	return tableOfContentItems
-}
+		style := text.GetStyle()
 
-func (r *Renderer) processSecondHeading(childBlock *childBlock, tableOfContentItems []templ.Component, name string) []templ.Component {
-	if childBlock.isChild {
-		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 2))
-	} else {
-		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 1))
+		if !contains(styles, style) {
+			continue
+		}
+
+		depth := 0
+
+		if style == model.BlockContentText_Header1 {
+			depth = 0
+			hasH1 = true
+			hasH2 = false
+		}
+
+		if style == model.BlockContentText_Header2 {
+			hasH2 = true
+			if hasH1 {
+				depth++
+			}
+		}
+
+		if style == model.BlockContentText_Header3 {
+			if hasH1 {
+				depth++
+			}
+			if hasH2 {
+				depth++
+			}
+		}
+
+		name := r.getHeadingName(bl.Block)
+		list = append(list, HeadingTemplate(bl.GetId(), name, depth))
 	}
-	return tableOfContentItems
+
+	return list
 }
 
 func (r *Renderer) getHeadingName(b *model.Block) string {
@@ -97,4 +110,13 @@ func (r *Renderer) traverseBlocks(blockMap map[string]*model.Block, blockID stri
 		}
 	}
 	return result
+}
+
+func contains(arr []model.BlockContentTextStyle, target any) bool {
+    for _, v := range arr {
+        if v == target {
+            return true
+        }
+    }
+    return false
 }

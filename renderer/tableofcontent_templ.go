@@ -112,7 +112,7 @@ func HeadingTemplate(id string, name string, depth int) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(
 			map[string]string{
-				"padding-left": fmt.Sprintf("%dpx", (depth-1)*24),
+				"padding-left": fmt.Sprintf("%dpx", depth*24),
 			})
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/tableofcontent.templ`, Line: 27, Col: 4}
