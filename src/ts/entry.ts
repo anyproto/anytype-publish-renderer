@@ -61,7 +61,7 @@ function initLatex () {
 };
 
 function initInlineLatex () {
-	const blocks = $('.block.blockText > .content > .flex > .text');
+	const blocks = $('.block.blockText:not(.textCode) > .content > .flex > .text');
 	
 	blocks.each((i, block) => {
 		block = $(block);
@@ -92,7 +92,7 @@ function initGraphviz() {
 };
 
 function initPrism () {
-	const blocks = $('code');
+	const blocks = $('.block.blockText.textCode > .content > .flex > .text');
 
 	blocks.each((i, block) => {
 		block = $(block);
