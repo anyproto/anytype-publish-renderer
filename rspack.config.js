@@ -11,10 +11,9 @@ module.exports = (env, argv) => {
 		devtool: 'source-map',
 
 		optimization: {
-			minimize: false,
+			minimize: true,
 			removeAvailableModules: true,
 			removeEmptyChunks: true,
-			splitChunks: false,
 		},
 		
 		entry: './src/ts/entry.ts',
@@ -22,6 +21,7 @@ module.exports = (env, argv) => {
 		output: {
 			path: path.resolve(__dirname, 'static', 'js'),
 			filename: 'main.js',
+			clean: true,
 		},
 
 		resolve: {

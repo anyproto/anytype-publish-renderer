@@ -42,14 +42,14 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta property=\"og:title\" content=\"Your Page Title\"><meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"https://www.example.com\"><meta property=\"og:image\" content=\"https://www.example.com/image.jpg\"><meta property=\"og:description\" content=\"A brief and compelling description of your page.\"><meta property=\"og:site_name\" content=\"Your Website Name\"><meta property=\"og:locale\" content=\"en_US\"><meta name=\"twitter:card\" content=\"summary_large_image\"><meta name=\"twitter:title\" content=\"Your Page Title\"><meta name=\"twitter:description\" content=\"A brief and engaging description of your page.\"><meta name=\"twitter:image\" content=\"https://www.example.com/image.jpg\"><meta name=\"twitter:url\" content=\"https://www.example.com\"><meta name=\"twitter:site\" content=\"@YourTwitterHandle\"><meta name=\"twitter:creator\" content=\"@CreatorTwitterHandle\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(r.titleText())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 11, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 27, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -62,7 +62,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(r.GetStaticFolderUrl("/js/main.js"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 17, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 33, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {

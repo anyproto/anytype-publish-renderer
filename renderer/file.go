@@ -9,8 +9,23 @@ import (
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
 )
+
+type FileFileRenderParams struct {
+	Id   string
+	Src  templ.SafeURL
+	Name string
+	Size string
+}
+
+type FileMediaRenderParams struct {
+	Id         string
+	Src        string
+	Classes    string
+	Width      string
+}
 
 func (r *Renderer) getFileUrl(id string) (url string, err error) {
 	path := fmt.Sprintf("filesObjects/%s.pb", id)
@@ -68,15 +83,23 @@ func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err e
 	return
 }
 
-type FileImageRenderParams struct {
-	Id         string
-	Src        string
-	Classes    string
-	ImageWidth string
+func GetWidth(fields *types.Struct) string {
+	width := pbtypes.GetFloat64(fields, "width")
+	log.Debug("image width", zap.Float64("width", width))
+
+	if int(width * 100) != 0 {
+		return strconv.Itoa(int(width*100)) + "%"
+	}
+	return ""
 }
 
-func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileImageRenderParams, err error) {
+func GetAlign(align model.BlockAlign) string {
+	return "align" + strconv.Itoa(int(align));
+}
+
+func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileMediaRenderParams, err error) {
 	file := b.GetFile()
+	
 	var src string
 	src, err = r.getFileUrl(file.TargetObjectId)
 	if err != nil {
@@ -86,29 +109,17 @@ func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileImageR
 
 	align := "align" + strconv.Itoa(int(b.GetAlign()))
 
-	width := pbtypes.GetFloat64(b.Fields, "width")
-	log.Debug("image width", zap.Float64("width", width))
-	var imageWidth string
-	if int(width*100) != 0 {
-		imageWidth = strconv.Itoa(int(width*100)) + "%"
-	}
-
-	params = &FileImageRenderParams{
+	params = &FileMediaRenderParams{
 		Id:         b.Id,
 		Src:        src,
 		Classes:    align,
-		ImageWidth: imageWidth,
+		Width:		GetWidth(b.Fields),
 	}
 
 	return
 }
 
-type FilePDFRenderParams struct {
-	Id  string
-	Src string
-}
-
-func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FilePDFRenderParams, err error) {
+func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FileMediaRenderParams, err error) {
 	file := b.GetFile()
 	var src string
 	src, err = r.getFileUrl(file.TargetObjectId)
@@ -117,20 +128,17 @@ func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FilePDFRende
 		return
 	}
 
-	params = &FilePDFRenderParams{
-		Id:  b.Id,
-		Src: src,
+	params = &FileMediaRenderParams{
+		Id:         b.Id,
+		Src:        src,
+		Classes:    GetAlign(b.GetAlign()),
+		Width:		GetWidth(b.Fields),
 	}
 
 	return
 }
 
-type FileAudioRenderParams struct {
-	Id  string
-	Src string
-}
-
-func (r *Renderer) MakeRenderFileAudioParams(b *model.Block) (params *FileAudioRenderParams, err error) {
+func (r *Renderer) MakeRenderFileAudioParams(b *model.Block) (params *FileMediaRenderParams, err error) {
 	file := b.GetFile()
 	var src string
 	src, err = r.getFileUrl(file.TargetObjectId)
@@ -139,20 +147,17 @@ func (r *Renderer) MakeRenderFileAudioParams(b *model.Block) (params *FileAudioR
 		return
 	}
 
-	params = &FileAudioRenderParams{
-		Id:  b.Id,
-		Src: src,
+	params = &FileMediaRenderParams{
+		Id:         b.Id,
+		Src:        src,
+		Classes:    GetAlign(b.GetAlign()),
+		Width:		GetWidth(b.Fields),
 	}
 
 	return
 }
 
-type FileVideoRenderParams struct {
-	Id  string
-	Src string
-}
-
-func (r *Renderer) MakeRenderFileVideoParams(b *model.Block) (params *FileVideoRenderParams, err error) {
+func (r *Renderer) MakeRenderFileVideoParams(b *model.Block) (params *FileMediaRenderParams, err error) {
 	file := b.GetFile()
 	var src string
 	src, err = r.getFileUrl(file.TargetObjectId)
@@ -161,19 +166,14 @@ func (r *Renderer) MakeRenderFileVideoParams(b *model.Block) (params *FileVideoR
 		return
 	}
 
-	params = &FileVideoRenderParams{
-		Id:  b.Id,
-		Src: src,
+	params = &FileMediaRenderParams{
+		Id:         b.Id,
+		Src:        src,
+		Classes:    GetAlign(b.GetAlign()),
+		Width:		GetWidth(b.Fields),
 	}
 
 	return
-}
-
-type FileFileRenderParams struct {
-	Id   string
-	Src  templ.SafeURL
-	Name string
-	Size string
 }
 
 func prettyByteSize(b int64) string {

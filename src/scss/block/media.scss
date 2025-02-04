@@ -1,24 +1,31 @@
 @use "../_mixins" as *;
 
-.block.blockMedia.isImage {
+.block.blockMedia { padding: 6px 0px; }
+.block.blockMedia {
+	> .content { display: flex; flex-direction: row; }
 	> .content {
-		.wrap { max-width: 100%; position: relative; display: inline-block; overflow: hidden; }
+		.wrap { max-width: 100%; position: relative; display: block; overflow: hidden; }
 		.wrap {
-			> img, > .media { width: 100%; display: block; }
+			> img, 
+			> .media,
+			> audio,
+			> video { width: 100%; display: block; }
+
+			> iframe { width: 100%; aspect-ratio: 3/4; display: block; }
 		}
 	}
 }
 
 .block.blockMedia.isAudio {
 	> .content {
-		.wrap { max-width: 100%; position: relative; display: block; overflow: hidden; }
-		.wrap > audio { width: 100%; display: block; }
+		.wrap { width: 100%; }
 	}
 }
 
-.block.blockMedia.isVideo {
-	> .content {
-		.wrap { max-width: 100%; position: relative; display: inline-block; overflow: hidden; }
-		.wrap > video { width: 100%; display: block; }
-	}
+.blockMedia.align1 {
+	.content { justify-content: center; }
+}
+
+.blockMedia.align2 {
+	.content { justify-content: flex-end; }
 }
