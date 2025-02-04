@@ -36,7 +36,7 @@ func (r *Renderer) hasPageIcon() bool {
 func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	var classes string
 	if r.hasPageIcon() {
-		classes = "hasPageIcon"
+		classes = "withIcon"
 	}
 	return &RenderPageParams{
 		Classes: classes,

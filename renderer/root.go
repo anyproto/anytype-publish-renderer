@@ -2,9 +2,9 @@ package renderer
 
 import (
 	"fmt"
+
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-	"strconv"
 )
 
 type RootRenderParams struct {
@@ -17,18 +17,22 @@ func (r *Renderer) makeRootRenderParams(b *model.Block) (params *RootRenderParam
 	if fields != nil && fields.Fields != nil && fields.Fields["width"] != nil {
 		width = fields.Fields["width"].GetNumberValue()
 	}
+
 	params = &RootRenderParams{}
+
 	if width == 0 {
 		return params
 	}
-	widthPercentage := strconv.Itoa(int(width*100)) + "%"
+
+	w := "max(60%, min(calc(100% - 96px), 60% + (40% - 96px) * " + fmt.Sprintf("%f", width) + "))";
+
 	params.Style = fmt.Sprintf(`
-<style> 
-.blocks {
-	width: %s
-}
-</style> 
-`, widthPercentage)
+		<style> 
+			.blocks {
+				width: %s;
+			}
+		</style> 
+	`, w)
 	return
 }
 func (r *Renderer) getStyle(params *RootRenderParams) templ.Component {
