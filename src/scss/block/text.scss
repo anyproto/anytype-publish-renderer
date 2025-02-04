@@ -113,6 +113,10 @@
 	}
 }
 
+/* Checkbox */
+
+.block.blockText.isChecked > .content > .flex { color: var(--color-control-active) !important; }
+
 /* Quote */
 
 .block.blockText.textQuote { 

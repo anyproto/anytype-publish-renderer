@@ -206,6 +206,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		var checkboxComp templ.Component
 		if blockText.Checked {
 			checkboxComp = CheckboxCheckedTemplate()
+			classes = append(classes, "isChecked")
 		} else {
 			checkboxComp = CheckboxUncheckedTemplate()
 		}
