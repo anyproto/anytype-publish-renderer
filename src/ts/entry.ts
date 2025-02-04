@@ -70,7 +70,15 @@ function initInlineLatex () {
 };
 
 function initMermaid () {
-    mermaid.initialize({ startOnLoad: true });
+    mermaid.initialize({ 
+		 securityLevel: 'loose',
+		theme: 'base', 
+		themeVariables: {
+			fontFamily: 'Helvetica, Arial, sans-serif',
+			fontSize: '14px'
+		},
+		startOnLoad: true,
+	});
 };
 
 function initGraphviz() {
