@@ -10,7 +10,7 @@
 /* Row */
 .block.blockLayout.layoutRow { padding: 14px 0px; }
 .block.blockLayout.layoutRow {
-	> .children { display: flex; flex-direction: row; align-items: stretch; padding: 0px; }
+	> .children { display: flex; flex-direction: row; align-items: stretch; padding: 0px; gap: 0px 48px; }
 }
 
 /* Column */
