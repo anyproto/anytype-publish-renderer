@@ -1,0 +1,57 @@
+package renderer
+
+templ FeaturedRelationTemplate(p *FeaturedRelationsParams) {
+	<div id={"block-" + p.Id} class={"block blockFeatured align0 index0"}>
+	    <div class="content">
+	        <div class="wrap focusable">
+	            for _, cell := range p.Cells {
+                    @cell
+                }
+	        </div>
+	    </div>
+	</div>
+}
+
+templ CellTemplate(class, last string, component templ.Component) {
+    <div class={ "cell " + last }>
+        <div class={ "cellContent " + class }>
+             @component
+        </div>
+        <div class="bullet"></div>
+    </div>
+}
+
+templ EmptyCellTemplate(value, class, last string) {
+    <div class={ "cell " + last }>
+        <div class={ "cellContent " + class }>
+            <div class="name"> { value } </div>
+        </div>
+        <div class="bullet"></div>
+    </div>
+}
+
+templ CheckBoxCellTemplate(value, last string, component templ.Component) {
+    <div class={ "cell " + last }>
+        <div class="cellContent c-checkbox">
+                @component
+                <div class="name"> { value } </div>
+        </div>
+        <div class="bullet"></div>
+    </div>
+}
+
+templ ListCellTemplate(class, last, more string, component templ.Component) {
+    <div class={ "cell " + last }>
+        <div class={ "cellContent " + class }>
+            <div class="wrap">
+                <div class="over">
+                    @component
+                    if more != "" {
+                        <div class="more"> { more } </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="bullet"></div>
+    </div>
+}

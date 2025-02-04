@@ -72,6 +72,16 @@ func TestMakeRelationRenderParams(t *testing.T) {
 			},
 		}
 
+		renderer.Sp = &pb.SnapshotWithType{
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyName.String(): pbtypes.String("test"),
+					},
+				},
+			}},
+		}
+
 		// when
 		params := renderer.MakeRelationRenderParams(block)
 
