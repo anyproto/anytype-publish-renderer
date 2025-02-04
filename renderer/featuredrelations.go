@@ -68,11 +68,15 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, lastCla
 		return append(cells, EmptyCellTemplate(name, formatClass, lastClass))
 	}
 
-	switch formatClass {
-	case "c-object", "c-file", "c-select":
-		return r.processObjectList(relationValue, format, cells, name, formatClass, lastClass)
-	default:
-		return r.processOneObject(relationValue, format, cells, name, lastClass, formatClass)
+	switch format {
+		case 
+			model.RelationFormat_object, 
+			model.RelationFormat_file, 
+			model.RelationFormat_tag,
+			model.RelationFormat_status:
+				return r.processObjectList(relationValue, format, cells, name, formatClass, lastClass)
+		default:
+			return r.processOneObject(relationValue, format, cells, name, lastClass, formatClass)
 	}
 }
 
