@@ -1,8 +1,8 @@
 package renderer
 
 templ LinkTempl(p *LinkRenderParams) {
-    <div id={"block-" + p.Id } class={ "block blockLink " + p.LinkTypeClass }>
-        <div class="content">
+    <div id={"block-" + p.Id } class={ "block blockLink " + p.Classes }>
+        <div class={ p.ContentClasses }>
 			<div class={ p.IsArchived }>
 				if p.IsDeleted {
 					<div class="deleted">
@@ -10,8 +10,8 @@ templ LinkTempl(p *LinkRenderParams) {
 						<div class="name">Non-existent object</div>
 					</div>
 				} else {
-					<a href={ p.Url } class={ "linkCard " + p.IconClass + " " + p.LayoutClass + " " + p.CoverClass }>
-						<div class="sides">
+					<a href={ p.Url } class={ p.CardClasses }>
+						<div class={ p.SidesClasses }>
 							<div class="side left">
 								<div class="cardName">
 									if p.Icon != "" {

@@ -162,11 +162,15 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	classes = append(classes, "align" + strconv.Itoa(int(b.GetAlign())))
 
 	if bgColor != "" {
-		contentClasses = append(classes, "bgColor", "bgColor-"+bgColor)
+		if style == model.BlockContentText_Callout {
+			classes = append(classes, "bgColor", "bgColor-" + bgColor)
+		} else {
+			contentClasses = append(classes, "bgColor", "bgColor-" + bgColor)
+		}
 	}
 
 	if color != "" {
-		contentClasses = append(classes, "textColor", "textColor-"+color)
+		contentClasses = append(classes, "textColor", "textColor-" + color)
 	}
 
 	text := blockText.Text

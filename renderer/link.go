@@ -2,12 +2,14 @@ package renderer
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
+
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
-	"path/filepath"
 )
 
 const linkTemplate = "anytype://object?objectId=%s&spaceId=%s"
@@ -15,6 +17,10 @@ const linkTemplate = "anytype://object?objectId=%s&spaceId=%s"
 type LinkRenderParams struct {
 	Id            string
 	LayoutClass   string
+	Classes       string
+	ContentClasses string
+	SidesClasses  string
+	CardClasses   string
 	IsDeleted     bool
 	IsArchived    string
 	Name          string
@@ -23,7 +29,6 @@ type LinkRenderParams struct {
 	Icon          string
 	IconClass     string
 	IconStyle     string
-	LinkTypeClass string
 	CoverClass    string
 	CoverParams   *CoverRenderParams
 	Url           templ.SafeURL
@@ -42,17 +47,30 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 		return &LinkRenderParams{IsDeleted: true}
 	}
 
+	bgColor := b.GetBackgroundColor()
 	name := getFieldValue(targetDetails, bundle.RelationKeyName.String(), defaultName)
 	icon, iconClass, iconStyle := r.getIconParams(b, targetDetails)
 	layoutClass := getLayoutClass(targetDetails)
 	archiveClass := getArchiveClass(targetDetails)
-
 	objectTypeName, coverParams, coverClass := r.getAdditionalParams(b, targetDetails)
-
 	spaceId := targetDetails.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 	link := fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
+	classes := []string{linkTypeClass}
+	contentClasses := []string{"content"}
+	sidesClasses := []string{"sides"}
+	cardClasses := []string{"linkCard", iconClass, layoutClass, coverClass}
+
+	if bgColor != "" {
+		sidesClasses = append(sidesClasses, "withBgColor")
+		contentClasses = append(contentClasses, "bgColor", "bgColor-" + bgColor)
+	}
+
 	return &LinkRenderParams{
 		Id:            b.GetId(),
+		Classes:       strings.Join(classes, " "),
+		ContentClasses: strings.Join(contentClasses, " "),
+		SidesClasses:  strings.Join(sidesClasses, " "),
+		CardClasses:   strings.Join(cardClasses, " "),
 		LayoutClass:   layoutClass,
 		IsArchived:    archiveClass,
 		Name:          name,
@@ -61,7 +79,6 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 		Icon:          icon,
 		IconClass:     iconClass,
 		IconStyle:     iconStyle,
-		LinkTypeClass: linkTypeClass,
 		CoverClass:    coverClass,
 		CoverParams:   coverParams,
 		Url:           templ.SafeURL(link),
@@ -78,22 +95,23 @@ func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
 
 func getLinkTypeClass(b *model.Block) string {
 	switch b.GetLink().GetCardStyle() {
-	case model.BlockContentLink_Card:
-		return "card"
-	default:
-		return "text"
+		case model.BlockContentLink_Card:
+			return "card"
+		default:
+			return "text"
 	}
 }
 
 func getDescription(b *model.Block, details *types.Struct) string {
 	var key string
+
 	switch b.GetLink().GetDescription() {
-	case model.BlockContentLink_Content:
-		key = bundle.RelationKeySnippet.String()
-	case model.BlockContentLink_Added:
-		key = bundle.RelationKeyDescription.String()
-	default:
-		return ""
+		case model.BlockContentLink_Content:
+			key = bundle.RelationKeySnippet.String()
+		case model.BlockContentLink_Added:
+			key = bundle.RelationKeyDescription.String()
+		default:
+			return ""
 	}
 
 	descriptionValue := details.GetFields()[key]
@@ -118,19 +136,20 @@ func getFieldValue(details *types.Struct, key, defaultValue string) string {
 
 func getLayoutClass(details *types.Struct) string {
 	layout := model.ObjectTypeLayout(details.GetFields()[bundle.RelationKeyLayout.String()].GetNumberValue())
+
 	switch layout {
-	case model.ObjectType_participant:
-		return "isParticipant"
-	case model.ObjectType_profile:
-		return "isHuman"
-	case model.ObjectType_todo:
-		return "isTask"
-	case model.ObjectType_collection:
-		return "isCollection"
-	case model.ObjectType_set:
-		return "isSet"
-	default:
-		return "isPage"
+		case model.ObjectType_participant:
+			return "isParticipant"
+		case model.ObjectType_profile:
+			return "isHuman"
+		case model.ObjectType_todo:
+			return "isTask"
+		case model.ObjectType_collection:
+			return "isCollection"
+		case model.ObjectType_set:
+			return "isSet"
+		default:
+			return "isPage"
 	}
 }
 

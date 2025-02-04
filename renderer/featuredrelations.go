@@ -82,13 +82,16 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, lastCla
 
 func (r *Renderer) processObjectList(relationValue *types.Value, format model.RelationFormat, cells []templ.Component, name, formatClass, lastClass string) []templ.Component {
 	objectsList := r.populateRelationListValue(format, relationValue)
+
 	if len(objectsList) == 0 {
 		return append(cells, EmptyCellTemplate(name, formatClass, lastClass))
 	}
+
 	var more string
 	if len(objectsList) > 1 {
 		more = fmt.Sprintf("+%s", strconv.FormatInt(int64(len(objectsList)-1), 10))
 	}
+
 	cells = append(cells, ListCellTemplate(formatClass, lastClass, more, objectsList[0]))
 	return cells
 }
