@@ -94,7 +94,13 @@ window.onclick = function(event) {
     }
   }
 }
+//
 function initDropdown() {
+    const h = document.getElementById("reportButton")?.href
+    if (h !== undefined) {
+        const withLocation = h + "%0A" + encodeURIComponent("Publish Url: " + window.location.href)
+        document.getElementById("reportButton").href = withLocation
+    }
     document.getElementById("menuButton")?.addEventListener("click", (e) => {
         document.getElementById("menuContent").classList.toggle("show");
     });

@@ -43,7 +43,7 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 								<img src={ r.GetStaticFolderUrl("/img/menu.svg") } />
 							</div>
 							<div id="menuContent" class="menuContent">
-								<a href="mailto:support@anytype.io">
+								<a id="reportButton" href={ r.supportLink() }>
 									<div class="menuItem textColor-red">
 										Report
 									</div>
