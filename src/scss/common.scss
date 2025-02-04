@@ -33,6 +33,32 @@ body {
 .bgColor-teal { background: #d9f6f4 !important; }
 .bgColor-lime { background: #e5f8d6 !important; }
 
+.isMultiSelect.archive { color: var(--color-text-secondary); background: var(--color-shape-tertiary); }
+.isMultiSelect.tagColor-default { color: var(--color-text-primary) !important; background: var(--color-bg-primary) !important; box-shadow: 0px 0px 0px 1px var(--color-shape-secondary) inset; }
+.isMultiSelect.tagColor-grey { color: #8c9ea5 !important; background: var(--color-shape-primary) !important; }
+.isMultiSelect.tagColor-yellow { color: #b2a616 !important; background: #f4eb91 !important; }
+.isMultiSelect.tagColor-orange { color: #d3720d !important; background: #fcdc9c !important; }
+.isMultiSelect.tagColor-red { color: #e2400c !important; background: #fcd1c3 !important; }
+.isMultiSelect.tagColor-pink { color: #ca1b8e !important; background: #f8c2e5 !important; }
+.isMultiSelect.tagColor-purple { color: #9e30c4 !important; background: #e8d0f1 !important; }
+.isMultiSelect.tagColor-blue { color: var(--color-blue) !important; background: #cbd2fa !important; }
+.isMultiSelect.tagColor-ice { color: #1c8bca !important; background: #b2dff9 !important; }
+.isMultiSelect.tagColor-teal { color: #0caaa3 !important; background: #a9ebe6 !important; }
+.isMultiSelect.tagColor-lime { color: #64b90f !important; background: #c5efa3 !important; }
+
+.isSelect.tagColor-default { color: var(--color-text-primary) !important; }
+.isSelect.tagColor-black { color: var(--color-text-primary) !important; }
+.isSelect.tagColor-grey { color: var(--color-control-active) !important; }
+.isSelect.tagColor-yellow { color: var(--color-yellow) !important; }
+.isSelect.tagColor-orange { color: var(--color-orange) !important; }
+.isSelect.tagColor-red { color: var(--color-red) !important; }
+.isSelect.tagColor-pink { color: var(--color-pink) !important; }
+.isSelect.tagColor-purple { color: var(--color-purple) !important; }
+.isSelect.tagColor-blue { color: var(--color-blue) !important; }
+.isSelect.tagColor-ice { color: var(--color-ice) !important; }
+.isSelect.tagColor-teal { color: var(--color-teal) !important; }
+.isSelect.tagColor-lime { color: var(--color-lime) !important; }
+
 .madeInAnytype { 
 	height: 36px; position: fixed; bottom: 10px; right: 10px; padding: 10px; border-radius: 8px; background: var(--color-shape-tertiary); 
 	display: flex; flex-direction: row; align-items: center; gap: 0px 6px;

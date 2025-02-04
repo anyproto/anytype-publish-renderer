@@ -300,7 +300,7 @@ func LinkTempl(p *LinkRenderParams) templ.Component {
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/link.templ`, Line: 41, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/link.templ`, Line: 42, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {
@@ -323,7 +323,7 @@ func LinkTempl(p *LinkRenderParams) templ.Component {
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/link.templ`, Line: 47, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/link.templ`, Line: 49, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 			if templ_7745c5c3_Err != nil {
@@ -341,7 +341,7 @@ func LinkTempl(p *LinkRenderParams) templ.Component {
 				var templ_7745c5c3_Var26 string
 				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(p.Type)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/link.templ`, Line: 51, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/link.templ`, Line: 54, Col: 37}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 				if templ_7745c5c3_Err != nil {

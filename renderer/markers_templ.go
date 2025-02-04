@@ -129,7 +129,7 @@ func EmojiTemplate(emojiPath, sizeClass string) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(emojiPath)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 23, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 22, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -308,7 +308,7 @@ func NumberMarkerTemplate(number string) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(number)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 75, Col: 12}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 73, Col: 12}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {

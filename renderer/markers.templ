@@ -3,8 +3,7 @@ package renderer
 templ BulletMarkerTemplate() {
 	<div class="markers">
 		<div class="marker bullet">
-			<span id="marker-" class="markerInner c3">
-			</span>
+			<span id="marker-" class="markerInner c3"></span>
 		</div>
 	</div>
 }
@@ -20,7 +19,7 @@ templ InlineEmojiTemplate(emojiPath, sizeClass string) {
 templ EmojiTemplate(emojiPath, sizeClass string) {
 	<div class={"iconObject", "isPage", sizeClass}>
 		<div class="iconEmoji">
-			<img src={emojiPath} class={"iconCommon", sizeClass}>
+			<img src={emojiPath} class={"iconCommon", sizeClass} />
 		</div>
 	</div>
 
@@ -37,7 +36,6 @@ templ AdditionalQuoteTemplate() {
 		<div class="line"></div>
 	</div>
 }
-
 
 templ CheckboxCheckedTemplate() {
 	<div class="markers">
