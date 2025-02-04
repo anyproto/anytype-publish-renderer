@@ -7,7 +7,6 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
-	"github.com/globalsign/mgo/bson"
 	"go.uber.org/zap"
 )
 
@@ -101,22 +100,21 @@ func (r *Renderer) RenderPageCover() templ.Component {
 	log.Warn("cover rendering failed: unknown cover type %+v", zap.Any("params", params))
 
 	if err != nil {
-		return EmptyCoverTemplate(bson.NewObjectId().Hex())
+		return NoneTemplate("")
 	}
 
 	switch params.CoverType {
-	case CoverType_Image:
-		fallthrough
-	case CoverType_Source:
-		return CoverImageTemplate(r, params)
-	case CoverType_Color:
-		return CoverColorTemplate(r, params)
-	case CoverType_Gradient:
-		return CoverGradientTemplate(r, params)
-
+		case 
+			CoverType_Image,
+			CoverType_Source:
+			return CoverImageTemplate(r, params)
+		case CoverType_Color:
+			return CoverColorTemplate(r, params)
+		case CoverType_Gradient:
+			return CoverGradientTemplate(r, params)
 	}
 
 	log.Warn("cover rendering failed: unknown cover type", zap.Int("coverType", int(params.CoverType)))
-	return EmptyCoverTemplate(bson.NewObjectId().Hex())
+	return NoneTemplate("")
 
 }
