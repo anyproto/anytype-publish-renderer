@@ -1,0 +1,12 @@
+@use "../_mixins" as *;
+
+.block.blockEmbed { padding: 6px 0px; }
+.block.blockEmbed {
+
+}
+
+.block.blockEmbed:not(.isLatex) {
+	> .content {
+		svg { max-width: 100% !important; background: var(--color-bg-primary); }
+	}
+}
