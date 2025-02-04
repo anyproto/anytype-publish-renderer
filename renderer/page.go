@@ -85,6 +85,8 @@ func (r *Renderer) RenderBlock(blockId string) templ.Component {
 	case *model.BlockContentOfSmartblock:
 	case *model.BlockContentOfRelation:
 		return r.RenderRelations(b)
+	case *model.BlockContentOfTableOfContents:
+		return r.RenderTableOfContent(b)
 	default:
 
 	}
