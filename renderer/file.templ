@@ -3,17 +3,15 @@ package renderer
 templ FileImageTemplate(r *Renderer, p *FileImageRenderParams) {
 	<div id={"block" + p.Id } class={"block blockMedia isImage index0 withContent", p.Classes}>
 		<div class="content">
-			<div class="flex">
-				if p.ImageWidth == "" {
-					<div class="wrap">
-						<img src={ p.Src } class="mediaImage" />
-					</div>
-				} else {
-					<div class={"wrap", imageSizeCss(string(p.ImageWidth)) }>
-						<img src={ p.Src } class="mediaImage" />
-					</div>
-				}
-			</div>
+			if p.ImageWidth == "" {
+				<div class="wrap">
+					<img src={ p.Src } class="mediaImage" />
+				</div>
+			} else {
+				<div class={"wrap", imageSizeCss(string(p.ImageWidth)) }>
+					<img src={ p.Src } class="mediaImage" />
+				</div>
+			}
 		</div>
 	</div>
 }
@@ -28,13 +26,7 @@ css imageSizeCss(width string) {
 templ FilePDFTemplate(r *Renderer, p *FilePDFRenderParams) {
 	<div id={"block" + p.Id } class="block blockMedia">
 		<div class="content">
-			<div class="flex">
-				<iframe id={"pdf-"+p.Id}
-						width="100%"
-						height="1000px"
-						src={ p.Src }>
-				</iframe>
-			</div>
+			<iframe id={"pdf-"+p.Id} width="100%" height="1000px" src={ p.Src }></iframe>
 		</div>
 	</div>
 }
@@ -42,9 +34,7 @@ templ FilePDFTemplate(r *Renderer, p *FilePDFRenderParams) {
 templ FileAudioTemplate(r *Renderer, p *FileAudioRenderParams) {
 	<div id={"block" + p.Id } class="block blockMedia">
 		<div class="content">
-			<div class="flex">
-				<audio controls src={ p.Src }></audio>
-			</div>
+			<audio controls src={ p.Src }></audio>
 		</div>
 	</div>
 }
@@ -52,11 +42,9 @@ templ FileAudioTemplate(r *Renderer, p *FileAudioRenderParams) {
 templ FileVideoTemplate(r *Renderer, p *FileVideoRenderParams) {
 	<div id={"block" + p.Id } class="block blockMedia">
 		<div class="content">
-			<div class="flex">
-				<video controls width="100%">
-					<source src={ p.Src} />
-				</video>
-			</div>
+			<video controls width="100%">
+				<source src={ p.Src} />
+			</video>
 		</div>
 	</div>
 }
@@ -64,21 +52,19 @@ templ FileVideoTemplate(r *Renderer, p *FileVideoRenderParams) {
 templ FileFileTemplate(r *Renderer, p *FileFileRenderParams) {
 	<div id={"block" + p.Id } class="block blockFile align0 index0 withContent">
 		<div class="content">
-			<div class="flex">
-				<div class="inner">
-					<div class="iconObject c24 isFile">
-						<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M2 1.5C2 0.671573 2.67157 0 3.5 0H16.5C17.3284 0 18 0.671573 18 1.5V18.5C18 19.3284 17.3284 20 16.5 20H3.5C2.67157 20 2 19.3284 2 18.5V1.5Z" fill="#F2F2F2"/>
-							<path fill-rule="evenodd" clip-rule="evenodd" d="M18 18.5C18 18.7761 17.3284 19 16.5 19H3.5C2.67157 19 2 18.7761 2 18.5C2 19.3284 2.67157 20 3.5 20H16.5C17.3284 20 18 19.3284 18 18.5Z" fill="#EBEBEB"/>
-							<path d="M6 6H14V7H6V6Z" fill="#2AA7EE"/>
-							<path d="M6 8H14V9H6V8Z" fill="#2AA7EE"/>
-							<path d="M6 10H14V11H6V10Z" fill="#2AA7EE"/>
-							<path d="M6 12H12V13H6V12Z" fill="#2AA7EE"/>
-						</svg>
-					</div>
-					<div class="name"><span><a href={ p.Src }>{ p.Name }</a></span></div>
-					<span class="size">{ p.Size }</span>
+			<div class="inner">
+				<div class="iconObject c24 isFile">
+					<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M2 1.5C2 0.671573 2.67157 0 3.5 0H16.5C17.3284 0 18 0.671573 18 1.5V18.5C18 19.3284 17.3284 20 16.5 20H3.5C2.67157 20 2 19.3284 2 18.5V1.5Z" fill="#F2F2F2"/>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M18 18.5C18 18.7761 17.3284 19 16.5 19H3.5C2.67157 19 2 18.7761 2 18.5C2 19.3284 2.67157 20 3.5 20H16.5C17.3284 20 18 19.3284 18 18.5Z" fill="#EBEBEB"/>
+						<path d="M6 6H14V7H6V6Z" fill="#2AA7EE"/>
+						<path d="M6 8H14V9H6V8Z" fill="#2AA7EE"/>
+						<path d="M6 10H14V11H6V10Z" fill="#2AA7EE"/>
+						<path d="M6 12H12V13H6V12Z" fill="#2AA7EE"/>
+					</svg>
 				</div>
+				<div class="name"><span><a href={ p.Src }>{ p.Name }</a></span></div>
+				<span class="size">{ p.Size }</span>
 			</div>
 		</div>
 	</div>

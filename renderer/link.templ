@@ -10,7 +10,7 @@ templ LinkTempl(p *LinkRenderParams) {
 						<div class="name">Non-existent object</div>
 					</div>
 				} else {
-					<a href={ p.Url } style="text-decoration: none" class={ "linkCard " + p.IconClass + " " + p.LayoutClass + " " + p.CoverClass }>
+					<a href={ p.Url } class={ "linkCard " + p.IconClass + " " + p.LayoutClass + " " + p.CoverClass }>
 						<div class="sides">
 							<div class="side left">
 								<div class="cardName">
@@ -38,7 +38,9 @@ templ LinkTempl(p *LinkRenderParams) {
 											</div>
 										}
 									}
-									<div class="name">  { p.Name }  </div>
+
+									<div class="name">{ p.Name }</div>
+
 									if p.IsArchived != "" {
 										<div class="tagItem isMultiSelect archive">Deleted</div>
 									}
@@ -46,24 +48,27 @@ templ LinkTempl(p *LinkRenderParams) {
 								<div class="relationItem cardDescription">
 									<div class="description"> { p.Description } </div>
 								</div>
+
 								if p.Type != "" {
 									<div class="relationItem cardType">
-											<div class="item"> { p.Type } </div>
+										<div class="item"> { p.Type } </div>
 									</div>
 								}
 							</div>
 							if p.CoverParams != nil {
-									<div class="side right">
+								<div class="side right">
 									if p.CoverParams.CoverType == 1 {
-									<div class={ "cover type1 " + p.CoverParams.Classes }></div>
+										<div class={ "cover type1 " + p.CoverParams.Classes }></div>
 									}
+
 									if p.CoverParams.CoverType == 2 {
-									<div class={ "cover type2 " + p.CoverParams.Classes }></div>
+										<div class={ "cover type2 " + p.CoverParams.Classes }></div>
 									}
+
 									if p.CoverParams.CoverType == 3 {
-									<div class={ "cover type3 " + p.CoverParams.Classes }></div>
+										<div class={ "cover type3 " + p.CoverParams.Classes }></div>
 									}
-									</div>
+								</div>
 							}
 						</div>
 					</a>
