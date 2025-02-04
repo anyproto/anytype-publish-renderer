@@ -2,12 +2,13 @@ package renderer
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
-	"path/filepath"
 )
 
 const linkTemplate = "anytype://object?objectId=%s&spaceId=%s"
@@ -66,14 +67,6 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 		CoverParams:   coverParams,
 		Url:           templ.SafeURL(link),
 	}
-}
-
-func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
-	snapshot := r.getObjectSnapshot(targetObjectId)
-	if snapshot == nil {
-		return nil
-	}
-	return snapshot.GetSnapshot().GetData().GetDetails()
 }
 
 func getLinkTypeClass(b *model.Block) string {

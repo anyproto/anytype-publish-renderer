@@ -1,17 +1,8 @@
 package renderer
 
-templ IconTemplate(p *IconParams) {
-	<img src={ p.Src } class={ p.Classes } />
-}
 
 templ IconObjectTemplate(r *Renderer, p *IconObjectParams) {
-	{{
-		bp := &BlockParams{
-			Id: p.BlockParams.Id,
-			Classes: p.BlockParams.Classes,
-			Content: IconTemplate(p.Icon),
-		}
-	}}
-
-	@BlockTemplate(r, bp)
+	<div class={ p.Classes }>
+		<img src={ p.Src } class={ p.IconClasses } />
+	</div>
 }
