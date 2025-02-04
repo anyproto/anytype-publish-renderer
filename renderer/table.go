@@ -85,10 +85,6 @@ func (r *Renderer) RenderTableRowCell(cellId string) templ.Component {
 	return TableRowCellTemplate(r, params)
 }
 
-func gridSizes(sizes string) templ.SafeCSSProperty {
-	return templ.SafeCSSProperty(sizes)
-}
-
 func (r *Renderer) rowHeaderClass(rowId string) string {
 	var headerClass string
 	if r.BlocksById[rowId].GetTableRow().IsHeader {
