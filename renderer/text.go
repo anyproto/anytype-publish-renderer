@@ -152,15 +152,18 @@ func replaceNewlineBr(text string) string {
 func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParams) {
 	blockText := b.GetText()
 	style := blockText.GetStyle()
-	textClass := "text" + style.String()
-	align := "align" + strconv.Itoa(int(b.GetAlign()))
-	classes := []string{textClass, align}
+	bgColor := b.GetBackgroundColor()
+	color := blockText.GetColor()
+	classes := []string{}
 
-	if bgColor := b.GetBackgroundColor(); bgColor != "" {
+	classes = append(classes, "text" + style.String())
+	classes = append(classes, "align" + strconv.Itoa(int(b.GetAlign())))
+
+	if bgColor != "" {
 		classes = append(classes, "bgColor", "bgColor-"+bgColor)
 	}
 
-	if color := blockText.GetColor(); color != "" {
+	if color != "" {
 		classes = append(classes, "textColor", "textColor-"+color)
 	}
 
@@ -181,7 +184,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	var innerFlex []templ.Component
 	switch style {
 	case model.BlockContentText_Toggle:
-		externalComp := ToggleMarkerTemplate()
+		externalComp := ToggleMarkerTemplate(utils.GetColor(color))
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Numbered:
 		number := r.BlockNumbers[b.Id]
@@ -189,7 +192,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		externalComp := NumberMarkerTemplate(fmt.Sprintf("%d", number))
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Marked:
-		externalComp := BulletMarkerTemplate()
+		externalComp := BulletMarkerTemplate(color)
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Callout:
 		emojiSrc := r.GetEmojiUrl(bulbEmoji)
