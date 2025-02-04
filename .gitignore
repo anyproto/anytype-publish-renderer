@@ -2,5 +2,5 @@
 /.envrc
 /bin/
 node_modules/
-dist/main.js
-dist/main.js.map
+static/js/main.js
+static/js/main.js.map
