@@ -2,8 +2,9 @@ package renderer
 
 import (
 	"fmt"
-	"github.com/gogo/protobuf/types"
 	"strconv"
+
+	"github.com/gogo/protobuf/types"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
@@ -11,20 +12,26 @@ import (
 )
 
 type FeaturedRelationsParams struct {
-	Id    string
-	Cells []templ.Component
+	Id       string
+	Classes  string
+	Cells    []templ.Component
 }
 
 func (r *Renderer) MakeFeaturedRelationsParams(block *model.Block) *FeaturedRelationsParams {
 	id := block.GetId()
 	details := r.Sp.GetSnapshot().GetData().GetDetails()
+	align := "align" + strconv.Itoa(int(block.GetAlign()))
+	param := &FeaturedRelationsParams{ Id: id, Classes: align }
+
 	if details == nil || len(details.GetFields()) == 0 {
-		return &FeaturedRelationsParams{Id: id}
+		return param
 	}
+
 	featuredRelationsList := details.GetFields()[bundle.RelationKeyFeaturedRelations.String()].GetListValue()
 	if featuredRelationsList == nil {
-		return &FeaturedRelationsParams{Id: id}
+		return param
 	}
+
 	cells := make([]templ.Component, 0, len(featuredRelationsList.Values))
 	for i, featuredRelation := range featuredRelationsList.Values {
 		var lastClass string
@@ -33,15 +40,24 @@ func (r *Renderer) MakeFeaturedRelationsParams(block *model.Block) *FeaturedRela
 		}
 		cells = r.processFeatureRelation(featuredRelation, lastClass, details, cells)
 	}
-	return &FeaturedRelationsParams{Id: id, Cells: cells}
+
+	param.Cells = cells
+	return param
 }
 
 func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, lastClass string, details *types.Struct, cells []templ.Component) []templ.Component {
 	if featuredRelation == nil {
 		return cells
 	}
+
 	relationKey := featuredRelation.GetStringValue()
+
+	if relationKey == "description" {
+		return cells
+	}
+
 	name, format, found := r.retrieveRelationInfo(relationKey)
+
 	if !found {
 		return cells
 	}

@@ -3,7 +3,7 @@ package renderer
 templ LinkTempl(p *LinkRenderParams) {
     <div id={"block-" + p.Id } class={ "block blockLink " + p.LinkTypeClass }>
         <div class="content">
-			<div class={ "focusable " + p.IsArchived }>
+			<div class={ p.IsArchived }>
 				if p.IsDeleted {
 					<div class="deleted">
 						<div id="" draggable="false" class="icon ghost"></div>
