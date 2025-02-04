@@ -29,14 +29,40 @@ func (r *Renderer) hasPageIcon() bool {
 
 	_, err := r.getFileUrl(iconImageId)
 
-	return (err == nil)
+	return err == nil
 
+}
+
+func (r *Renderer) hasPageCover() bool {
+	fields := r.Sp.Snapshot.Data.GetDetails()
+	coverType, err := ToCoverType(pbtypes.GetInt64(fields, "coverType"))
+	if err != nil {
+		return false
+	}
+	coverId := pbtypes.GetString(fields, "coverId")
+	if coverId != "" {
+		switch coverType {
+		case CoverType_Image, CoverType_Source:
+			_, err := r.getFileUrl(coverId)
+			return err == nil
+		default:
+			return true
+		}
+	}
+	return false
 }
 
 func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	var classes string
-	if r.hasPageIcon() {
+	hasPageIcon := r.hasPageIcon()
+	hasPageCover := r.hasPageCover()
+	switch {
+	case hasPageIcon && hasPageCover:
+		classes = "withIconAndCover"
+	case hasPageIcon:
 		classes = "withIcon"
+	case hasPageCover:
+		classes = "withCover"
 	}
 	return &RenderPageParams{
 		Classes: classes,

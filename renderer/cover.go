@@ -54,6 +54,7 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 
 	switch coverType {
 	case CoverType_Image:
+		fallthrough
 	case CoverType_Source:
 		src, err := r.getFileUrl(coverId)
 		if err != nil {
@@ -105,6 +106,7 @@ func (r *Renderer) RenderPageCover() templ.Component {
 
 	switch params.CoverType {
 	case CoverType_Image:
+		fallthrough
 	case CoverType_Source:
 		return CoverImageTemplate(r, params)
 	case CoverType_Color:
