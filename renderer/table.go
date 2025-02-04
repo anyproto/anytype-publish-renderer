@@ -49,6 +49,7 @@ func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTablePar
 	if b.BackgroundColor != "" {
 		classes = fmt.Sprintf("bgColor bgColor-%s", b.BackgroundColor)
 	}
+
 	params = &RenderTableParams{
 		Classes:     classes,
 		Id:          b.Id,

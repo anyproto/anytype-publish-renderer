@@ -18,22 +18,21 @@ func (r *Renderer) makeRootRenderParams(b *model.Block) (params *RootRenderParam
 		width = fields.Fields["width"].GetNumberValue()
 	}
 
-	params = &RootRenderParams{}
+	min := fmt.Sprintf("%dpx", 704);
+	w := fmt.Sprintf("%f", width);
 
-	if width == 0 {
-		return params
-	}
-
-	w := "max(60%, min(calc(100% - 96px), 60% + (40% - 96px) * " + fmt.Sprintf("%f", width) + "))";
-
-	params.Style = fmt.Sprintf(`
+	str := "max(" + min + ", min(calc(100% - 96px), calc(" + min + " + (100% - " + min + " - 96px) * " + w + ")))";
+	style := fmt.Sprintf(`
 		<style> 
 			.blocks {
 				width: %s;
 			}
 		</style> 
-	`, w)
-	return
+	`, str)
+
+	return &RootRenderParams{
+		Style: style,
+	}
 }
 func (r *Renderer) getStyle(params *RootRenderParams) templ.Component {
 	return templ.Raw(params.Style)
