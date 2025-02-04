@@ -47,7 +47,7 @@ func (r *Renderer) retrieveTableOfContentItem(childBlock *childBlock, tableOfCon
 		name := r.getHeadingName(childBlock.Block)
 		switch style {
 		case model.BlockContentText_Header1:
-			tableOfContentItems = append(tableOfContentItems, HeadingTemplate(name, 1))
+			tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 1))
 		case model.BlockContentText_Header2:
 			tableOfContentItems = r.processSecondHeading(childBlock, tableOfContentItems, name)
 		case model.BlockContentText_Header3:
@@ -59,18 +59,18 @@ func (r *Renderer) retrieveTableOfContentItem(childBlock *childBlock, tableOfCon
 
 func (r *Renderer) processThirdHeading(childBlock *childBlock, tableOfContentItems []templ.Component, name string) []templ.Component {
 	if childBlock.isChild {
-		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(name, 3))
+		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 3))
 	} else {
-		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(name, 2))
+		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 2))
 	}
 	return tableOfContentItems
 }
 
 func (r *Renderer) processSecondHeading(childBlock *childBlock, tableOfContentItems []templ.Component, name string) []templ.Component {
 	if childBlock.isChild {
-		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(name, 2))
+		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 2))
 	} else {
-		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(name, 1))
+		tableOfContentItems = append(tableOfContentItems, HeadingTemplate(childBlock.GetId(), name, 1))
 	}
 	return tableOfContentItems
 }

@@ -18,7 +18,7 @@ templ TableOfContentTemplate(p *TableOfContentRenderParams) {
 	</div>
 }
 
-templ HeadingTemplate(name string, depth int) {
+templ HeadingTemplate(id string, name string, depth int) {
     <div 
 		class="item" 
 		style={
@@ -27,6 +27,6 @@ templ HeadingTemplate(name string, depth int) {
 			}
 	 	}
 	>
-		<span>{ name }</span>
+		<a href={ templ.URL("#block-" + id) }>{ name }</a>
 	</div>
 }
