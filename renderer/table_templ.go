@@ -29,7 +29,7 @@ func TableTemplate(r *Renderer, p *RenderTableParams) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{"block blockTable " + p.Classes}
+		var templ_7745c5c3_Var2 = []any{p.Classes}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -191,7 +191,7 @@ func TableRowTemplate(r *Renderer, rowId string, p *RenderTableParams) templ.Com
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var10 = []any{"row", r.rowHeaderClass(rowId)}
+		var templ_7745c5c3_Var10 = []any{r.rowHeaderClass(rowId)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

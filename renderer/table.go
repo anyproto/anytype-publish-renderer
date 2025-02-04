@@ -45,13 +45,13 @@ func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTablePar
 
 	rows := r.BlocksById[b.ChildrenIds[1]]
 
-	var classes string
+	classes := []string{"block", "blockTable"}
 	if b.BackgroundColor != "" {
-		classes = fmt.Sprintf("bgColor bgColor-%s", b.BackgroundColor)
+		classes = append(classes, fmt.Sprintf("bgColor bgColor-%s", b.BackgroundColor))
 	}
 
 	params = &RenderTableParams{
-		Classes:     classes,
+		Classes:     strings.Join(classes, " "),
 		Id:          b.Id,
 		Rows:        rows,
 		Columns:     columns,
@@ -87,9 +87,11 @@ func (r *Renderer) RenderTableRowCell(cellId string) templ.Component {
 }
 
 func (r *Renderer) rowHeaderClass(rowId string) string {
-	var headerClass string
+	classes := []string{"row"}
+
 	if r.BlocksById[rowId].GetTableRow().IsHeader {
-		headerClass = "isHeader"
+		classes = append(classes, "isHeader")
 	}
-	return headerClass
+
+	return strings.Join(classes, " ")
 }
