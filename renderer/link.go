@@ -49,7 +49,7 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 
 	objectTypeName, coverParams, coverClass := r.getAdditionalParams(b, targetDetails)
 
-	spaceId := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
+	spaceId := targetDetails.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 	link := fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
 	return &LinkRenderParams{
 		Id:            b.GetId(),
