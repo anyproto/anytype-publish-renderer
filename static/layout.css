@@ -2836,11 +2836,62 @@ a {
 
 }
 
-.joinSpace {
+.topBar {
     width: 100%;
-    text-align: right;
+    display: flex;
+    flex-direction: row;
+
 }
-.joinSpace a {
+.topBar .rightContainer {
+    display: flex;
+    flex-direction: row;
+    margin-left: auto;
+}
+.topBar .menu.dropDown {
+    padding-top: 2px;
+    cursor: pointer;
+}
+.topBar .menu .menuContent {
+    position: absolute;
+    z-index: 10;
+    width: 224px;
+    height: 44px;
+    top: 45px;
+    right: 15px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 8px 0px;
+    display: none;
+}
+
+.topBar .menu .menuContent.show {
+    display: block;
+}
+
+.topBar .menu .menuContent a {
+    text-decoration: none;
+}
+
+.topBar .menu .menuItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 3px 0px;
+    isolation: isolate;
+
+    padding: 0px 16px;
+    height: 28px;
+}
+
+.topBar .menu .menuItem:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.topBar .joinSpace {
+    margin-left: auto;
+}
+.topBar .joinSpace a {
     color: var(--color-text-primary);
     font-size: var(--font-size-common);
     font-weight: 500;

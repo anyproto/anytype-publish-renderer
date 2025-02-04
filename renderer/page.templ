@@ -27,15 +27,31 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			<script src={ r.GetPrismJsUrl("/components/prism-core.min.js") }></script>
 			<script src={ r.GetPrismJsUrl("/plugins/autoloader/prism-autoloader.min.js") }></script>
 			<main>
-				if r.joinSpaceLink() != "" {
-					<div class="joinSpace">
-						<a href={r.joinSpaceLink()} target="blank">
-							<span id="joinSpaceLink">
-								Join Space
-							</span>
-						</a>
+				<div class="topBar">
+					<div class="rightContainer">
+						if r.joinSpaceLink() != "" {
+							<div class="joinSpace">
+								<a href={r.joinSpaceLink()} target="blank">
+									<span id="joinSpaceLink">
+										Join Space
+									</span>
+								</a>
+							</div>
+						}
+						<div class="menu dropDown">
+							<div id="menuButton" class="menuButton">
+								<img src={ r.GetStaticFolderUrl("/img/menu.svg") } />
+							</div>
+							<div id="menuContent" class="menuContent">
+								<a href="mailto:support@anytype.io">
+									<div class="menuItem textColor-red">
+										Report
+									</div>
+								</a>
+							</div>
+						</div>
 					</div>
-				}
+				</div>
 				<div class="coverWrapper">
 					@r.RenderPageCover()
 				</div>
