@@ -31,8 +31,8 @@ templ AdditionalEmojiTemplate(emojiPath string) {
 	</div>
 }
 
-templ AdditionalQuoteTemplate() {
-	<div class="additional">
+templ AdditionalQuoteTemplate(color string) {
+	<div class={"additional textColor-" + color}>
 		<div class="line"></div>
 	</div>
 }

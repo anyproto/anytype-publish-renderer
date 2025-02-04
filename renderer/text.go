@@ -201,7 +201,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		externalComp := AdditionalEmojiTemplate(emojiSrc)
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Quote:
-		externalComp := AdditionalQuoteTemplate()
+		externalComp := AdditionalQuoteTemplate(color)
 		outerFlex = append(outerFlex, externalComp)
 		innerFlex = append(innerFlex, textComp)
 	case model.BlockContentText_Checkbox:
