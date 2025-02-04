@@ -1,17 +1,19 @@
 package renderer
 
 templ FileImageTemplate(r *Renderer, p *FileImageRenderParams) {
-	<div id={"block" + p.Id } class={"block blockMedia isImage index0 withContent", p.Classes}>
+	<div id={"block" + p.Id } class={"block blockMedia isImage", p.Classes}>
 		<div class="content">
-			if p.ImageWidth == "" {
-				<div class="wrap">
-					<img src={ p.Src } class="mediaImage" />
-				</div>
-			} else {
-				<div class={"wrap", imageSizeCss(string(p.ImageWidth)) }>
-					<img src={ p.Src } class="mediaImage" />
-				</div>
-			}
+			<div class="wrap">
+				if p.ImageWidth == "" {
+					<div class="wrap">
+						<img src={ p.Src } class="media" />
+					</div>
+				} else {
+					<div class={"wrap", imageSizeCss(string(p.ImageWidth)) }>
+						<img src={ p.Src } class="media" />
+					</div>
+				}
+			</div>
 		</div>
 	</div>
 }
@@ -24,33 +26,37 @@ css imageSizeCss(width string) {
 }
 
 templ FilePDFTemplate(r *Renderer, p *FilePDFRenderParams) {
-	<div id={"block" + p.Id } class="block blockMedia">
+	<div id={"block" + p.Id } class="block blockMedia isPdf">
 		<div class="content">
-			<iframe id={"pdf-"+p.Id} width="100%" height="1000px" src={ p.Src }></iframe>
+			<div class="wrap">
+				<iframe id={"pdf-"+p.Id} width="100%" height="1000px" src={ p.Src }></iframe>
+			</div>
 		</div>
 	</div>
 }
 
 templ FileAudioTemplate(r *Renderer, p *FileAudioRenderParams) {
-	<div id={"block" + p.Id } class="block blockMedia">
+	<div id={"block" + p.Id } class="block blockMedia isAudio">
 		<div class="content">
-			<audio controls src={ p.Src }></audio>
+			<div class="wrap">
+				<audio controls src={ p.Src }></audio>
+			</div>
 		</div>
 	</div>
 }
 
 templ FileVideoTemplate(r *Renderer, p *FileVideoRenderParams) {
-	<div id={"block" + p.Id } class="block blockMedia">
+	<div id={"block" + p.Id } class="block blockMedia isVideo">
 		<div class="content">
-			<video controls width="100%">
-				<source src={ p.Src} />
-			</video>
+			<div class="wrap">
+				<video controls src={ p.Src}></video>
+			</div>
 		</div>
 	</div>
 }
 
 templ FileFileTemplate(r *Renderer, p *FileFileRenderParams) {
-	<div id={"block" + p.Id } class="block blockFile align0 index0 withContent">
+	<div id={"block" + p.Id } class="block blockFile">
 		<div class="content">
 			<div class="inner">
 				<div class="iconObject c24 isFile">
@@ -68,5 +74,4 @@ templ FileFileTemplate(r *Renderer, p *FileFileRenderParams) {
 			</div>
 		</div>
 	</div>
-
 }
