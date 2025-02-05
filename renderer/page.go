@@ -3,6 +3,7 @@ package renderer
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
@@ -29,17 +30,51 @@ func (r *Renderer) hasPageIcon() bool {
 
 	_, err := r.getFileUrl(iconImageId)
 
-	return (err == nil)
+	return err == nil
 
 }
 
-func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
-	var classes string
-	if r.hasPageIcon() {
-		classes = "hasPageIcon"
+func (r *Renderer) hasPageCover() bool {
+	fields := r.Sp.Snapshot.Data.GetDetails()
+	coverType, err := ToCoverType(pbtypes.GetInt64(fields, "coverType"))
+	if err != nil {
+		return false
 	}
+	coverId := pbtypes.GetString(fields, "coverId")
+	if coverId != "" {
+		switch coverType {
+		case CoverType_Image, CoverType_Source:
+			_, err := r.getFileUrl(coverId)
+			return err == nil
+		default:
+			return true
+		}
+	}
+	return false
+}
+
+func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
+	fields := r.Sp.Snapshot.Data.GetDetails()
+	layoutAlign := pbtypes.GetInt64(fields, "layoutAlign")
+	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", layoutAlign)}
+
+	hasPageIcon := r.hasPageIcon()
+	hasPageCover := r.hasPageCover()
+
+	class := ""
+	switch {
+	case hasPageIcon && hasPageCover:
+		class = "withIconAndCover"
+	case hasPageIcon:
+		class = "withIcon"
+	case hasPageCover:
+		class = "withCover"
+	}
+
+	classes = append(classes, class)
+
 	return &RenderPageParams{
-		Classes: classes,
+		Classes: strings.Join(classes, " "),
 	}
 }
 

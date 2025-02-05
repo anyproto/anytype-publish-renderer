@@ -1,11 +1,12 @@
 package renderer
 
 import (
+	"path/filepath"
+	"testing"
+
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
-	"path/filepath"
-	"testing"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -80,7 +81,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				IsArchived:    "isArchived",
 				Name:          "Archived Block",
 				IconClass:     "c20",
-				LinkTypeClass: "text",
 				Url:           templ.SafeURL("anytype://object?objectId=archived-id&spaceId=spaceId"),
 			},
 		},
@@ -113,7 +113,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Icon:          "https://anytype-static.fra1.cdn.digitaloceanspaces.com/emojies/1f60a.png",
 				IconClass:     "c20 withIcon",
 				IconStyle:     "smileImage c20",
-				LinkTypeClass: "text",
 				Url:           templ.SafeURL("anytype://object?objectId=emoji-icon-id&spaceId=spaceId"),
 			},
 		},
@@ -144,7 +143,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Default Icon Block",
 				IconStyle:     "iconCommon icon page c28",
 				IconClass:     "c48",
-				LinkTypeClass: "card",
 				LayoutClass:   "isPage",
 				Url:           templ.SafeURL("anytype://object?objectId=default-icon-id&spaceId=spaceId"),
 			},
@@ -176,7 +174,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				LayoutClass:   "isCollection",
 				IconStyle:     "iconCommon icon collection c20",
 				IconClass:     "c20",
-				LinkTypeClass: "text",
 				Url:           templ.SafeURL("anytype://object?objectId=collection-id&spaceId=spaceId"),
 			},
 		},
@@ -208,7 +205,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				LayoutClass:   "isTask",
 				IconStyle:     "iconCheckbox c20 icon checkbox unset",
 				IconClass:     "c20",
-				LinkTypeClass: "text",
 				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=spaceId"),
 			},
 		},
@@ -241,7 +237,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				LayoutClass:   "isTask",
 				IconStyle:     "iconCheckbox c20 icon checkbox set",
 				IconClass:     "c20",
-				LinkTypeClass: "text",
 				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=spaceId"),
 			},
 		},
@@ -273,7 +268,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Test",
 				LayoutClass:   "isHuman",
 				Description:   "description",
-				LinkTypeClass: "text",
 				IconClass:     "c20",
 				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=spaceId"),
 			},
@@ -307,7 +301,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Test",
 				LayoutClass:   "isParticipant",
 				Description:   "snippet",
-				LinkTypeClass: "card",
 				IconClass:     "c20",
 				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=spaceId"),
 			},
@@ -341,7 +334,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Test",
 				LayoutClass:   "isSet",
 				IconClass:     "c20",
-				LinkTypeClass: "text",
 				CoverClass:    "withCover",
 				CoverParams: &CoverRenderParams{
 					Id:        "gray",
@@ -387,7 +379,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Test",
 				LayoutClass:   "isSet",
 				IconClass:     "c20",
-				LinkTypeClass: "text",
 				Type:          "Type",
 				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=spaceId"),
 			},

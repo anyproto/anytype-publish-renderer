@@ -20,6 +20,7 @@ setup-go:
 	@go mod download
 
 build: setup-go deps
+	npm run build
 	templ generate -lazy
 	go build -o $(EXEC) .
 
@@ -31,18 +32,14 @@ test: setup-go
 	go test -v ./...
 
 render: build
-	npm run build
 	templ generate -lazy
 	$(EXEC) $(SNAPSHOT_PATH) > index.html
+
+clean-html:
+	rm *.html
 
 render-all: build
 	templ generate -lazy
 	for p in $(shell ls $(SNAPSHOTS_DIR)); do \
-		$(EXEC) $(SNAPSHOTS_DIR)/$$p > $$p.html; \
-	done
-
-render-all-layout: build
-	templ generate -lazy
-	for p in $(shell ls $(SNAPSHOTS_DIR) | grep layout); do \
 		$(EXEC) $(SNAPSHOTS_DIR)/$$p > $$p.html; \
 	done

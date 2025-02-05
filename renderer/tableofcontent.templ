@@ -18,15 +18,15 @@ templ TableOfContentTemplate(p *TableOfContentRenderParams) {
 	</div>
 }
 
-templ HeadingTemplate(name string, depth int) {
+templ HeadingTemplate(id string, name string, depth int) {
     <div 
 		class="item" 
 		style={
 			map[string]string{
-				"padding-left": fmt.Sprintf("%dpx", (depth - 1) * 24),
+				"padding-left": fmt.Sprintf("%dpx", depth * 24),
 			}
 	 	}
 	>
-		<span>{ name }</span>
+		<a href={ templ.URL("#block-" + id) }>{ name }</a>
 	</div>
 }

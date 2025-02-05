@@ -1,9 +1,9 @@
 package renderer
 
 templ BookmarkTempl(p *BookmarkRendererParams) {
-    <div id={"block-" + p.Id } class={ "block blockBookmark" }>
+    <div id={"block-" + p.Id} class={p.Classes}>
 		<div class="content">
-			if !p.IsEmpty {
+
 				<a href={ p.SafeUrl } target="_blank" class="inner withImage">
 					<div class="side left">
 						<div class="link">
@@ -21,7 +21,7 @@ templ BookmarkTempl(p *BookmarkRendererParams) {
 						</div>
 					}
 				</a>
-			}
+
 		</div>
     </div>
 }

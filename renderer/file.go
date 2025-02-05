@@ -27,6 +27,15 @@ type FileMediaRenderParams struct {
 	Width      string
 }
 
+type FilePdfRenderParams struct {
+	Id         string
+	Src        string
+	Classes    string
+	Width      string
+	Name	   string
+	Size	   string
+}
+
 func (r *Renderer) getFileUrl(id string) (url string, err error) {
 	path := fmt.Sprintf("filesObjects/%s.pb", id)
 	snapshot, err := r.ReadJsonpbSnapshot(path)
@@ -119,7 +128,7 @@ func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileMediaR
 	return
 }
 
-func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FileMediaRenderParams, err error) {
+func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FilePdfRenderParams, err error) {
 	file := b.GetFile()
 	var src string
 	src, err = r.getFileUrl(file.TargetObjectId)
@@ -128,11 +137,16 @@ func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FileMediaRen
 		return
 	}
 
-	params = &FileMediaRenderParams{
+	name := file.Name
+	size := prettyByteSize(file.Size_)
+
+	params = &FilePdfRenderParams{
 		Id:         b.Id,
 		Src:        src,
 		Classes:    GetAlign(b.GetAlign()),
 		Width:		GetWidth(b.Fields),
+		Name:		name,
+		Size:		size,
 	}
 
 	return

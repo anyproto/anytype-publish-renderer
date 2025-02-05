@@ -7,15 +7,17 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
-	"github.com/globalsign/mgo/bson"
 	"go.uber.org/zap"
 )
 
 type CoverRenderParams struct {
-	Id        string
-	Src       string
-	Classes   string
-	CoverType CoverType
+	Id         string
+	Src        string
+	Classes    string
+	CoverType  CoverType
+	CoverX     float64
+	CoverY     float64
+	CoverScale float64
 }
 
 type CoverType int32
@@ -51,9 +53,13 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 	}
 
 	coverId := pbtypes.GetString(fields, "coverId")
+	coverX := pbtypes.GetFloat64(fields, "coverX")
+	coverY := pbtypes.GetFloat64(fields, "coverY")
+	coverScale := pbtypes.GetFloat64(fields, "coverScale")
 
 	switch coverType {
 	case CoverType_Image:
+		fallthrough
 	case CoverType_Source:
 		src, err := r.getFileUrl(coverId)
 		if err != nil {
@@ -66,6 +72,9 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 			Src:       src,
 			Classes:   "type1",
 			CoverType: coverType,
+			CoverX:    coverX,
+			CoverY:    coverY,
+			CoverScale: coverScale,
 		}
 
 		return params, nil
@@ -100,21 +109,21 @@ func (r *Renderer) RenderPageCover() templ.Component {
 	log.Warn("cover rendering failed: unknown cover type %+v", zap.Any("params", params))
 
 	if err != nil {
-		return EmptyCoverTemplate(bson.NewObjectId().Hex())
+		return NoneTemplate("")
 	}
 
 	switch params.CoverType {
-	case CoverType_Image:
-	case CoverType_Source:
-		return CoverImageTemplate(r, params)
-	case CoverType_Color:
-		return CoverColorTemplate(r, params)
-	case CoverType_Gradient:
-		return CoverGradientTemplate(r, params)
-
+		case 
+			CoverType_Image,
+			CoverType_Source:
+			return CoverImageTemplate(r, params)
+		case CoverType_Color:
+			return CoverColorTemplate(r, params)
+		case CoverType_Gradient:
+			return CoverGradientTemplate(r, params)
 	}
 
 	log.Warn("cover rendering failed: unknown cover type", zap.Int("coverType", int(params.CoverType)))
-	return EmptyCoverTemplate(bson.NewObjectId().Hex())
+	return NoneTemplate("")
 
 }

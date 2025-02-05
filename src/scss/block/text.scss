@@ -42,7 +42,7 @@
 			}
 
 			.additional { flex-shrink: 0; }
-			.text { min-height: var(--line-height-paragraph); flex-grow: 1; }
+			.text { min-height: var(--line-height-paragraph); flex-grow: 1; padding: 1px 0px; }
 		}
 	}
 }

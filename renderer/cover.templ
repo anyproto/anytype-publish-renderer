@@ -1,13 +1,24 @@
 package renderer
 
+script coverParam(x float64, y float64, scale float64) {
+	window.CoverParam = {};
+
+	function setParam(k, v) {
+		window.CoverParam[k] = v;
+	};
+
+	setParam('x', x);
+	setParam('y', y);
+	setParam('scale', scale);
+}
+
 templ CoverImageTemplate(r *Renderer, p *CoverRenderParams) {
+	@coverParam(p.CoverX, p.CoverY, p.CoverScale)
+
 	<div id={"block-" + p.Id } class="block blockCover">
 		<div class="content">
 			<div class="wrap">
-				<img id="cover" src={ p.Src }
-					class="cover type1"
-					style="opacity: 1; height: auto; width: 100%; transform: translate3d(0%, -25%, 0px);"
-				 />
+				<img id="cover" src={ p.Src } class="cover type1" />
 			</div>
 		</div>
 	</div>
@@ -26,12 +37,6 @@ templ CoverGradientTemplate(r *Renderer, p *CoverRenderParams) {
 		<div class="wrap">
 			<div class={"cover type3", p.Classes}></div>
 		</div>
-	</div>
-}
-
-templ EmptyCoverTemplate(id string) {
-	<div id={"block-cover-" + id } >
-	    <div class="empty" style="width: 100%; height: 72px; margin: 0px auto; line-height: 16px; opacity: 0;"> </div>
 	</div>
 }
 

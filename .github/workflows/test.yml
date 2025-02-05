@@ -37,6 +37,7 @@ jobs:
           path: ./open
       - name: Go build
         run: |
+          npm i
           make build
       - name: Go test
         run: |
