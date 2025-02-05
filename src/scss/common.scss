@@ -9,6 +9,10 @@ body {
 	-webkit-font-smoothing: antialiased; backface-visibility: hidden; transform-style: flat; overscroll-behavior: none; scrollbar-gutter: stable both-edges;
 }
 
+.flex { display: flex; }
+
+.coverWrapper { padding: 16px 16px 0px 16px; }
+
 .textColor-default { color: var(--color-text-primary) !important; }
 .textColor-black { color: var(--color-text-primary) !important; }
 .textColor-grey { color: var(--color-control-active) !important; }

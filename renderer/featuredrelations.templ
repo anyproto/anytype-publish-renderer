@@ -1,9 +1,9 @@
 package renderer
 
 templ FeaturedRelationTemplate(p *FeaturedRelationsParams) {
-	<div id={"block-" + p.Id} class={"block blockFeatured align0 index0"}>
-	    <div class="content">
-	        <div class="wrap focusable">
+	<div id={"block-" + p.Id} class={p.Classes}>
+	    <div class={p.ContentClasses}>
+	        <div class="wrap">
 	            for _, cell := range p.Cells {
                     @cell
                 }

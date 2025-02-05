@@ -64,7 +64,7 @@ func RelationTemplate(p *RelationRenderParams) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 = []any{"wrap focusable" + p.IsDeleted}
+		var templ_7745c5c3_Var5 = []any{"wrap" + p.IsDeleted}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

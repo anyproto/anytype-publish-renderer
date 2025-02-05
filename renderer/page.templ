@@ -17,7 +17,7 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			<meta property="og:locale" content="en_US">
 
 			<meta name="twitter:card" content="summary_large_image">
-			<meta name="twitter:title" content="Your Page Title">
+			<meta name="twitter:title" content={ r.titleText() }>
 			<meta name="twitter:description" content="A brief and engaging description of your page.">
 			<meta name="twitter:image" content="https://www.example.com/image.jpg">
 			<meta name="twitter:url" content="https://www.example.com">

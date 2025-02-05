@@ -69,7 +69,7 @@ templ FileFileTemplate(r *Renderer, p *FileFileRenderParams) {
 						<path d="M6 12H12V13H6V12Z" fill="#2AA7EE"/>
 					</svg>
 				</div>
-				<div class="name"><span><a href={ p.Src }>{ p.Name }</a></span></div>
+				<a href={ p.Src } class="name">{ p.Name }</a>
 				<span class="size">{ p.Size }</span>
 			</div>
 		</div>
