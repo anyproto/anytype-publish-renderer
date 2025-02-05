@@ -1,18 +1,18 @@
 @use "../_mixins" as *;
 
-smile { text-align: center; }
-smile {
+.smile { text-align: center; }
+.smile {
 	img { position: static !important; left: auto !important; top: auto !important; margin: 0px !important; vertical-align: top; }
 }
-smile * { display: inline; vertical-align: middle; }
-smile .loaderWrapper { display: inline-block; }
+.smile * { display: inline; vertical-align: middle; }
+.smile .loaderWrapper { display: inline-block; }
 
 markupcode { display: inline; font-family: 'Plex'; border-radius: 4px; background: var(--color-shape-secondary); padding: 1px 4px; }
 
 markupemoji { display: inline; user-select: all; }
 markupemoji * { user-select: all; }
 markupemoji {
-	smile img { vertical-align: top; }
+	.smile img { vertical-align: top; }
 }
 
 markuplink, markupobject { 
@@ -29,7 +29,7 @@ markupmention {
 	.name { display: inline; white-space: normal; position: relative; border-bottom: 0.075em solid; border-color: inherit; }
 }
 markupmention.disabled {
-	name { border-width: 0px; }
+	.name { border-width: 0px; }
 }
 markupmention.withImage {
 	.smile { display: inline; }
@@ -40,7 +40,7 @@ markupmention.withImage.c26 name markupBgcolor:first-child { margin-left: -22px;
 markupmention.withImage.c28 name markupBgcolor:first-child { margin-left: -27px; padding-left: 27px; }
 markupmention.withImage.c32 name markupBgcolor:first-child { margin-left: -34px; padding-left: 34px; }
 markupmention:hover {
-	name::before { border-color: var(--color-text-primary); }
+	.name::before { border-color: var(--color-text-primary); }
 }
 
 markupbold { font-weight: 600; }

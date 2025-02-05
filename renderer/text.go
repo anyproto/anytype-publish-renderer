@@ -21,19 +21,34 @@ import (
 const bulbEmoji = 0x1F4A1
 
 type TextRenderParams struct {
-	Classes    		 string
-	ContentClasses	 string
-	Id         		 string
-	InnerFlex  		 []templ.Component
-	OuterFlex  		 []templ.Component
-	ChildrenIds		 []string
+	Classes        string
+	ContentClasses string
+	Id             string
+	InnerFlex      []templ.Component
+	OuterFlex      []templ.Component
+	ChildrenIds    []string
 }
 
 func cmpMarks(a, b *model.BlockContentTextMark) int {
 	return cmp.Compare(a.Range.From, b.Range.From)
 }
 
-func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string {
+func emojiParam(t model.BlockContentTextStyle) int32 {
+	switch t {
+	default:
+		return 20
+	case model.BlockContentText_Header1:
+		return 30
+	case model.BlockContentText_Header2:
+		return 26
+	case model.BlockContentText_Header3:
+		return 22
+	}
+}
+
+func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *model.BlockContentTextMark) string {
+	emojiSize := emojiParam(style)
+
 	switch mark.Type {
 	case model.BlockContentTextMark_Strikethrough:
 		return "<markupstrike>" + s + "</markupstrike>"
@@ -59,12 +74,32 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 		return tag + s + "</markupbgcolor>"
 
 	case model.BlockContentTextMark_Mention:
-		return `<markupmention><span class="smile"></span><img src="./static/img/space.svg" class="space" /><span class="name">` + s +`</span></markupmention>`
+		details := r.findTargetDetails(mark.Param)
+
+		iconHtml := ""
+		class := ""
+
+		if details != nil || len(details.Fields) != 0 {
+			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
+
+			var err error
+			iconHtml, err = utils.TemplToString(IconObjectTemplate(r, params))
+
+			if err != nil {
+				log.Error("Failed to render mention icon", zap.Error(err))
+			}
+
+			if iconHtml != "" {
+				class = "withImage"
+			}
+		}
+
+		return `<markupmention class="` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><span class="name">` + s + `</span></markupmention>`
 
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
 		emojiSrc := r.GetEmojiUrl(code)
-		emojiHtml, err := utils.TemplToString(InlineEmojiTemplate(emojiSrc, "c28"))
+		emojiHtml, err := utils.TemplToString(InlineEmojiTemplate(emojiSrc, fmt.Sprintf("c%d", emojiSize)))
 		if err != nil {
 			log.Error("Failed to render emoji template", zap.Error(err))
 			return ""
@@ -85,7 +120,7 @@ func StrToUTF16(str string) []uint16 {
 //   - sort
 //   - for each range, find overlapping intervals
 //     add props from each of this ranges to this range
-func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockContentTextMark) string {
+func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, text string, marks []*model.BlockContentTextMark) string {
 	if len(marks) == 0 {
 		text = html.EscapeString(text)
 		return text
@@ -136,7 +171,7 @@ func (r *Renderer) applyNonOverlapingMarks(text string, marks []*model.BlockCont
 			zap.Int32("to", curRange.To))
 		markedPart = html.EscapeString(markedPart)
 		for _, m := range marksToApply {
-			markedPart = r.applyMark(markedPart, m)
+			markedPart = r.applyMark(style, markedPart, m)
 			log.Debug("apply mark", zap.String("markedPart", markedPart), zap.Int32("from", m.Range.From), zap.Int32("to", m.Range.To))
 		}
 		log.Debug("final marked part", zap.String("m", markedPart))
@@ -160,28 +195,27 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	classes := []string{"block", "blockText"}
 	contentClasses := []string{"content"}
 
-	classes = append(classes, "text" + style.String())
-	classes = append(classes, "align" + strconv.Itoa(int(b.GetAlign())))
+	classes = append(classes, "text"+style.String())
+	classes = append(classes, "align"+strconv.Itoa(int(b.GetAlign())))
 
 	if bgColor != "" {
-		if 
-			(style == model.BlockContentText_Callout) || 
+		if (style == model.BlockContentText_Callout) ||
 			(style == model.BlockContentText_Quote) {
-			classes = append(classes, "bgColor", "bgColor-" + bgColor)
+			classes = append(classes, "bgColor", "bgColor-"+bgColor)
 		} else {
-			contentClasses = append(contentClasses, "bgColor", "bgColor-" + bgColor)
+			contentClasses = append(contentClasses, "bgColor", "bgColor-"+bgColor)
 		}
 	}
 
 	if color != "" {
-		contentClasses = append(contentClasses, "textColor", "textColor-" + color)
+		contentClasses = append(contentClasses, "textColor", "textColor-"+color)
 	}
 
 	text := blockText.Text
 	var textComp templ.Component
 	if style != model.BlockContentText_Code {
 		marks := blockText.GetMarks().Marks
-		text = r.applyNonOverlapingMarks(text, marks)
+		text = r.applyNonOverlapingMarks(style, text, marks)
 		text = replaceNewlineBr(text)
 		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
@@ -226,12 +260,12 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	}
 
 	params = &TextRenderParams{
-		Id:          b.Id,
-		Classes:     strings.Join(classes, " "),
+		Id:             b.Id,
+		Classes:        strings.Join(classes, " "),
 		ContentClasses: strings.Join(contentClasses, " "),
-		ChildrenIds: b.ChildrenIds,
-		OuterFlex:   outerFlex,
-		InnerFlex:   innerFlex,
+		ChildrenIds:    b.ChildrenIds,
+		OuterFlex:      outerFlex,
+		InnerFlex:      innerFlex,
 	}
 	return
 
