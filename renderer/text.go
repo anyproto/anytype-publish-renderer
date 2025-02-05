@@ -47,6 +47,8 @@ func emojiParam (t model.BlockContentTextStyle) int {
 	};
 
 func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *model.BlockContentTextMark) string {
+	emojiSize := int32(emojiParam(style))
+
 	switch mark.Type {
 	case model.BlockContentTextMark_Strikethrough:
 		return "<markupstrike>" + s + "</markupstrike>"
@@ -79,7 +81,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		err := error(nil)
 
 		if details != nil || len(details.Fields) != 0 {
-			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: int32(emojiParam(style)) })
+			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: emojiSize })
 
 			iconHtml, err = utils.TemplToString(IconObjectTemplate(r, params))
 			if err != nil {
@@ -96,7 +98,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
 		emojiSrc := r.GetEmojiUrl(code)
-		emojiHtml, err := utils.TemplToString(InlineEmojiTemplate(emojiSrc, "c28"))
+		emojiHtml, err := utils.TemplToString(InlineEmojiTemplate(emojiSrc, fmt.Sprintf("c%d", emojiSize)))
 		if err != nil {
 			log.Error("Failed to render emoji template", zap.Error(err))
 			return ""

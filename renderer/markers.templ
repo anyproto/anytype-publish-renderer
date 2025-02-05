@@ -10,9 +10,9 @@ templ BulletMarkerTemplate(color string) {
 
 templ InlineEmojiTemplate(emojiPath, sizeClass string) {
 	<markupemoji contenteditable="false">
-		<smile>
+		<span class="smile">
 			@EmojiTemplate(emojiPath, sizeClass)
-		</smile>
+		</span>
 	</markupemoji>
 }
 
@@ -22,7 +22,6 @@ templ EmojiTemplate(emojiPath, sizeClass string) {
 			<img src={emojiPath} class={"iconCommon", sizeClass} />
 		</div>
 	</div>
-
 }
 
 templ AdditionalEmojiTemplate(emojiPath string) {
