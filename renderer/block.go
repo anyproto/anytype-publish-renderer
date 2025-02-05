@@ -55,13 +55,13 @@ type BlockParams struct {
 }
 
 func makeDefaultBlockParams(b *model.Block) *BlockParams {
-	classes := []string{"block"}
 	a := b.GetAlign()
 	align := fmt.Sprintf("align%d", a)
+	classes := []string{"block", align}
+
 	if blockType := blockContentTypeToName(b); blockType != "" {
 		classes = append(classes, fmt.Sprintf("block%s", blockType))
 	}
-	classes = append(classes, align)
 
 	return &BlockParams{
 		Id:          b.Id,
