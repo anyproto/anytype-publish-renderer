@@ -35,8 +35,10 @@ render: build
 	templ generate -lazy
 	ANYTYPE_PUBLISH_CSS_DEBUG=yesplease $(EXEC) $(SNAPSHOT_PATH) > index.html
 
+clean-html:
+	rm *.html
+
 render-all: build
-	rm -f index.html
 	templ generate -lazy
 	for p in $(shell ls $(SNAPSHOTS_DIR)); do \
 		ANYTYPE_PUBLISH_CSS_DEBUG=yesplease $(EXEC) $(SNAPSHOTS_DIR)/$$p > $$p.html; \
