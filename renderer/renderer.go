@@ -52,6 +52,9 @@ type RenderConfig struct {
 
 	// analytics code to inject
 	AnalyticsCode string
+
+	// classes for <html> tag, used for debug
+	HtmlClasses []string
 }
 
 type Renderer struct {
@@ -157,6 +160,12 @@ func debugJsonSnapshot(snapshot pb.SnapshotWithType) error {
 	return nil
 }
 
+func (r *Renderer) maybeAddDebugCss() {
+	if isDebugCss := os.Getenv("ANYTYPE_PUBLISH_CSS_DEBUG"); isDebugCss != "" {
+		r.Config.HtmlClasses = append(r.Config.HtmlClasses, "debug")
+	}
+}
+
 func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	defer func() {
 		if p := recover(); p != nil {
@@ -203,6 +212,7 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 		Config:        config,
 	}
 
+	r.maybeAddDebugCss()
 	r.hydrateSpecialBlocks()
 	r.hydrateNumberBlocks()
 	r.RootComp = r.RenderPage()
