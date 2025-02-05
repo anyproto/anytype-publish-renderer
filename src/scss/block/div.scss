@@ -1,0 +1,21 @@
+.block.blockDiv { padding: 0px; line-height: 0px; position: relative; height: 16px; }
+.block.blockDiv {
+	> .content { text-align: center !important; }
+	> .content {
+		.line, .dots { width: 100%; position: absolute; top: 50%; left: 0px; }
+	}
+}
+
+.block.blockDiv.divLine {
+	> .content {
+		.line {  height: 1px; border-bottom: 1px solid var(--color-shape-primary); }
+	}
+}
+
+.block.blockDiv.divDot {
+	> .content {
+		.dots { height: 2px; margin-top: -1px; white-space: nowrap; }
+		.dot { width: 2px; height: 2px; background: var(--color-control-accent); margin-right: 18px; display: inline-block; vertical-align: top; }
+		.dot:last-child { margin: 0px; }
+	}
+}

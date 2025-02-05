@@ -1,13 +1,5 @@
 package renderer
 
-templ DivTemplate(p *DivRenderParams) {
-	<div id={"block-" + p.Id } class={"block blockDiv " + p.Classes }>
-		<div class="content">
-			@p.Comp
-		</div>
-	</div>
-}
-
 templ DivDotTemplate() {
 	<div class="dots">
 		<div class="dot"></div>

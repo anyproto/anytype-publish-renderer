@@ -21,11 +21,12 @@ import (
 const bulbEmoji = 0x1F4A1
 
 type TextRenderParams struct {
-	Classes     string
-	Id          string
-	InnerFlex   []templ.Component
-	OuterFlex   []templ.Component
-	ChildrenIds []string
+	Classes    		 string
+	ContentClasses	 string
+	Id         		 string
+	InnerFlex  		 []templ.Component
+	OuterFlex  		 []templ.Component
+	ChildrenIds		 []string
 }
 
 func cmpMarks(a, b *model.BlockContentTextMark) int {
@@ -56,8 +57,10 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 		color := mark.Param
 		tag := fmt.Sprintf(`<markupbgcolor class="bgColor bgColor-%s">`, color)
 		return tag + s + "</markupbgcolor>"
+
 	case model.BlockContentTextMark_Mention:
-		return "<markupmention>" + s + "</markupmention>"
+		return `<markupmention><span class="smile"></span><img src="./static/img/space.svg" class="space" /><span class="name">` + s +`</span></markupmention>`
+
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
 		emojiSrc := r.GetEmojiUrl(code)
@@ -152,16 +155,26 @@ func replaceNewlineBr(text string) string {
 func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParams) {
 	blockText := b.GetText()
 	style := blockText.GetStyle()
-	textClass := "text" + style.String()
-	align := "align" + strconv.Itoa(int(b.GetAlign()))
-	classes := []string{textClass, align}
+	bgColor := b.GetBackgroundColor()
+	color := blockText.GetColor()
+	classes := []string{"block", "blockText"}
+	contentClasses := []string{"content"}
 
-	if bgColor := b.GetBackgroundColor(); bgColor != "" {
-		classes = append(classes, "bgColor", "bgColor-"+bgColor)
+	classes = append(classes, "text" + style.String())
+	classes = append(classes, "align" + strconv.Itoa(int(b.GetAlign())))
+
+	if bgColor != "" {
+		if 
+			(style == model.BlockContentText_Callout) || 
+			(style == model.BlockContentText_Quote) {
+			classes = append(classes, "bgColor", "bgColor-" + bgColor)
+		} else {
+			contentClasses = append(contentClasses, "bgColor", "bgColor-" + bgColor)
+		}
 	}
 
-	if color := blockText.GetColor(); color != "" {
-		classes = append(classes, "textColor", "textColor-"+color)
+	if color != "" {
+		contentClasses = append(contentClasses, "textColor", "textColor-" + color)
 	}
 
 	text := blockText.Text
@@ -181,7 +194,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	var innerFlex []templ.Component
 	switch style {
 	case model.BlockContentText_Toggle:
-		externalComp := ToggleMarkerTemplate()
+		externalComp := ToggleMarkerTemplate(utils.GetColor(color))
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Numbered:
 		number := r.BlockNumbers[b.Id]
@@ -189,20 +202,21 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		externalComp := NumberMarkerTemplate(fmt.Sprintf("%d", number))
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Marked:
-		externalComp := BulletMarkerTemplate()
+		externalComp := BulletMarkerTemplate(color)
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Callout:
 		emojiSrc := r.GetEmojiUrl(bulbEmoji)
 		externalComp := AdditionalEmojiTemplate(emojiSrc)
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Quote:
-		externalComp := AdditionalQuoteTemplate()
+		externalComp := AdditionalQuoteTemplate(color)
 		outerFlex = append(outerFlex, externalComp)
 		innerFlex = append(innerFlex, textComp)
 	case model.BlockContentText_Checkbox:
 		var checkboxComp templ.Component
 		if blockText.Checked {
 			checkboxComp = CheckboxCheckedTemplate()
+			classes = append(classes, "isChecked")
 		} else {
 			checkboxComp = CheckboxUncheckedTemplate()
 		}
@@ -214,6 +228,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	params = &TextRenderParams{
 		Id:          b.Id,
 		Classes:     strings.Join(classes, " "),
+		ContentClasses: strings.Join(contentClasses, " "),
 		ChildrenIds: b.ChildrenIds,
 		OuterFlex:   outerFlex,
 		InnerFlex:   innerFlex,

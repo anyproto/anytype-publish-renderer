@@ -1,8 +1,8 @@
 package renderer
 
 templ IconImageTemplate(r *Renderer, p *IconImageRenderParams) {
-	<div id={"block-" + p.Id } class={"block blockIconPage index0 noPlus " + p.Classes}>
-		<div class="wrapContent">
+	<div id={"block-" + p.Id } class={"block blockIcon " + p.Classes}>
+		<div class="content">
 			if p.Src != "" {
 				<div id="block-icon" class={"iconObject isPage withImage " + p.IconClasses}>
 					<div class="iconEmoji">

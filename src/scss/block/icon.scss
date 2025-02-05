@@ -1,0 +1,18 @@
+.block.blockIcon {
+	> .content { padding: 0px 0px 16px 0px; }
+	> .content:empty { display: none; }
+
+	.iconObject { 
+		position: relative; z-index: 2; display: inline-block; box-shadow: 0px 0px 0px 4px var(--color-bg-primary); 
+		background-color: var(--color-bg-primary) !important;
+	}
+}
+
+.block.blockIcon.isHuman { padding: 0px 0px 12px 0px; }
+
+.blocks.layoutAlign1 {
+	.block.blockIcon { text-align: center; }
+}
+.blocks.layoutAlign2 {
+	.block.blockIcon { text-align: right; }
+}

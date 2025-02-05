@@ -13,9 +13,11 @@
       devShell = pkgs.mkShell {
         name = "anytype-publish-renderer";
         ANYTYPE_LOG_LEVEL="renderer*=DEBUG;*=WARN";
+        ANYTYPE_LOG_NOGELF="1";
         nativeBuildInputs = [
           pkgs.go_1_23
           pkgs.templ
+          pkgs.nodejs_22
         ];
       };
     });

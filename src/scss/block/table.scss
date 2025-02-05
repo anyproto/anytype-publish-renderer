@@ -1,0 +1,88 @@
+@use "../_mixins" as *;
+
+.blocks {
+
+	.block.blockTable { padding: 6px 0px; }
+	.block.blockTable {
+		.scrollWrap { width: 100%; line-height: 0px; }
+		.scrollWrap.withScroll { overflow-x: auto; padding-bottom: 8px; }
+		.scrollWrap > .inner { display: inline-block; position: relative; }
+
+		.table { display: block; border-collapse: collapse; position: relative; border-radius: 4px; }
+
+		.row { display: grid; position: relative; border-right: 1px solid var(--color-shape-primary); background-color: var(--color-shape-primary); }
+		.row:first-child { border-radius: 4px 4px 0px 0px; }
+		.row:last-child { border-bottom: 1px solid var(--color-shape-primary); border-radius: 0px 0px 4px 4px; }
+
+		.row:first-child .cell:first-child { border-radius: 4px 0px 0px 0px; }
+		.row:first-child .cell:first-child {
+			.content { border-radius: 4px 0px 0px 0px; }
+		}
+		.row:first-child .cell:last-child { border-radius: 0px 4px 0px 0px; }
+		.row:first-child .cell:last-child {
+			.content { border-radius: 0px 4px 0px 0px; }
+		}
+
+		.row:last-child .cell:last-child { border-radius: 0px 0px 4px 0px; }
+		.row:last-child .cell:last-child { 
+			.content { border-radius: 0px 0px 4px 0px; }
+		}
+
+		.row:last-child .cell:first-child { border-radius: 0px 0px 0px 4px; }
+		.row:last-child .cell:first-child { 
+			.content { border-radius: 0px 0px 0px 4px; }
+		}
+
+		.row.isHeader {
+			.cell { background-color: var(--color-shape-tertiary); }
+			.block { font-weight: 500; }
+		}
+
+		.cell { 
+			@include text-common; vertical-align: top; position: relative; cursor: text; flex-shrink: 0; background: var(--color-bg-primary);
+			color: var(--color-shape-primary); border-left: 1px solid var(--color-shape-primary); border-top: 1px solid var(--color-shape-primary);
+			min-height: 40px;;
+		}
+
+		.cell.isHighlightedColumn.isFirst { border-radius: 4px 4px 0px 0px; }
+		.cell.isHighlightedColumn.isLast { border-radius: 0px 0px 4px 4px; }
+
+		.cell.align-h0 .value { text-align: left; }
+		.cell.align-h1 .value { text-align: right; }
+		.cell.align-h2 .value { text-align: center; }
+
+		.cell.align-v0 { 
+			.block #value { vertical-align: top; }
+		}
+		.cell.align-v1 { 
+			.block #value { vertical-align: middle; }
+		}
+		.cell.align-v2 { 
+			.block #value { vertical-align: bottom; }
+		}
+
+		.cell {
+			.block { height: 100%; min-height: 40px; border: 0px !important; padding: 0px; margin: 0px; color: var(--color-text-primary); }
+			.block {
+				.content, .wrap, .flex { height: 100%; }
+				.content { width: 100%; display: flex; flex-direction: column;  }
+
+				.markers { padding: 9px 0px 9px 9px; }
+				.wrap { display: table; }
+			}
+
+			.block.blockText.bgColor {
+				> .content { padding-left: 0px; padding-right: 0px; }
+			}
+
+			.block.blockText { @include text-common; }
+			.block.blockText {
+				> .content {
+					> .flex {
+						> .text { display: table-cell; height: 100%; padding: 9px; }
+					}
+				}
+			}
+		}
+	}
+}

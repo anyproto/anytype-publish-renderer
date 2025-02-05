@@ -2,45 +2,51 @@ package renderer
 
 templ PageTemplate(r *Renderer, p *RenderPageParams) {
 	<!DOCTYPE html>
-    <html lang="en">
+    <html lang="en" class={ r.Config.HtmlClasses }>
         <head>
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 			<meta property="PublishFilesPath" content={ r.Config.PublishFilesPath }/>
-			<title>{ r.titleText() }</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+			<meta property="og:title" content="Your Page Title">
+			<meta property="og:type" content="website">
+			<meta property="og:url" content="https://www.example.com">
+			<meta property="og:image" content="https://www.example.com/image.jpg">
+			<meta property="og:description" content="A brief and compelling description of your page.">
+			<meta property="og:site_name" content="Your Website Name">
+			<meta property="og:locale" content="en_US">
+
+			<meta name="twitter:card" content="summary_large_image">
+			<meta name="twitter:title" content={ r.titleText() }>
+			<meta name="twitter:description" content="A brief and engaging description of your page.">
+			<meta name="twitter:image" content="https://www.example.com/image.jpg">
+			<meta name="twitter:url" content="https://www.example.com">
+			<meta name="twitter:site" content="@YourTwitterHandle">
+			<meta name="twitter:creator" content="@CreatorTwitterHandle">
+
+			<title>{ r.titleText() }</title>
+
 			<link rel="apple-touch-icon" sizes="180x180" href="https://anytype.io/apple-touch-icon.png" />
 			<link rel="icon" type="image/png" sizes="32x32" href="https://anytype.io/favicon-32x32.png" />
 			<link rel="icon" type="image/png" sizes="16x16" href="https://anytype.io/favicon-16x16.png" />
 
-            <link rel="stylesheet" href={ r.GetStaticFolderUrl("/layout.css") } />
-			<link rel="stylesheet" href={ r.GetPrismJsUrl("/themes/prism.css") } />
-
-			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous" />
-			<script src={ r.GetStaticFolderUrl("/scripts.js") }></script>
-			<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
-			<script defer src=" https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js" integrity="sha512-vnRdmX8ZxbU+IhA2gLhZqXkX1neJISG10xy0iP0WauuClu3AIMknxyDjYHEpEhi8fTZPyOCWgqUCnEafDB/jVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js" integrity="sha512-1zKK2bG3QY2JaUPpfHZDUMe3dwBwFdCDwXQ01GrKSd+/l0hqPbF+aak66zYPUZtn+o2JYi1mjXAqy5mW04v3iA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+			<script src={ r.GetStaticFolderUrl("/js/main.js") } type="text/javascript"></script>
         </head>
 		<body>
-			<script src={ r.GetPrismJsUrl("/components/prism-core.min.js") }></script>
-			<script src={ r.GetPrismJsUrl("/plugins/autoloader/prism-autoloader.min.js") }></script>
 			<main>
 				if r.joinSpaceLink() != "" {
 					<div class="joinSpace">
-						<a href={r.joinSpaceLink()} target="blank">
-							<span id="joinSpaceLink">
-								Join Space
-							</span>
-						</a>
+						<a href={r.joinSpaceLink()} target="_blank" class="fathom" data-event="PublishJoinSpaceClick">Join Space</a>
 					</div>
 				}
+
 				<div class="coverWrapper">
 					@r.RenderPageCover()
 				</div>
+
  			    @r.RenderRoot()
-				<div class={"blocks " + p.Classes }>
+
+				<div class={p.Classes}>
  					@r.RenderPageIconImage()
 					<div>
 						for _, childId := range r.Root.ChildrenIds {
@@ -48,22 +54,14 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 						}
 					</div>
 				</div>
-				<a href="https://anytype.io/" target="blank">
- 					<div class="madeInAnytype" id="madeInAnytypeLink">
-						<div class="container">
-							<div class="anyIcon">
-								<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-									<path fill-rule="evenodd" clip-rule="evenodd" d="M11 3V0H3V3H11ZM11 3V14H14V3H11ZM4.5 14C6.98528 14 9 11.9853 9 9.5C9 7.01472 6.98528 5 4.5 5C2.01472 5 0 7.01472 0 9.5C0 11.9853 2.01472 14 4.5 14Z" fill="black"/>
-								</svg>
-							</div>
-							<div class="madeInText">
-								Crafted with Anytype
-							</div>
-						</div>
-					</div>
+
+				<a href="https://anytype.io/" target="_blank" class="madeInAnytype fathom" data-event="PublishSiteClick">
+					<div class="icon"></div>
+					<div class="text">Crafted with Anytype</div>
 				</a>
 
 			</main>
+
 			@templ.Raw(r.Config.AnalyticsCode)
         </body>
     </html>
