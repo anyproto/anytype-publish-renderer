@@ -97,7 +97,6 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 func isHumanLayout(layout model.ObjectTypeLayout) bool {
 	return layout == model.ObjectType_profile || layout == model.ObjectType_participant
 }
-
 func pageIconInitSize(layout model.ObjectTypeLayout) int32 {
 	if isHumanLayout(layout) {
 		return 128

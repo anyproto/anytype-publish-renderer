@@ -11,6 +11,7 @@ templ BlockTemplate(r *Renderer, p *BlockParams) {
 		<div class="content">
 			@p.Content
 		</div>
+
 		<div class="children">
 			for _, childId := range p.ChildrenIds {
 				@r.RenderBlock(childId)

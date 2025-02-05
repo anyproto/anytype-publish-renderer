@@ -9,3 +9,10 @@
 }
 
 .block.blockIcon.isHuman { padding: 0px 0px 12px 0px; }
+
+.blocks.layoutAlign1 {
+	.block.blockIcon { text-align: center; }
+}
+.blocks.layoutAlign2 {
+	.block.blockIcon { text-align: right; }
+}

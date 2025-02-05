@@ -3,6 +3,7 @@ package renderer
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
@@ -53,19 +54,27 @@ func (r *Renderer) hasPageCover() bool {
 }
 
 func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
-	var classes string
+	fields := r.Sp.Snapshot.Data.GetDetails()
+	layoutAlign := pbtypes.GetInt64(fields, "layoutAlign")
+	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", layoutAlign)}
+
 	hasPageIcon := r.hasPageIcon()
 	hasPageCover := r.hasPageCover()
+
+	class := ""
 	switch {
 	case hasPageIcon && hasPageCover:
-		classes = "withIconAndCover"
+		class = "withIconAndCover"
 	case hasPageIcon:
-		classes = "withIcon"
+		class = "withIcon"
 	case hasPageCover:
-		classes = "withCover"
+		class = "withCover"
 	}
+
+	classes = append(classes, class)
+
 	return &RenderPageParams{
-		Classes: classes,
+		Classes: strings.Join(classes, " "),
 	}
 }
 

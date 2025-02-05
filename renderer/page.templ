@@ -46,7 +46,7 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 
  			    @r.RenderRoot()
 
-				<div class={"blocks " + p.Classes }>
+				<div class={p.Classes}>
  					@r.RenderPageIconImage()
 					<div>
 						for _, childId := range r.Root.ChildrenIds {
