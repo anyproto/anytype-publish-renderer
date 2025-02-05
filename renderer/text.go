@@ -47,7 +47,7 @@ func emojiParam(t model.BlockContentTextStyle) int32 {
 }
 
 func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *model.BlockContentTextMark) string {
-	emojiSize := int32(emojiParam(style))
+	emojiSize := emojiParam(style)
 
 	switch mark.Type {
 	case model.BlockContentTextMark_Strikethrough:
@@ -80,8 +80,10 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		class := ""
 
 		if details != nil || len(details.Fields) != 0 {
-			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: emojiSize })
-			iconHtml, err := utils.TemplToString(IconObjectTemplate(r, params))
+			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
+
+			var err error
+			iconHtml, err = utils.TemplToString(IconObjectTemplate(r, params))
 
 			if err != nil {
 				log.Error("Failed to render mention icon", zap.Error(err))
