@@ -1,19 +1,11 @@
 package renderer
 
 import (
-	"strings"
-
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 )
 
-type DivRenderParams struct {
-	Classes string
-	Id      string
-	Comp    templ.Component
-}
-
-func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *DivRenderParams) {
+func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *BlockParams) {
 	var divClass string
 	var comp templ.Component
 
@@ -26,17 +18,14 @@ func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *DivRenderParams)
 		comp = DivDotTemplate()
 	}
 
-	classes := []string{"block", "blockDiv", divClass}
-	params = &DivRenderParams{
-		Id:      b.Id,
-		Classes: strings.Join(classes, " "),
-		Comp:    comp,
-	}
+	params = makeDefaultBlockParams(b)
+	params.Classes = append(params.Classes, "blockDiv", divClass)
+	params.Content = comp
 
 	return
 }
 
 func (r *Renderer) RenderDiv(b *model.Block) templ.Component {
 	params := r.MakeRenderDivParams(b)
-	return DivTemplate(params)
+	return BlockTemplate(r, params)
 }
