@@ -57,8 +57,10 @@ func (r *Renderer) applyMark(s string, mark *model.BlockContentTextMark) string 
 		color := mark.Param
 		tag := fmt.Sprintf(`<markupbgcolor class="bgColor bgColor-%s">`, color)
 		return tag + s + "</markupbgcolor>"
+
 	case model.BlockContentTextMark_Mention:
-		return "<markupmention>" + s + "</markupmention>"
+		return `<markupmention><span class="smile"></span><img src="./static/img/space.svg" class="space" /><span class="name">` + s +`</span></markupmention>`
+
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
 		emojiSrc := r.GetEmojiUrl(code)
