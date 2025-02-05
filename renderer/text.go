@@ -21,30 +21,30 @@ import (
 const bulbEmoji = 0x1F4A1
 
 type TextRenderParams struct {
-	Classes    		 string
-	ContentClasses	 string
-	Id         		 string
-	InnerFlex  		 []templ.Component
-	OuterFlex  		 []templ.Component
-	ChildrenIds		 []string
+	Classes        string
+	ContentClasses string
+	Id             string
+	InnerFlex      []templ.Component
+	OuterFlex      []templ.Component
+	ChildrenIds    []string
 }
 
 func cmpMarks(a, b *model.BlockContentTextMark) int {
 	return cmp.Compare(a.Range.From, b.Range.From)
 }
 
-func emojiParam (t model.BlockContentTextStyle) int {
-		switch (t) {
-			default:
-				return 20;
-			case model.BlockContentText_Header1:	 
-				return 30;
-			case model.BlockContentText_Header2:
-				return 26;
-			case model.BlockContentText_Header3:
-				return 22;
-		};
-	};
+func emojiParam(t model.BlockContentTextStyle) int32 {
+	switch t {
+	default:
+		return 20
+	case model.BlockContentText_Header1:
+		return 30
+	case model.BlockContentText_Header2:
+		return 26
+	case model.BlockContentText_Header3:
+		return 22
+	}
+}
 
 func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *model.BlockContentTextMark) string {
 	emojiSize := int32(emojiParam(style))
@@ -78,12 +78,11 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 
 		iconHtml := ""
 		class := ""
-		err := error(nil)
 
 		if details != nil || len(details.Fields) != 0 {
 			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: emojiSize })
+			iconHtml, err := utils.TemplToString(IconObjectTemplate(r, params))
 
-			iconHtml, err = utils.TemplToString(IconObjectTemplate(r, params))
 			if err != nil {
 				log.Error("Failed to render mention icon", zap.Error(err))
 			}
@@ -93,7 +92,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 			}
 		}
 
-		return `<markupmention class="` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><span class="name">` + s +`</span></markupmention>`
+		return `<markupmention class="` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><span class="name">` + s + `</span></markupmention>`
 
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
@@ -194,21 +193,20 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	classes := []string{"block", "blockText"}
 	contentClasses := []string{"content"}
 
-	classes = append(classes, "text" + style.String())
-	classes = append(classes, "align" + strconv.Itoa(int(b.GetAlign())))
+	classes = append(classes, "text"+style.String())
+	classes = append(classes, "align"+strconv.Itoa(int(b.GetAlign())))
 
 	if bgColor != "" {
-		if 
-			(style == model.BlockContentText_Callout) || 
+		if (style == model.BlockContentText_Callout) ||
 			(style == model.BlockContentText_Quote) {
-			classes = append(classes, "bgColor", "bgColor-" + bgColor)
+			classes = append(classes, "bgColor", "bgColor-"+bgColor)
 		} else {
-			contentClasses = append(contentClasses, "bgColor", "bgColor-" + bgColor)
+			contentClasses = append(contentClasses, "bgColor", "bgColor-"+bgColor)
 		}
 	}
 
 	if color != "" {
-		contentClasses = append(contentClasses, "textColor", "textColor-" + color)
+		contentClasses = append(contentClasses, "textColor", "textColor-"+color)
 	}
 
 	text := blockText.Text
@@ -260,12 +258,12 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	}
 
 	params = &TextRenderParams{
-		Id:          b.Id,
-		Classes:     strings.Join(classes, " "),
+		Id:             b.Id,
+		Classes:        strings.Join(classes, " "),
 		ContentClasses: strings.Join(contentClasses, " "),
-		ChildrenIds: b.ChildrenIds,
-		OuterFlex:   outerFlex,
-		InnerFlex:   innerFlex,
+		ChildrenIds:    b.ChildrenIds,
+		OuterFlex:      outerFlex,
+		InnerFlex:      innerFlex,
 	}
 	return
 
