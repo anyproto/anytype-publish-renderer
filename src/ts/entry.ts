@@ -20,10 +20,44 @@ declare global {
 	interface Window {
 		svgSrc: any;
 		fathom: any;
+		CoverParam: any;
 	}
 };
 
 window.svgSrc = {};
+
+function initCover () {
+	const { x, y, scale } = window.CoverParam;
+	const block = $('.block.blockCover');
+	const cover = block.find('#cover');
+	const bw = block.width();
+	const bh = block.height();
+
+	cover.css({ height: 'auto', width: `${(scale + 1) * 100}%` });
+
+	const cw = cover.width();
+	const ch = cover.height();
+	const mx = cw - bw;
+	const my = ch - bh;
+
+	let newX = x * cw;
+	let newY = y * ch;
+
+	newX = Math.max(-mx, Math.min(0, newX));
+	newY = Math.max(-my, Math.min(0, newY));
+
+	const px = (newX / cw) * 100;
+	const py = (newY / ch) * 100;
+	const css: any = { transform: `translate3d(${px}%,${py}%,0px)` };
+
+	if (ch < bh) {
+		css.transform = 'translate3d(0px,0px,0px)';
+		css.height = bh;
+		css.width = 'auto';
+	};
+
+	cover.css(css);
+};
 
 function initToggles () {
     $('.block.textToggle').each((i, block) => {
@@ -61,7 +95,12 @@ function initLatex () {
 };
 
 function initInlineLatex () {
-	const blocks = $('.block.blockText:not(.textCode) > .content > .flex > .text');
+	const blocks = $(`
+		.block.blockText:not(.textCode) > .content > .flex > .text,
+		.block.blockTableOfContents > .content .item a,
+		.block.blockLink > .content .name,
+		.block.blockLink > .content .description
+	`);
 	
 	blocks.each((i, block) => {
 		block = $(block);
@@ -124,6 +163,7 @@ function initAnalyticsEvents () {
 
 document.addEventListener("DOMContentLoaded", function() {
     const initFns = [ 
+		initCover,
 		initAnalyticsEvents, 
 		initToggles, 
 		initLatex, 

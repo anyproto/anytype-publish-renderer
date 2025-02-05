@@ -8,6 +8,24 @@ package renderer
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+func coverParam(x float64, y float64, scale float64) templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_coverParam_c779`,
+		Function: `function __templ_coverParam_c779(x, y, scale){window.CoverParam = {};
+
+	function setParam(k, v) {
+		window.CoverParam[k] = v;
+	};
+
+	setParam('x', x);
+	setParam('y', y);
+	setParam('scale', scale);
+}`,
+		Call:       templ.SafeScript(`__templ_coverParam_c779`, x, y, scale),
+		CallInline: templ.SafeScriptInline(`__templ_coverParam_c779`, x, y, scale),
+	}
+}
+
 func CoverImageTemplate(r *Renderer, p *CoverRenderParams) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,6 +47,10 @@ func CoverImageTemplate(r *Renderer, p *CoverRenderParams) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = coverParam(p.CoverX, p.CoverY, p.CoverScale).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -36,7 +58,7 @@ func CoverImageTemplate(r *Renderer, p *CoverRenderParams) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("block-" + p.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 4, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 18, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -49,13 +71,13 @@ func CoverImageTemplate(r *Renderer, p *CoverRenderParams) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.Src)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 7, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 21, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"cover type1\" style=\"opacity: 1; height: auto; width: 100%; transform: translate3d(0%, -25%, 0px);\"></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"cover type1\"></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -91,7 +113,7 @@ func CoverColorTemplate(r *Renderer, p *CoverRenderParams) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs("block-cover-" + p.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 17, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 28, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -155,7 +177,7 @@ func CoverGradientTemplate(r *Renderer, p *CoverRenderParams) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs("block-cover-" + p.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 25, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 36, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {

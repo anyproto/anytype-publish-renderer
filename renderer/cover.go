@@ -11,10 +11,13 @@ import (
 )
 
 type CoverRenderParams struct {
-	Id        string
-	Src       string
-	Classes   string
-	CoverType CoverType
+	Id         string
+	Src        string
+	Classes    string
+	CoverType  CoverType
+	CoverX     float64
+	CoverY     float64
+	CoverScale float64
 }
 
 type CoverType int32
@@ -50,6 +53,9 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 	}
 
 	coverId := pbtypes.GetString(fields, "coverId")
+	coverX := pbtypes.GetFloat64(fields, "coverX")
+	coverY := pbtypes.GetFloat64(fields, "coverY")
+	coverScale := pbtypes.GetFloat64(fields, "coverScale")
 
 	switch coverType {
 	case CoverType_Image:
@@ -66,6 +72,9 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 			Src:       src,
 			Classes:   "type1",
 			CoverType: coverType,
+			CoverX:    coverX,
+			CoverY:    coverY,
+			CoverScale: coverScale,
 		}
 
 		return params, nil

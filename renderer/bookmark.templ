@@ -3,22 +3,20 @@ package renderer
 templ BookmarkTempl(p *BookmarkRendererParams) {
     <div id={"block-" + p.Id} class={p.Classes}>
 		<div class="content">
-			if !p.IsEmpty {
-				<a href={ p.SafeUrl } target="_blank" class="inner withImage">
-					<div class="side left">
-						<div class="link">
-							<img src={ p.Favicon } class="fav" /> { p.Url }
-						</div>
-						<div class="name"> { p.Name } </div>
-						<div class="descr"> { p.Description } </div>
+			<a href={ p.SafeUrl } target="_blank" class="inner withImage">
+				<div class="side left">
+					<div class="link">
+						<img src={ p.Favicon } class="fav" /> { p.Url }
 					</div>
-					if p.Image != "" {
-						<div class="side right">
-							<img src={ p.Image } class="img" />
-						</div>
-					}
-				</a>
-			}
+					<div class="name"> { p.Name } </div>
+					<div class="descr"> { p.Description } </div>
+				</div>
+				if p.Image != "" {
+					<div class="side right">
+						<img src={ p.Image } class="img" />
+					</div>
+				}
+			</a>
 		</div>
     </div>
 }

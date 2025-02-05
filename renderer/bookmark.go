@@ -89,5 +89,10 @@ func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkR
 
 func (r *Renderer) RenderBookmark(b *model.Block) templ.Component {
 	params := r.MakeBookmarkRendererParams(b)
-	return BookmarkTempl(params)
+
+	if params.IsEmpty {
+		return NoneTemplate("")
+	} else {
+		return BookmarkTempl(params)
+	}
 }
