@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/a-h/templ"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"go.uber.org/zap"
@@ -93,11 +94,39 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 
 }
 
-func (r *Renderer) RenderPageIconImage() templ.Component {
-	params, err := r.MakeRenderPageIconImageParams()
-	if err != nil {
-		return NoneTemplate("")
-	}
+func isHumanLayout(layout model.ObjectTypeLayout) bool {
+	return layout == model.ObjectType_profile || layout == model.ObjectType_participant
+}
 
-	return IconImageTemplate(r, params)
+func pageIconInitSize(layout model.ObjectTypeLayout) int32 {
+	if isHumanLayout(layout) {
+		return 128
+	} else {
+		return 96
+	}
+}
+func (r *Renderer) RenderPageIconImage() templ.Component {
+	details := r.Sp.Snapshot.Data.GetDetails()
+	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+
+	props := &IconObjectProps{
+		Size: pageIconInitSize(layout),
+	}
+	params := r.MakeRenderIconObjectParams(details, props)
+	content := IconObjectTemplate(r, params)
+
+	classes := []string{""}
+	var blockType string
+	if layout == model.ObjectType_profile {
+		blockType = "IconUser"
+		classes = append(classes, "isHuman")
+	} else if layout == model.ObjectType_basic {
+		blockType = "IconPage"
+	}
+	blockParams := &BlockParams{
+		BlockType: blockType,
+		Classes:   classes,
+		Content:   content,
+	}
+	return BlockTemplate(r, blockParams)
 }
