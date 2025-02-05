@@ -105,6 +105,7 @@ func pageIconInitSize(layout model.ObjectTypeLayout) int32 {
 		return 96
 	}
 }
+
 func (r *Renderer) RenderPageIconImage() templ.Component {
 	details := r.Sp.Snapshot.Data.GetDetails()
 	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
