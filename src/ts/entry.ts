@@ -235,6 +235,7 @@ function renderPdf () {
 };
 
 document.addEventListener("DOMContentLoaded", function() {
+	const win = $(window);
     const renderFns = [ 
 		renderCover,
 		renderAnalyticsEvents, 
@@ -256,4 +257,8 @@ document.addEventListener("DOMContentLoaded", function() {
             };
         });
     });
+
+	win.off('resize').on('resize', () => {
+		renderCover();
+	});
 });
