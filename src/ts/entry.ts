@@ -230,36 +230,6 @@ function renderPdf () {
 	});
 };
 
-/*
-function renderPDF(pdfData) {
-    const loadingTask = pdfjsLib.getDocument({ data: pdfData });
-    loadingTask.promise.then((pdf) => {
-        console.log("PDF loaded");
-
-        pdf.getPage(1).then((page) => {
-            console.log("Page loaded");
-
-            const scale = 1.5;
-            const viewport = page.getViewport({ scale });
-
-            const canvas = document.getElementById("pdfCanvas");
-            const context = canvas.getContext("2d");
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-
-            const renderContext = {
-                canvasContext: context,
-                viewport: viewport,
-            };
-
-            page.render(renderContext);
-        });
-    }).catch((error) => {
-        console.error("Error loading PDF:", error);
-    });
-}
-*/
-
 document.addEventListener("DOMContentLoaded", function() {
     const renderFns = [ 
 		renderCover,
