@@ -33,37 +33,40 @@ func removeIframeWidthHeight(text string) string {
 }
 
 func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
-	style := b.GetLatex().Processor.String()
+	latex := b.GetLatex()
+	processor := latex.Processor
+	text := latex.Text
+	style := processor.String()
+	bgColor := b.GetBackgroundColor()
 	embedClass := "is" + style
 	align := "align" + strconv.Itoa(int(b.GetAlign()))
 	classes := []string{embedClass, align}
 
-	if bgColor := b.GetBackgroundColor(); bgColor != "" {
-		classes = append(classes, "bgColor", "bgColor-"+bgColor)
+	if bgColor != "" {
+		classes = append(classes, "bgColor", "bgColor-" + bgColor)
 	}
 
-	content := b.GetLatex().Text
-	content = removeIframeWidthHeight(content)
+	text = removeIframeWidthHeight(text)
 
-	if b.GetLatex().Processor == model.BlockContentLatex_Mermaid {
-		content = fmt.Sprintf(`<pre class="mermaid">%s</pre>`, content)
+	if processor == model.BlockContentLatex_Mermaid {
+		text = fmt.Sprintf(`<pre class="mermaid">%s</pre>`, text)
 	}
 
-	if b.GetLatex().Processor == model.BlockContentLatex_Kroki {
-		content = fmt.Sprintf(`<img src="%s" />`, content)
+	if processor == model.BlockContentLatex_Kroki {
+		text = fmt.Sprintf(`<img src="%s" />`, text)
 	}
 
-	if b.GetLatex().Processor == model.BlockContentLatex_Graphviz {
+	if processor == model.BlockContentLatex_Graphviz {
 
 		jsObj := JsSVGString{
-			Content: content,
+			Content: text,
 		}
 		jsObjString, err := json.Marshal(jsObj)
 		if err != nil {
 			log.Error("svg json marshal error", zap.Error(err))
-			content = fmt.Sprintf("<script>window.svgSrc['%s'] = `digraph { graphviz -> render error }`</script>", "block-"+b.Id)
+			text = fmt.Sprintf("<script>window.svgSrc['%s'] = `digraph { graphviz -> render error }`</script>", "block-" + b.Id)
 		} else {
-			content = fmt.Sprintf("<script>window.svgSrc['%s'] = %s</script>", "block-"+b.Id, string(jsObjString))
+			text = fmt.Sprintf("<script>window.svgSrc['%s'] = %s</script>", "block-" + b.Id, string(jsObjString))
 		}
 
 	}
@@ -71,7 +74,7 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 	return &EmbedRenderParams{
 		Id:      b.Id,
 		Classes: strings.Join(classes, " "),
-		Content: content,
+		Content: text,
 	}
 }
 func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
