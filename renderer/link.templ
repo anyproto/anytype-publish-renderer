@@ -55,20 +55,10 @@ templ LinkTempl(p *LinkRenderParams) {
 									</div>
 								}
 							</div>
-							if p.CoverParams != nil {
-								<div class="side right">
-									if p.CoverParams.CoverType == 1 {
-										<div class={ "cover type1 " + p.CoverParams.Classes }></div>
-									}
-
-									if p.CoverParams.CoverType == 2 {
-										<div class={ "cover type2 " + p.CoverParams.Classes }></div>
-									}
-
-									if p.CoverParams.CoverType == 3 {
-										<div class={ "cover type3 " + p.CoverParams.Classes }></div>
-									}
-								</div>
+							if p.CoverTemplate != nil {
+							<div class="side right">
+								@p.CoverTemplate
+							</div>
 							}
 						</div>
 					</a>

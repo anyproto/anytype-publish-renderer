@@ -12,38 +12,31 @@ script coverParam(x float64, y float64, scale float64) {
 	setParam('scale', scale);
 }
 
-templ CoverImageTemplate(r *Renderer, p *CoverRenderParams) {
+templ CoverBlockTemplate(r *Renderer, p *CoverRenderParams) {
 	@coverParam(p.CoverX, p.CoverY, p.CoverScale)
-
 	<div id={"block-" + p.Id } class="block blockCover">
 		<div class="content">
 			<div class="wrap">
-				<img id="cover" src={ p.Src } class="cover type1" />
+				@p.CoverTemplate
 			</div>
 		</div>
 	</div>
 }
 
-templ CoverColorTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-cover-" + p.Id } class="block blockCover">
-		<div class="wrap">
-			<div class={"cover type2", p.Classes}></div>
-		</div>
-	</div>
+templ CoverImageTemplate(p *CoverRenderParams) {
+	 <img id="cover" src={ p.Src } class={"cover", p.Classes} />
+	 if p.UnsplashComponent != nil {
+        @p.UnsplashComponent
+     }
 }
 
-templ CoverGradientTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-cover-" + p.Id } class="block blockCover">
-		<div class="wrap">
-			<div class={"cover type3", p.Classes}></div>
-		</div>
-	</div>
+templ CoverDefaultColor(p *CoverRenderParams) {
+	<div class={"cover", p.Classes}></div>
 }
 
-templ UnsplashReferral() {
+templ UnsplashReferral(author string, authorUrl templ.SafeURL) {
 	<div class="author label">
 		Photo by
-		<a href="https://unsplash.com/@santesson89?utm_source=Anytype&amp;utm_medium=referral">Andrea De Santis</a> on <a href="https://unsplash.com/?utm_source=Anytype&amp;utm_medium=referral">Unsplash</a>
+		<a href={ authorUrl }> { author } </a> on <a href="https://unsplash.com/?utm_source=Anytype&amp;utm_medium=referral">Unsplash</a>
 	</div>
-
 }
