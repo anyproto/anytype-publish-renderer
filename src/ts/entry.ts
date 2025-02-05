@@ -188,6 +188,10 @@ function renderPdf () {
 				const canLeft = page > 1;
 				const canRight = page < pdf.numPages;
 
+				if (pdf.numPages == 1) {
+					pager.hide();
+				};
+
 				number.text(`${page} / ${pdf.numPages}`);
 
 				arrowLeft.toggleClass('disabled', !canLeft);
