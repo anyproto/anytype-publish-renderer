@@ -19,7 +19,7 @@ func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *BlockParams) {
 	}
 
 	params = makeDefaultBlockParams(b)
-	params.Classes = append(params.Classes, "blockDiv", divClass)
+	params.Classes = append(params.Classes, divClass)
 	params.Content = comp
 
 	return
