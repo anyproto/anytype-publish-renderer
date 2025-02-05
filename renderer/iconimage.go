@@ -115,16 +115,14 @@ func (r *Renderer) RenderPageIconImage() templ.Component {
 	params := r.MakeRenderIconObjectParams(details, props)
 	content := IconObjectTemplate(r, params)
 
-	classes := []string{""}
-	var blockType string
-	if layout == model.ObjectType_profile {
-		blockType = "IconUser"
+	classes := []string{}
+	if 
+		layout == model.ObjectType_profile ||
+		layout == model.ObjectType_participant {
 		classes = append(classes, "isHuman")
-	} else if layout == model.ObjectType_basic {
-		blockType = "IconPage"
 	}
 	blockParams := &BlockParams{
-		BlockType: blockType,
+		BlockType: "Icon",
 		Classes:   classes,
 		Content:   content,
 	}
