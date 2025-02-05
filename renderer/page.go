@@ -13,7 +13,9 @@ import (
 )
 
 type RenderPageParams struct {
-	Classes string
+	Classes     string
+	Name        string
+	Description string
 }
 
 func (r *Renderer) hasPageIcon() bool {
@@ -57,6 +59,9 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
 	layoutAlign := pbtypes.GetInt64(fields, "layoutAlign")
 	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", layoutAlign)}
+	name := pbtypes.GetString(fields, "name")
+	description := pbtypes.GetString(fields, "description")
+	snippet := pbtypes.GetString(fields, "snippet")
 
 	hasPageIcon := r.hasPageIcon()
 	hasPageCover := r.hasPageCover()
@@ -73,8 +78,15 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 
 	classes = append(classes, class)
 
+	descr := description
+	if descr == "" {
+		descr = snippet
+	}
+
 	return &RenderPageParams{
-		Classes: strings.Join(classes, " "),
+		Classes:	 strings.Join(classes, " "),
+		Name:   	 name,
+		Description: descr,
 	}
 }
 
@@ -134,13 +146,4 @@ func (r *Renderer) RenderBlock(blockId string) templ.Component {
 
 func (r *Renderer) joinSpaceLink() templ.SafeURL {
 	return templ.SafeURL(r.UberSp.Meta.InviteLink)
-}
-
-func (r *Renderer) titleText() string {
-	titleBlock, ok := r.BlocksById["title"]
-	if !ok {
-		return ""
-	}
-
-	return titleBlock.GetText().Text
 }
