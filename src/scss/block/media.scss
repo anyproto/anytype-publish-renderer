@@ -4,7 +4,7 @@
 .block.blockMedia {
 	> .content { display: flex; flex-direction: row; }
 	> .content {
-		.wrap { max-width: 100%; position: relative; display: block; overflow: hidden; }
+		.wrap { width: 100%; max-width: 100%; position: relative; display: block; overflow: hidden; }
 		.wrap {
 			> img, 
 			> .media,

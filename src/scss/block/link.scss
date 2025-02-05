@@ -15,7 +15,7 @@
 
 		.linkCard {
 			.sides { display: flex; flex-direction: row; }
-			.side { transition: border-color $transitionCommon; }
+			.side { transition: border-color $transitionCommon; position: relative; }
 			.side.left { width: 100%; position: relative; display: flex; }
 			.side.right { display: none; overflow: hidden; }
 

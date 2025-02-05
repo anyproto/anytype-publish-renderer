@@ -9,6 +9,7 @@ func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *BlockParams) {
 	var divClass string
 	var comp templ.Component
 
+
 	switch b.GetDiv().Style {
 	case model.BlockContentDiv_Line:
 		divClass = "divLine"
@@ -18,9 +19,15 @@ func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *BlockParams) {
 		comp = DivDotTemplate()
 	}
 
+	bgColor := b.GetBackgroundColor()
+
 	params = makeDefaultBlockParams(b)
 	params.Classes = append(params.Classes, divClass)
 	params.Content = comp
+
+	if bgColor != "" {
+		params.Classes = append(params.Classes, "bgColor", "bgColor-" + bgColor)
+	}
 
 	return
 }

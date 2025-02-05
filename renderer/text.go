@@ -52,22 +52,27 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 	switch mark.Type {
 	case model.BlockContentTextMark_Strikethrough:
 		return "<markupstrike>" + s + "</markupstrike>"
+
 	case model.BlockContentTextMark_Keyboard:
 		return "<markupcode>" + s + "</markupcode>"
+
 	case model.BlockContentTextMark_Italic:
 		return "<markupitalic>" + s + "</markupitalic>"
+
 	case model.BlockContentTextMark_Bold:
 		return "<markupbold>" + s + "</markupbold>"
+
 	case model.BlockContentTextMark_Underscored:
 		return "<markupunderline>" + s + "</markupunderline>"
+
 	case model.BlockContentTextMark_Link:
-		url := mark.Param
-		tag := fmt.Sprintf(`<a href="%s">`, url)
-		return tag + s + "</a>"
+		return fmt.Sprintf(`<a href="%s" class="markuplink" target="_blank">`, mark.Param) + s + "</a>"
+
 	case model.BlockContentTextMark_TextColor:
 		color := mark.Param
 		tag := fmt.Sprintf(`<markupcolor class="textColor textColor-%s">`, color)
 		return tag + s + "</markupcolor>"
+
 	case model.BlockContentTextMark_BackgroundColor:
 		color := mark.Param
 		tag := fmt.Sprintf(`<markupbgcolor class="bgColor bgColor-%s">`, color)
