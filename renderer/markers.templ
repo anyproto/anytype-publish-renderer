@@ -18,9 +18,7 @@ templ InlineEmojiTemplate(emojiPath, sizeClass string) {
 
 templ EmojiTemplate(emojiPath, sizeClass string) {
 	<div class={"iconObject", "isPage", sizeClass}>
-		<div class="iconEmoji">
-			<img src={emojiPath} class={"iconCommon", sizeClass} />
-		</div>
+		<img src={emojiPath} class={"smileImage", sizeClass} />
 	</div>
 }
 
