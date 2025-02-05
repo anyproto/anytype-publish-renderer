@@ -178,9 +178,6 @@ function renderPdf () {
 		const loadingTask = pdfjs.getDocument(src);
 
 		loadingTask.promise.then(pdf => {
-			console.log(pdf, pdf.numPages);
-			console.log("Page loaded");
-
 			const switchPage = (page) => {
 				const pager = block.find('.pager');
 				const number = pager.find('.number');
