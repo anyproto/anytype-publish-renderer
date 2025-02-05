@@ -1,0 +1,20 @@
+package renderer
+
+templ BlockTemplate(r *Renderer, p *BlockParams) {
+    <div id={ p.Id } class={ "block", "block"+p.BlockType, p.Classes }>
+		if p.Additional != nil {
+			<div className="additional">
+				@p.Additional
+			</div>
+		}
+
+		<div class="content">
+			@p.Content
+		</div>
+		<div class="children">
+			for _, childId := range p.ChildrenIds {
+				@r.RenderBlock(childId)
+			}
+		</div>
+	</div>
+}
