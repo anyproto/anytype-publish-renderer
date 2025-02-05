@@ -10,6 +10,7 @@ body {
 }
 
 .flex { display: flex; }
+.disabled { opacity: 0.5; cursor: default !important; }
 
 .coverWrapper { padding: 16px 16px 0px 16px; }
 
