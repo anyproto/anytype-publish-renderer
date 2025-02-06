@@ -6,7 +6,10 @@ templ BookmarkTempl(p *BookmarkRendererParams) {
 			<a href={ p.SafeUrl } target="_blank" class="inner withImage">
 				<div class="side left">
 					<div class="link">
-						<img src={ p.Favicon } class="fav" /> { p.Url }
+					if p.Favicon != "" {
+						<img src={ p.Favicon } class="fav" />
+					}
+					{ p.Url }
 					</div>
 					<div class="name"> { p.Name } </div>
 					<div class="descr"> { p.Description } </div>

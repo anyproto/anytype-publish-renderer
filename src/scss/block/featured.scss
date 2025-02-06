@@ -52,6 +52,7 @@
 		}
 
 		.cellContent.c-object {
+			.over { display: flex; flex-direction: row; align-items: center; height: 28px; }
 			.iconObject { flex-shrink: 0; margin: 0px 6px 0px 0px !important; }
 		}
 

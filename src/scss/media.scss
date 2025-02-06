@@ -1,0 +1,14 @@
+@media (max-width: 736px) {
+
+	.blocks { width: 100% !important; padding-left: 16px; padding-right: 16px; }
+
+	.block.blockCover { height: 208px; }
+
+	.block.blockTable {
+		.scrollWrap { overflow-x: auto; padding-bottom: 8px; }
+	}
+
+	.block.blockLayout.layoutRow {
+		> .children { flex-direction: column; gap: 16px; }
+	}
+}

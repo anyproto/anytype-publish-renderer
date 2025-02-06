@@ -2,6 +2,7 @@ import $ from 'jquery';
 import Prism from 'prismjs';
 import mermaid from 'mermaid';
 import { instance as viz } from '@viz-js/viz';
+import * as pdfjs from 'pdfjs-dist';
 import UtilCommon from './lib/common';
 import UtilPrism from './lib/prism';
 
@@ -16,6 +17,8 @@ for (const lang of UtilPrism.components) {
 	require(`prismjs/components/prism-${lang}.js`);
 };
 
+pdfjs.GlobalWorkerOptions.workerSrc = require('pdfjs-dist/build/pdf.worker.js');
+
 declare global {
 	interface Window {
 		svgSrc: any;
@@ -26,7 +29,7 @@ declare global {
 
 window.svgSrc = {};
 
-function initCover () {
+function renderCover () {
 	const { x, y, scale } = window.CoverParam;
 	const block = $('.block.blockCover');
 	const cover = block.find('#cover');
@@ -59,14 +62,14 @@ function initCover () {
 	cover.css(css);
 };
 
-function initToggles () {
+function renderToggles () {
     $('.block.textToggle').each((i, block) => {
 		block = $(block);
 		block.off('click').on('click', () => block.toggleClass('isToggled'));
     });
 };
 
-function initLatex () {
+function renderLatex () {
     const blocks = $('.block.blockEmbed.isLatex > .content');
     const trustFn = context => [ '\\url', '\\href', '\\includegraphics' ].includes(context.command);
 
@@ -94,7 +97,7 @@ function initLatex () {
     });
 };
 
-function initInlineLatex () {
+function renderInlineLatex () {
 	const blocks = $(`
 		.block.blockText:not(.textCode) > .content > .flex > .text,
 		.block.blockTableOfContents > .content .item a,
@@ -108,7 +111,7 @@ function initInlineLatex () {
 	});
 };
 
-function initMermaid () {
+function renderMermaid () {
     mermaid.initialize({ 
 		 securityLevel: 'loose',
 		theme: 'base', 
@@ -120,7 +123,8 @@ function initMermaid () {
 	});
 };
 
-function initGraphviz() {
+function renderGraphviz () {
+	/*
     const gphBlocks = document.querySelectorAll(".isGraphviz");
     gphBlocks.forEach(b => {
         const gphFormula = window.svgSrc[b.id].content
@@ -136,9 +140,10 @@ function initGraphviz() {
             console.error("viz error:",e);
         };
     });
+	*/
 };
 
-function initPrism () {
+function renderPrism () {
 	const blocks = $('.block.blockText.textCode > .content > .flex > .text');
 
 	blocks.each((i, block) => {
@@ -151,7 +156,7 @@ function initPrism () {
 	});
 };
 
-function initAnalyticsEvents () {
+function renderAnalyticsEvents () {
 	$('.fathom').each((item, i) => {
 		item = $(item);
 
@@ -161,25 +166,99 @@ function initAnalyticsEvents () {
 	});
 };
 
+function renderPdf () {
+	const blocks = $('.block.blockMedia.isPdf > .content > .wrap');
+
+	let page = 1;
+
+	blocks.each((i, block) => {
+		block = $(block);
+
+		const { id, src } = block.data();
+		const loadingTask = pdfjs.getDocument(src);
+
+		loadingTask.promise.then(pdf => {
+			const switchPage = (page) => {
+				const pager = block.find('.pager');
+				const number = pager.find('.number');
+				const arrowLeft = pager.find('.arrow.left');
+				const arrowRight = pager.find('.arrow.right');
+				const arrowEndLeft = pager.find('.arrow.end.left');
+				const arrowEndRight = pager.find('.arrow.end.right');
+				const canLeft = page > 1;
+				const canRight = page < pdf.numPages;
+
+				if (pdf.numPages == 1) {
+					pager.hide();
+				};
+
+				number.text(`${page} / ${pdf.numPages}`);
+
+				arrowLeft.toggleClass('disabled', !canLeft);
+				arrowEndLeft.toggleClass('disabled', !canLeft);
+				arrowRight.toggleClass('disabled', !canRight);
+				arrowEndRight.toggleClass('disabled', !canRight);
+
+				if (canLeft) {
+					arrowLeft.off('click').on('click', () => switchPage(page - 1));
+					arrowEndLeft.off('click').on('click', () => switchPage(1));
+				};
+
+				if (canRight) {
+					arrowRight.off('click').on('click', () => switchPage(page + 1));
+					arrowEndRight.off('click').on('click', () => switchPage(pdf.numPages));
+				};
+
+				pdf.getPage(page).then((page) => {
+					const scale = 1.5;
+					const viewport = page.getViewport({ scale });
+					const canvas = block.find(`#pdfCanvas-${id}`).get(0);
+					const context = canvas.getContext('2d');
+
+					canvas.width = viewport.width;
+					canvas.height = viewport.height;
+
+					const renderContext = {
+						canvasContext: context,
+						viewport: viewport,
+					};
+
+					page.render(renderContext);
+				});
+			};
+
+			switchPage(page);
+		}).catch((error) => {
+			console.error("Error loading PDF:", error);
+		});
+	});
+};
+
 document.addEventListener("DOMContentLoaded", function() {
-    const initFns = [ 
-		initCover,
-		initAnalyticsEvents, 
-		initToggles, 
-		initLatex, 
-		initMermaid, 
-		initGraphviz, 
-		initPrism, 
-		initInlineLatex,
+	const win = $(window);
+    const renderFns = [ 
+		renderCover,
+		renderAnalyticsEvents, 
+		renderToggles, 
+		renderLatex, 
+		renderMermaid, 
+		renderGraphviz, 
+		renderPrism, 
+		renderInlineLatex,
+		renderPdf,
 	];
 
-    initFns.forEach(f => {
+    renderFns.forEach(f => {
         setTimeout(_ => {
             try {
                 f();
             } catch (e) {
-                console.error(`error executing init function "${f.name}":`, e);
+                console.error(`error executing render function "${f.name}":`, e);
             };
         });
     });
+
+	win.off('resize').on('resize', () => {
+		renderCover();
+	});
 });

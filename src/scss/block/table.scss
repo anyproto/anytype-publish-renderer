@@ -41,6 +41,7 @@
 		.cell { 
 			@include text-common; vertical-align: top; position: relative; cursor: text; flex-shrink: 0; background: var(--color-bg-primary);
 			color: var(--color-shape-primary); border-left: 1px solid var(--color-shape-primary); border-top: 1px solid var(--color-shape-primary);
+			min-height: 40px;;
 		}
 
 		.cell.isHighlightedColumn.isFirst { border-radius: 4px 4px 0px 0px; }
