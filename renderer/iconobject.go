@@ -2,6 +2,8 @@ package renderer
 
 import (
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -91,6 +93,89 @@ func getIconSize(props *IconObjectProps, layout model.ObjectTypeLayout, gsProps 
 	return s
 }
 
+var fileExtensions = map[string][]string{
+	"image":  {"jpg", "jpeg", "png", "gif", "svg", "webp"},
+	"video":  {"mp4", "m4v", "mov"},
+	"cover":  {"jpg", "jpeg", "png", "gif", "webp"},
+	"audio":  {"mp3", "m4a", "flac", "ogg", "wav"},
+	"pdf":    {"pdf"},
+	"import": {"zip", "md", "pb", "json", "html", "htm", "mhtml", "txt"},
+}
+
+func fileIconName(details *types.Struct) string {
+
+	name := getRelationField(details, bundle.RelationKeyName, relationToString)
+	mime := getRelationField(details, bundle.RelationKeyFileMimeType, relationToString)
+	fileExt := getRelationField(details, bundle.RelationKeyFileExt, relationToString)
+	n := strings.Split(name, ".")
+
+	e := ""
+	if fileExt != "" {
+		e = strings.ToLower(fileExt)
+	} else if len(n) > 1 {
+		e = strings.ToLower(n[len(n)-1])
+	}
+
+	icon := "other"
+	var t []string
+
+	if mime != "" {
+		a := strings.Split(mime, ";")
+		if len(a) > 0 {
+			t = strings.Split(a[0], "/")
+		}
+	}
+
+	if len(t) > 0 {
+		switch t[0] {
+		case "image", "video", "text", "audio":
+			icon = t[0]
+		}
+		switch t[1] {
+		case "pdf":
+			icon = "pdf"
+		case "zip", "gzip", "tar", "gz", "rar":
+			icon = "archive"
+		case "vnd.ms-powerpoint":
+			icon = "presentation"
+		case "vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+			icon = "table"
+		}
+	}
+
+	switch e {
+	case "m4v":
+		icon = "video"
+	case "csv", "json", "txt", "doc", "docx", "md", "tsx", "scss", "html", "yml", "rtf":
+		icon = "text"
+	case "zip", "gzip", "tar", "gz", "rar":
+		icon = "archive"
+	case "xls", "xlsx", "sqlite":
+		icon = "table"
+	case "ppt", "pptx", "key":
+		icon = "presentation"
+	case "aif":
+		icon = "audio"
+	case "dwg":
+		icon = "other"
+	case "ai":
+		icon = "image"
+	}
+
+	for k, v := range fileExtensions {
+		if slices.Contains(v, e) {
+			icon = k
+			break
+		}
+	}
+
+	return icon
+}
+
+// TODO
+// - render user svg
+// - render files as inline link
+// - https://linear.app/anytype/issue/GO-5052/add-marker-to-text-block-with-style=title-when-object-layout-is-task
 func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
 	var src string
 	classes := []string{"iconObject"}
@@ -138,20 +223,27 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			classes = append(classes, "withImage")
 			iconClasses = append(iconClasses, "iconImage")
 		}
+
 		// case model.ObjectType_set:
 		// case model.ObjectType_todo:
 		// case model.ObjectType_dashboard:
 		// case model.ObjectType_note:
 		// case model.ObjectType_objectType:
 		// case model.ObjectType_relation:
-		// case model.ObjectType_bookmark:
-		// case model.ObjectType_image:
-		// case model.ObjectType_video:
-		// case model.ObjectType_audio:
-		// case model.ObjectType_pdf:
-		// case model.ObjectType_file:
-		// case model.ObjectType_spaceView:
-
+	// case model.ObjectType_bookmark:
+	// case model.ObjectType_spaceView:
+	case model.ObjectType_image:
+		fallthrough
+	case model.ObjectType_video:
+		fallthrough
+	case model.ObjectType_audio:
+		fallthrough
+	case model.ObjectType_pdf:
+		fallthrough
+	case model.ObjectType_file:
+		iconClasses = append(iconClasses, "iconFile")
+		iconName := fileIconName(targetDetails)
+		src = fmt.Sprintf("%s/img/icon/file/%s.svg", r.Config.StaticFilesPath, iconName)
 	}
 
 	if props.Size != 0 {
