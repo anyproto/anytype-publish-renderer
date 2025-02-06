@@ -94,22 +94,20 @@ func getIconSize(props *IconObjectProps, layout model.ObjectTypeLayout, gsProps 
 }
 
 var fileExtensions = map[string][]string{
-	"image":  {"jpg", "jpeg", "png", "gif", "svg", "webp"},
-	"video":  {"mp4", "m4v", "mov"},
-	"cover":  {"jpg", "jpeg", "png", "gif", "webp"},
-	"audio":  {"mp3", "m4a", "flac", "ogg", "wav"},
-	"pdf":    {"pdf"},
-	"import": {"zip", "md", "pb", "json", "html", "htm", "mhtml", "txt"},
+	"image": {"jpg", "jpeg", "png", "gif", "svg", "webp"},
+	"video": {"mp4", "m4v", "mov"},
+	"cover": {"jpg", "jpeg", "png", "gif", "webp"},
+	"audio": {"mp3", "m4a", "flac", "ogg", "wav"},
+	"pdf":   {"pdf"},
 }
 
 func fileIconName(details *types.Struct) string {
-
 	name := getRelationField(details, bundle.RelationKeyName, relationToString)
 	mime := getRelationField(details, bundle.RelationKeyFileMimeType, relationToString)
 	fileExt := getRelationField(details, bundle.RelationKeyFileExt, relationToString)
 	n := strings.Split(name, ".")
-
 	e := ""
+
 	if fileExt != "" {
 		e = strings.ToLower(fileExt)
 	} else if len(n) > 1 {
@@ -118,11 +116,10 @@ func fileIconName(details *types.Struct) string {
 
 	icon := "other"
 	var t []string
-
 	if mime != "" {
-		a := strings.Split(mime, ";")
-		if len(a) > 0 {
-			t = strings.Split(a[0], "/")
+		splitMime := strings.Split(mime, ";")
+		if len(splitMime) > 0 {
+			t = strings.Split(splitMime[0], "/")
 		}
 	}
 
@@ -156,10 +153,11 @@ func fileIconName(details *types.Struct) string {
 		icon = "presentation"
 	case "aif":
 		icon = "audio"
-	case "dwg":
-		icon = "other"
 	case "ai":
 		icon = "image"
+	case "dwg":
+		icon = "other"
+
 	}
 
 	for k, v := range fileExtensions {
@@ -173,6 +171,7 @@ func fileIconName(details *types.Struct) string {
 }
 
 // TODO
+// - finish all layouts
 // - render user svg
 // - render files as inline link
 // - https://linear.app/anytype/issue/GO-5052/add-marker-to-text-block-with-style=title-when-object-layout-is-task
@@ -243,7 +242,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 	case model.ObjectType_file:
 		iconClasses = append(iconClasses, "iconFile")
 		iconName := fileIconName(targetDetails)
-		src = fmt.Sprintf("%s/img/icon/file/%s.svg", r.Config.StaticFilesPath, iconName)
+		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/file/%s.svg", iconName))
 	}
 
 	if props.Size != 0 {
