@@ -88,8 +88,6 @@
 
 				win.on('message', e => {
 					const oe = e.originalEvent;
-					console.log(oe);
-
 					if (!allowedOrigins.some(it => oe.origin.match(it))) {
 						//return;
 					};

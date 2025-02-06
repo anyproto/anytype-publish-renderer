@@ -24,6 +24,7 @@ declare global {
 		svgSrc: any;
 		fathom: any;
 		CoverParam: any;
+		onMessage: any;
 	}
 };
 
@@ -35,7 +36,7 @@ function renderCover () {
 		return;
 	};
 
-	const { x, y, scale } = window.CoverParam || {};
+	const { CoverX: x, CoverY: y, CoverScale: scale } = window.CoverParam || {};
 	const cover = block.find('#cover');
 	const bw = block.width();
 	const bh = block.height();
@@ -161,7 +162,7 @@ function renderPrism () {
 };
 
 function renderAnalyticsEvents () {
-	$('.fathom').each((item, i) => {
+	$('.fathom').each((i, item) => {
 		item = $(item);
 
 		item.off('click').on('click', () => {
@@ -238,8 +239,29 @@ function renderPdf () {
 	});
 };
 
+window.onMessage = (data) => {
+	const { type, height, blockId, url } = data;
+
+	switch (type) {
+		case 'resize': {
+			$(`#receiver${blockId}`).css({ height: Math.max(80, height) });
+			break;
+		};
+
+		case 'openUrl': {
+			window.open(url, '_blank');
+			break;
+		};
+	};
+};
+
 $(document).ready(() => {
 	const win = $(window);
+
+	win.off('resize').on('resize', () => { 
+		renderCover();
+	});
+
     const renderFns = [ 
 		renderCover,
 		renderAnalyticsEvents, 
@@ -257,12 +279,8 @@ $(document).ready(() => {
             try {
                 f();
             } catch (e) {
-                console.error(`error executing render function "${f.name}":`, e);
+                console.error(`error executing render function "${f.name}":`, e, f);
             };
         });
     });
-
-	win.off('resize').on('resize', () => {
-		renderCover();
-	});
 });

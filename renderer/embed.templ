@@ -1,8 +1,6 @@
 package renderer
 
 script EmbedData(data EmbedIframeData) {
-	console.log('ON LOAD', data);
-
 	document.getElementById(`receiver${data.BlockId}`).contentWindow.postMessage(data, '*');
 }
 

@@ -315,8 +315,6 @@ func getHtml(processor model.BlockContentLatexProcessor, content string) string 
 	fnName := fmt.Sprintf("Get%sHtml", processor.String())
 	method := reflect.ValueOf(&embedFunctions).MethodByName(fnName)
 
-	fmt.Println("method", fnName, method.IsValid())
-
 	if method.IsValid() {
 		results := method.Call([]reflect.Value{reflect.ValueOf(content)})
 		return results[0].String()
@@ -337,8 +335,6 @@ func (e *embedFuncStruct) GetYoutubeHtml(content string) string {
 	q.Set("enablejsapi", "1")
 	q.Set("rel", "0")
 	parsedUrl.RawQuery = q.Encode()
-
-	fmt.Println("parsedUrl", content)
 
 	return fmt.Sprintf(`<iframe id="player" src="%s" %s title="YouTube video player"></iframe>`, parsedUrl.String(), iframeParams)
 }
