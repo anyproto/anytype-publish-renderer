@@ -26,14 +26,20 @@ templ CoverImageTemplate(p *CoverRenderParams) {
      }
 }
 
+func getCoverStyle (p *CoverRenderParams) map[string]string {
+	ret := map[string]string{}
+
+	if p.Src != "" {
+		ret["background-image"] = fmt.Sprintf(`url(%s)`, p.Src)
+	}
+
+	return ret
+}
+
 templ CoverDefaultTemplate(p *CoverRenderParams) {
 	<div 
 		class={"cover", p.Classes}
-		style={
-			map[string]string{
-				"background-image": fmt.Sprintf(`url(%s)`, p.Src),
-			}
-	 	}
+		style={getCoverStyle(p)}
 	>
 	</div>
 }
