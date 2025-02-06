@@ -179,7 +179,7 @@ func fileIconName(details *types.Struct) string {
 func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
 	var src string
 	classes := []string{"iconObject"}
-	iconClasses := []string{}
+	var iconClasses []string
 	var isDeleted bool
 	if targetDetails == nil || len(targetDetails.Fields) == 0 {
 		isDeleted = true

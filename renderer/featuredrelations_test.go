@@ -22,7 +22,7 @@ func TestMakeFeaturedRelationsParams(t *testing.T) {
 		r.Sp = &pb.SnapshotWithType{}
 
 		// when
-		params := r.MakeFeaturedRelationsParams(block)
+		params := r.MakeFeaturedRelationsComponent(block)
 
 		// then
 		assert.Equal(t, "block1", params.Id)
@@ -39,7 +39,7 @@ func TestMakeFeaturedRelationsParams(t *testing.T) {
 		block := &model.Block{Id: "block2"}
 
 		// when
-		params := r.MakeFeaturedRelationsParams(block)
+		params := r.MakeFeaturedRelationsComponent(block)
 
 		// theb
 		assert.Equal(t, "block2", params.Id)
@@ -60,7 +60,7 @@ func TestMakeFeaturedRelationsParams(t *testing.T) {
 		block := &model.Block{Id: "block3"}
 
 		// when
-		params := r.MakeFeaturedRelationsParams(block)
+		params := r.MakeFeaturedRelationsComponent(block)
 
 		// then
 		assert.Equal(t, "block3", params.Id)
@@ -121,7 +121,7 @@ func TestMakeFeaturedRelationsParams(t *testing.T) {
 		block := &model.Block{Id: "block4"}
 
 		// when
-		params := r.MakeFeaturedRelationsParams(block)
+		params := r.MakeFeaturedRelationsComponent(block)
 
 		// then
 		assert.Equal(t, "block4", params.Id)
