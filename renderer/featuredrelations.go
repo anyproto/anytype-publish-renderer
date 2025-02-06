@@ -28,12 +28,12 @@ func (r *Renderer) MakeFeaturedRelationsParams(b *model.Block) *FeaturedRelation
 	contentClasses := []string{"content"}
 
 	if bgColor != "" {
-		contentClasses = append(contentClasses, "bgColor", "bgColor-" + bgColor)
+		contentClasses = append(contentClasses, "bgColor", "bgColor-"+bgColor)
 	}
 
-	param := &FeaturedRelationsParams{ 
-		Id: id, 
-		Classes: strings.Join(classes, " "),
+	param := &FeaturedRelationsParams{
+		Id:             id,
+		Classes:        strings.Join(classes, " "),
 		ContentClasses: strings.Join(contentClasses, " "),
 	}
 
@@ -50,7 +50,7 @@ func (r *Renderer) MakeFeaturedRelationsParams(b *model.Block) *FeaturedRelation
 	for i, featuredRelation := range featuredRelationsList.Values {
 		var lastClass string
 
-		if i == len(featuredRelationsList.Values) - 1 {
+		if i == len(featuredRelationsList.Values)-1 {
 			lastClass = "last"
 		}
 
@@ -68,7 +68,7 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, lastCla
 
 	relationKey := featuredRelation.GetStringValue()
 
-	if relationKey == "description" {
+	if relationKey == bundle.RelationKeyDescription.String() {
 		return cells
 	}
 
@@ -85,21 +85,24 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, lastCla
 	}
 
 	switch format {
-		case 
-			model.RelationFormat_object, 
-			model.RelationFormat_file, 
-			model.RelationFormat_tag,
-			model.RelationFormat_status:
-				return r.processObjectList(relationValue, format, cells, name, formatClass, lastClass)
-		default:
-			return r.processOneObject(relationValue, format, cells, name, lastClass, formatClass)
+	case
+		model.RelationFormat_object,
+		model.RelationFormat_file,
+		model.RelationFormat_tag,
+		model.RelationFormat_status:
+		return r.processObjectList(relationKey, relationValue, format, cells, name, formatClass, lastClass)
+	default:
+		return r.processOneObject(relationValue, format, cells, name, lastClass, formatClass)
 	}
 }
 
-func (r *Renderer) processObjectList(relationValue *types.Value, format model.RelationFormat, cells []templ.Component, name, formatClass, lastClass string) []templ.Component {
+func (r *Renderer) processObjectList(key string, relationValue *types.Value, format model.RelationFormat, cells []templ.Component, name, formatClass, lastClass string) []templ.Component {
 	objectsList := r.populateRelationListValue(format, relationValue)
 
 	if len(objectsList) == 0 {
+		if key == bundle.RelationKeyBacklinks.String() || key == bundle.RelationKeyLinks.String() {
+			return cells
+		}
 		return append(cells, EmptyCellTemplate(name, formatClass, lastClass))
 	}
 

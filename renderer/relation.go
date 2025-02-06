@@ -3,15 +3,18 @@ package renderer
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/a-h/templ"
+	"go.uber.org/zap"
+
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
+	"github.com/anyproto/anytype-heart/pkg/lib/localstore/addr"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
-	"go.uber.org/zap"
 )
 
 const defaultName = "Untitled"
@@ -28,6 +31,12 @@ type RelationRenderParams struct {
 
 func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParams {
 	relationBlock := b.GetRelation()
+	key := relationBlock.GetKey()
+
+	if key == "" {
+		return nil
+	}
+
 	color := b.GetBackgroundColor()
 
 	params := &RelationRenderParams{
@@ -38,7 +47,7 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParam
 		params.BackgroundColor = fmt.Sprintf("bgColor bgColor-%s", color)
 	}
 
-	name, format, found := r.retrieveRelationInfo(relationBlock.GetKey())
+	name, format, found := r.retrieveRelationInfo(key)
 	params.Name = name
 
 	if !found {
@@ -47,7 +56,7 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParam
 		return params
 	}
 
-	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[relationBlock.GetKey()]
+	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[key]
 	if relationValue == nil {
 		params.IsEmpty = "isEmpty"
 		return params
@@ -239,6 +248,9 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 }
 
 func (r *Renderer) getObjectSnapshot(objectId string) *pb.SnapshotWithType {
+	if strings.HasPrefix(objectId, addr.DatePrefix) {
+		return r.getDateSnapshot(objectId)
+	}
 	directories := []string{"objects", "relations", "types", "templates", "filesObjects"}
 	var (
 		snapshot *pb.SnapshotWithType
@@ -289,5 +301,8 @@ func (r *Renderer) createFileIcon(url string, fileBlock *model.BlockContentFile)
 
 func (r *Renderer) RenderRelations(b *model.Block) templ.Component {
 	params := r.MakeRelationRenderParams(b)
+	if params == nil {
+		return NoneTemplate("")
+	}
 	return RelationTemplate(params)
 }
