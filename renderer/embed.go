@@ -375,113 +375,60 @@ func (e *embedFuncStruct) GetImageHtml(content string) string {
 }
 
 func allowPresentation(p model.BlockContentLatexProcessor) bool {
-	allowed := []model.BlockContentLatexProcessor{
-		model.BlockContentLatex_Youtube, model.BlockContentLatex_Vimeo, model.BlockContentLatex_Bilibili,
+	allowed := map[model.BlockContentLatexProcessor]bool{
+		model.BlockContentLatex_Youtube: true, model.BlockContentLatex_Vimeo: true, model.BlockContentLatex_Bilibili: true,
 	}
-	for _, item := range allowed {
-		if p == item {
-			return true
-		}
-	}
-	return false
+	return allowed[p]
 }
 
 func allowEmbedUrl(p model.BlockContentLatexProcessor) bool {
-	allowed := []model.BlockContentLatexProcessor{
-		model.BlockContentLatex_Youtube, model.BlockContentLatex_Vimeo, model.BlockContentLatex_GoogleMaps, model.BlockContentLatex_Miro, model.BlockContentLatex_Figma,
-		model.BlockContentLatex_OpenStreetMap, model.BlockContentLatex_Telegram, model.BlockContentLatex_GithubGist, model.BlockContentLatex_Codepen,
-		model.BlockContentLatex_Bilibili, model.BlockContentLatex_Kroki, model.BlockContentLatex_Sketchfab, model.BlockContentLatex_Image,
+	allowed := map[model.BlockContentLatexProcessor]bool{
+		model.BlockContentLatex_Youtube: true, model.BlockContentLatex_Vimeo: true, model.BlockContentLatex_GoogleMaps: true,
+		model.BlockContentLatex_Miro: true, model.BlockContentLatex_Figma: true, model.BlockContentLatex_OpenStreetMap: true,
+		model.BlockContentLatex_Telegram: true, model.BlockContentLatex_GithubGist: true, model.BlockContentLatex_Codepen: true,
+		model.BlockContentLatex_Bilibili: true, model.BlockContentLatex_Kroki: true, model.BlockContentLatex_Sketchfab: true,
+		model.BlockContentLatex_Image: true,
 	}
-	for _, item := range allowed {
-		if p == item {
-			return true
-		}
-	}
-	return false
+	return allowed[p]
 }
 
 func allowJs(p model.BlockContentLatexProcessor) bool {
-	allowed := []model.BlockContentLatexProcessor{
-		model.BlockContentLatex_Chart,
+	allowed := map[model.BlockContentLatexProcessor]bool{
+		model.BlockContentLatex_Chart: true,
 	}
-	for _, item := range allowed {
-		if p == item {
-			return true
-		}
-	}
-	return false
+	return allowed[p]
 }
 
 func allowPopup(p model.BlockContentLatexProcessor) bool {
-	allowed := []model.BlockContentLatexProcessor{
-		model.BlockContentLatex_Bilibili,
+	allowed := map[model.BlockContentLatexProcessor]bool{
+		model.BlockContentLatex_Bilibili: true,
 	}
-	for _, item := range allowed {
-		if p == item {
-			return true
-		}
-	}
-	return false
-}
-
-func allowBlockResize(p model.BlockContentLatexProcessor) bool {
-	disallowed := []model.BlockContentLatexProcessor{
-		model.BlockContentLatex_Latex,
-	}
-	for _, item := range disallowed {
-		if p == item {
-			return false
-		}
-	}
-	return true
+	return allowed[p]
 }
 
 func allowIframeResize(p model.BlockContentLatexProcessor) bool {
-	allowed := []model.BlockContentLatexProcessor{
-		model.BlockContentLatex_Twitter, model.BlockContentLatex_Reddit, model.BlockContentLatex_Facebook, model.BlockContentLatex_Instagram, model.BlockContentLatex_Telegram,
-		model.BlockContentLatex_GithubGist, model.BlockContentLatex_Codepen, model.BlockContentLatex_Kroki, model.BlockContentLatex_Chart, model.BlockContentLatex_Image,
+	allowed := map[model.BlockContentLatexProcessor]bool{
+		model.BlockContentLatex_Twitter: true, model.BlockContentLatex_Reddit: true, model.BlockContentLatex_Facebook: true,
+		model.BlockContentLatex_Instagram: true, model.BlockContentLatex_Telegram: true, model.BlockContentLatex_GithubGist: true,
+		model.BlockContentLatex_Codepen: true, model.BlockContentLatex_Kroki: true, model.BlockContentLatex_Chart: true,
+		model.BlockContentLatex_Image: true,
 	}
-	for _, item := range allowed {
-		if p == item {
-			return true
-		}
-	}
-	return false
-}
-
-func allowAutoRender(p model.BlockContentLatexProcessor) bool {
-	allowed := []model.BlockContentLatexProcessor{
-		model.BlockContentLatex_Latex, model.BlockContentLatex_Twitter, model.BlockContentLatex_Reddit, model.BlockContentLatex_Facebook, model.BlockContentLatex_Instagram, model.BlockContentLatex_Telegram,
-		model.BlockContentLatex_GithubGist, model.BlockContentLatex_Codepen, model.BlockContentLatex_Bilibili, model.BlockContentLatex_Graphviz, model.BlockContentLatex_Kroki, model.BlockContentLatex_Image,
-	}
-	for _, item := range allowed {
-		if p == item {
-			return true
-		}
-	}
-	return false
+	return allowed[p]
 }
 
 func insertBeforeLoad(p model.BlockContentLatexProcessor) bool {
-	allowed := []model.BlockContentLatexProcessor{
-		model.BlockContentLatex_Twitter, model.BlockContentLatex_Reddit, model.BlockContentLatex_Instagram, model.BlockContentLatex_Codepen,
+	allowed := map[model.BlockContentLatexProcessor]bool{
+		model.BlockContentLatex_Twitter: true, model.BlockContentLatex_Reddit: true, model.BlockContentLatex_Instagram: true,
+		model.BlockContentLatex_Codepen: true,
 	}
-	for _, item := range allowed {
-		if p == item {
-			return true
-		}
-	}
-	return false
+	return allowed[p]
 }
 
 func useRootHeight(p model.BlockContentLatexProcessor) bool {
-	allowed := []model.BlockContentLatexProcessor{
-		model.BlockContentLatex_Twitter, model.BlockContentLatex_Telegram, model.BlockContentLatex_Instagram, model.BlockContentLatex_GithubGist, model.BlockContentLatex_Codepen, model.BlockContentLatex_Kroki, model.BlockContentLatex_Chart,
+	allowed := map[model.BlockContentLatexProcessor]bool{
+		model.BlockContentLatex_Twitter: true, model.BlockContentLatex_Telegram: true, model.BlockContentLatex_Instagram: true,
+		model.BlockContentLatex_GithubGist: true, model.BlockContentLatex_Codepen: true, model.BlockContentLatex_Kroki: true,
+		model.BlockContentLatex_Chart: true,
 	}
-	for _, item := range allowed {
-		if p == item {
-			return true
-		}
-	}
-	return false
+	return allowed[p]
 }
