@@ -4,20 +4,12 @@ import (
 	"fmt"
 )
 
-script coverParam(x float64, y float64, scale float64) {
-	window.CoverParam = {};
-
-	function setParam(k, v) {
-		window.CoverParam[k] = v;
-	};
-
-	setParam('x', x);
-	setParam('y', y);
-	setParam('scale', scale);
+script coverParam(p CoverResizeParams) {
+	window.CoverParam = p;
 }
 
 templ CoverBlockTemplate(r *Renderer, p *CoverRenderParams) {
-	@coverParam(p.CoverX, p.CoverY, p.CoverScale)
+	@coverParam(p.ResizeParams)
 	<div id={"block-" + p.Id } class="block blockCover">
 		<div class="content">
 			<div class="wrap">
@@ -34,14 +26,20 @@ templ CoverImageTemplate(p *CoverRenderParams) {
      }
 }
 
+func getCoverStyle (p *CoverRenderParams) map[string]string {
+	ret := map[string]string{}
+
+	if p.Src != "" {
+		ret["background-image"] = fmt.Sprintf(`url(%s)`, p.Src)
+	}
+
+	return ret
+}
+
 templ CoverDefaultTemplate(p *CoverRenderParams) {
 	<div 
 		class={"cover", p.Classes}
-		style={
-			map[string]string{
-				"background-image": fmt.Sprintf(`url(%s)`, p.Src),
-			}
-	 	}
+		style={getCoverStyle(p)}
 	>
 	</div>
 }

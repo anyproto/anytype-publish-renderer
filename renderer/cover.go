@@ -11,14 +11,18 @@ import (
 	"go.uber.org/zap"
 )
 
+type CoverResizeParams struct {
+	CoverX            float64
+	CoverY            float64
+	CoverScale        float64
+}
+
 type CoverRenderParams struct {
 	Id                string
 	Src               string
 	Classes           string
 	CoverType         CoverType
-	CoverX            float64
-	CoverY            float64
-	CoverScale        float64
+	ResizeParams      CoverResizeParams
 	UnsplashComponent templ.Component
 	CoverTemplate     templ.Component
 }
@@ -64,10 +68,12 @@ func (r *Renderer) getCoverParams(fields *types.Struct, asImage bool, withAuthor
 	params := &CoverRenderParams{
 		Id:         coverId,
 		CoverType:  coverType,
-		CoverX:     coverX,
-		CoverY:     coverY,
-		CoverScale: coverScale,
 		Classes:    strings.Join([]string{class, coverId}, " "),
+		ResizeParams: CoverResizeParams{
+			CoverX:     coverX,
+			CoverY:     coverY,
+			CoverScale: coverScale,
+		},
 	}
 
 	switch coverType {

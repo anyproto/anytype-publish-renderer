@@ -24,14 +24,19 @@ declare global {
 		svgSrc: any;
 		fathom: any;
 		CoverParam: any;
+		onMessage: any;
 	}
 };
 
 window.svgSrc = {};
 
 function renderCover () {
-	const { x, y, scale } = window.CoverParam;
 	const block = $('.block.blockCover');
+	if (!block.length) {
+		return;
+	};
+
+	const { CoverX: x, CoverY: y, CoverScale: scale } = window.CoverParam || {};
 	const cover = block.find('#cover');
 	const bw = block.width();
 	const bh = block.height();
@@ -124,23 +129,16 @@ function renderMermaid () {
 };
 
 function renderGraphviz () {
-	/*
-    const gphBlocks = document.querySelectorAll(".isGraphviz");
-    gphBlocks.forEach(b => {
-        const gphFormula = window.svgSrc[b.id].content
-        try {
-            const viz = new Viz()
-            viz.renderSVGElement(gphFormula).then(svg => {
-                parent = b.querySelector(".content")
-                parent.appendChild(svg);
-            }, err => {
-                console.error("viz error:",err)
-            });
-        } catch (e) {
-            console.error("viz error:",e);
-        };
-    });
-	*/
+	const blocks = $(`.block.blockEmbed.isGraphviz > .content`);
+
+	blocks.each((i, block) => {
+		block = $(block);
+
+		viz().then(viz => {
+			const text = block.text();
+			block.html(viz.renderSVGElement(text));
+		});
+	});
 };
 
 function renderPrism () {
@@ -157,7 +155,7 @@ function renderPrism () {
 };
 
 function renderAnalyticsEvents () {
-	$('.fathom').each((item, i) => {
+	$('.fathom').each((i, item) => {
 		item = $(item);
 
 		item.off('click').on('click', () => {
@@ -234,8 +232,29 @@ function renderPdf () {
 	});
 };
 
-document.addEventListener("DOMContentLoaded", function() {
+window.onMessage = (data) => {
+	const { type, height, blockId, url } = data;
+
+	switch (type) {
+		case 'resize': {
+			$(`#receiver${blockId}`).css({ height: Math.max(80, height) });
+			break;
+		};
+
+		case 'openUrl': {
+			window.open(url, '_blank');
+			break;
+		};
+	};
+};
+
+$(document).ready(() => {
 	const win = $(window);
+
+	win.off('resize').on('resize', () => { 
+		renderCover();
+	});
+
     const renderFns = [ 
 		renderCover,
 		renderAnalyticsEvents, 
@@ -253,12 +272,8 @@ document.addEventListener("DOMContentLoaded", function() {
             try {
                 f();
             } catch (e) {
-                console.error(`error executing render function "${f.name}":`, e);
+                console.error(`error executing render function "${f.name}":`, e, f);
             };
         });
     });
-
-	win.off('resize').on('resize', () => {
-		renderCover();
-	});
 });

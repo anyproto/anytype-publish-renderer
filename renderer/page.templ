@@ -31,6 +31,9 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			<link rel="icon" type="image/png" sizes="16x16" href="https://anytype.io/favicon-16x16.png" />
 
 			<script src={ r.GetStaticFolderUrl("/js/main.js") } type="text/javascript"></script>
+			<script type="text/javascript">
+				window.addEventListener('message', e => window.onMessage(e.data));
+			</script>
         </head>
 		<body>
 			<main>
@@ -57,10 +60,12 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 					</div>
 				</div>
 
-				<a href="https://anytype.io/" target="_blank" class="madeInAnytype fathom" data-event="PublishSiteClick">
-					<div class="icon"></div>
-					<div class="text">Crafted with Anytype</div>
-				</a>
+				<footer class="footer">
+					<a href="https://anytype.io/" target="_blank" class="button c36 fathom" data-event="PublishSiteClick">
+						<div class="icon"></div>
+						<div class="text">Crafted with Anytype</div>
+					</a>
+				</footer>
 
 			</main>
 

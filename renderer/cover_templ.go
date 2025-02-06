@@ -12,21 +12,13 @@ import (
 	"fmt"
 )
 
-func coverParam(x float64, y float64, scale float64) templ.ComponentScript {
+func coverParam(p CoverResizeParams) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_coverParam_c779`,
-		Function: `function __templ_coverParam_c779(x, y, scale){window.CoverParam = {};
-
-	function setParam(k, v) {
-		window.CoverParam[k] = v;
-	};
-
-	setParam('x', x);
-	setParam('y', y);
-	setParam('scale', scale);
+		Name: `__templ_coverParam_b07a`,
+		Function: `function __templ_coverParam_b07a(p){window.CoverParam = p;
 }`,
-		Call:       templ.SafeScript(`__templ_coverParam_c779`, x, y, scale),
-		CallInline: templ.SafeScriptInline(`__templ_coverParam_c779`, x, y, scale),
+		Call:       templ.SafeScript(`__templ_coverParam_b07a`, p),
+		CallInline: templ.SafeScriptInline(`__templ_coverParam_b07a`, p),
 	}
 }
 
@@ -51,7 +43,7 @@ func CoverBlockTemplate(r *Renderer, p *CoverRenderParams) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = coverParam(p.CoverX, p.CoverY, p.CoverScale).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = coverParam(p.ResizeParams).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -62,7 +54,7 @@ func CoverBlockTemplate(r *Renderer, p *CoverRenderParams) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("block-" + p.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 21, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 13, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -117,7 +109,7 @@ func CoverImageTemplate(p *CoverRenderParams) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Src)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 31, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 23, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -148,6 +140,16 @@ func CoverImageTemplate(p *CoverRenderParams) templ.Component {
 		}
 		return nil
 	})
+}
+
+func getCoverStyle(p *CoverRenderParams) map[string]string {
+	ret := map[string]string{}
+
+	if p.Src != "" {
+		ret["background-image"] = fmt.Sprintf(`url(%s)`, p.Src)
+	}
+
+	return ret
 }
 
 func CoverDefaultTemplate(p *CoverRenderParams) templ.Component {
@@ -194,12 +196,9 @@ func CoverDefaultTemplate(p *CoverRenderParams) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(
-			map[string]string{
-				"background-image": fmt.Sprintf(`url(%s)`, p.Src),
-			})
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(getCoverStyle(p))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 43, Col: 4}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 42, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -250,7 +249,7 @@ func UnsplashReferral(author string, authorUrl templ.SafeURL) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(author)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 52, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 50, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {

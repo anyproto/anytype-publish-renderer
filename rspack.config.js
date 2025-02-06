@@ -21,7 +21,6 @@ module.exports = (env, argv) => {
 		output: {
 			path: path.resolve(__dirname, 'static', 'js'),
 			filename: 'main.js',
-			clean: true,
 		},
 
 		resolve: {

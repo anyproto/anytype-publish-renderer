@@ -2,7 +2,7 @@
 
 .block.blockEmbed { padding: 6px 0px; }
 .block.blockEmbed {
-
+	iframe { width: 100%; aspect-ratio: 16/9; border: 0px; display: block; }
 }
 
 .block.blockEmbed:not(.isLatex) {
