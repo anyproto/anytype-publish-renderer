@@ -18,7 +18,7 @@ templ TableTemplate(r *Renderer, p *RenderTableParams) {
 }
 
 templ TableRowCellTemplate(r *Renderer,p *RenderTableRowCellParams) {
-	<div id={"cell-"+p.Id} class="cell align-v0">
+	<div id={"cell-" + p.Id} class={p.Classes}>
 		@p.TextComp
 	</div>
 }

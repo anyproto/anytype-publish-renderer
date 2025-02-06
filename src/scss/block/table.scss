@@ -47,24 +47,21 @@
 		.cell.isHighlightedColumn.isFirst { border-radius: 4px 4px 0px 0px; }
 		.cell.isHighlightedColumn.isLast { border-radius: 0px 0px 4px 4px; }
 
-		.cell.align-h0 .value { text-align: left; }
-		.cell.align-h1 .value { text-align: right; }
-		.cell.align-h2 .value { text-align: center; }
-
 		.cell.align-v0 { 
-			.block #value { vertical-align: top; }
+			.block .text { vertical-align: top; }
 		}
 		.cell.align-v1 { 
-			.block #value { vertical-align: middle; }
+			.block .text { vertical-align: middle; }
 		}
 		.cell.align-v2 { 
-			.block #value { vertical-align: bottom; }
+			.block .text { vertical-align: bottom; }
 		}
 
 		.cell {
 			.block { height: 100%; min-height: 40px; border: 0px !important; padding: 0px; margin: 0px; color: var(--color-text-primary); }
 			.block {
 				.content, .wrap, .flex { height: 100%; }
+				.content > .flex { display: table; }
 				.content { width: 100%; display: flex; flex-direction: column;  }
 
 				.markers { padding: 9px 0px 9px 9px; }
