@@ -13,22 +13,22 @@ templ FileImageTemplate(r *Renderer, p *FileMediaRenderParams) {
 				class="wrap"
 				style={ getStyle(p.Width) }
 			>
-				<img src={ p.Src } class="media" />
+				<img src={ string(p.Src) } class="media" />
 			</div>
 		</div>
 	</div>
 }
 
-templ FilePDFTemplate(r *Renderer, p *FilePdfRenderParams) {
+templ FilePDFTemplate(r *Renderer, p *FileMediaRenderParams) {
 	<div id={"block" + p.Id }  class={"block blockMedia isPdf", p.Classes}>
 		<div class="content">
 			<div
 				class="wrap"
 				style={ getStyle(p.Width) }
 				data-id={p.Id}
-				data-src={p.Src}
+				data-src={string(p.Src)}
 			>
-				<a href={templ.URL(p.Src)} target="_blank" class="info">
+				<a href={p.Src} target="_blank" class="info">
 					<span class="name">{p.Name}</span>
 					<span class="size">{p.Size}</span>
 				</a>
@@ -51,7 +51,7 @@ templ FileAudioTemplate(r *Renderer, p *FileMediaRenderParams) {
 	<div id={"block" + p.Id } class={"block blockMedia isAudio", p.Classes}>
 		<div class="content">
 			<div class="wrap">
-				<audio controls src={ p.Src }></audio>
+				<audio controls src={ string(p.Src) }></audio>
 			</div>
 		</div>
 	</div>
@@ -64,7 +64,7 @@ templ FileVideoTemplate(r *Renderer, p *FileMediaRenderParams) {
 				class="wrap"
 				style={ getStyle(p.Width) }
 			>
-				<video controls src={ p.Src}></video>
+				<video controls src={ string(p.Src) }></video>
 			</div>
 		</div>
 	</div>

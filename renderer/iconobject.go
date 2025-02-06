@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
@@ -48,6 +49,7 @@ type IconObjectProps struct {
 	Size        int32
 	IconSize    int32
 	ForceLetter bool
+	Src         templ.SafeURL
 }
 
 type GetSizeProps struct {
@@ -96,7 +98,6 @@ func getIconSize(props *IconObjectProps, layout model.ObjectTypeLayout, gsProps 
 var fileExtensions = map[string][]string{
 	"image": {"jpg", "jpeg", "png", "gif", "svg", "webp"},
 	"video": {"mp4", "m4v", "mov"},
-	"cover": {"jpg", "jpeg", "png", "gif", "webp"},
 	"audio": {"mp3", "m4a", "flac", "ogg", "wav"},
 	"pdf":   {"pdf"},
 }
@@ -232,6 +233,9 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 	// case model.ObjectType_bookmark:
 	// case model.ObjectType_spaceView:
 	case model.ObjectType_image:
+		iconClasses = append(iconClasses, "iconImage")
+		// TODO: should show image preview
+		// getFileUrl
 		fallthrough
 	case model.ObjectType_video:
 		fallthrough
