@@ -1,6 +1,9 @@
 package renderer
 
 import (
+	"bytes"
+	"compress/zlib"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -76,7 +79,6 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 			isIframe = true
 			allowIframeResize := allowIframeResize(processor)
 			allowScript := false
-
 			sandbox = append(sandbox, "allow-scripts", "allow-same-origin")
 
 			if allowPresentation(processor) {
@@ -109,11 +111,12 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 
 			// Convert Kroki code into an SVG URL
 			if processor == model.BlockContentLatex_Kroki && !strings.HasPrefix(text, "https://kroki.io") {
-				compressed := ""
-				typeId := pbtypes.GetString(b.GetFields(), "type")
+				compressed, err := compressAndEncode(text)
 
-				//compressed := compressKrokiText(text)
-				text = fmt.Sprintf("https://kroki.io/%s/svg/%s", typeId, compressed)
+				if err == nil {
+					typeId := pbtypes.GetString(b.GetFields(), "type")
+					text = fmt.Sprintf("https://kroki.io/%s/svg/%s", typeId, compressed)
+				}
 			}
 
 			// Process embedded content
@@ -431,4 +434,22 @@ func useRootHeight(p model.BlockContentLatexProcessor) bool {
 		model.BlockContentLatex_Chart: true,
 	}
 	return allowed[p]
+}
+
+func compressAndEncode(text string) (string, error) {
+	var buf bytes.Buffer
+
+	writer := zlib.NewWriter(&buf)
+	_, err := writer.Write([]byte(text))
+	if err != nil {
+		return "", err
+	}
+	writer.Close()
+
+	// Encode to base64 and replace characters for URL safety
+	encoded := base64.StdEncoding.EncodeToString(buf.Bytes())
+	encoded = strings.ReplaceAll(encoded, "+", "-")
+	encoded = strings.ReplaceAll(encoded, "/", "_")
+
+	return encoded, nil
 }
