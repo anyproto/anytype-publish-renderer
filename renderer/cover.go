@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 
@@ -11,13 +12,15 @@ import (
 )
 
 type CoverRenderParams struct {
-	Id         string
-	Src        string
-	Classes    string
-	CoverType  CoverType
-	CoverX     float64
-	CoverY     float64
-	CoverScale float64
+	Id                string
+	Src               string
+	Classes           string
+	CoverType         CoverType
+	CoverX            float64
+	CoverY            float64
+	CoverScale        float64
+	UnsplashComponent templ.Component
+	CoverTemplate     templ.Component
 }
 
 type CoverType int32
@@ -41,10 +44,10 @@ func ToCoverType(val int64) (CoverType, error) {
 
 func (r *Renderer) MakeRenderPageCoverParams() (*CoverRenderParams, error) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
-	return r.getCoverParams(fields)
+	return r.getCoverParams(fields, true, true)
 }
 
-func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, error) {
+func (r *Renderer) getCoverParams(fields *types.Struct, asImage bool, withAuthor bool) (*CoverRenderParams, error) {
 	coverType, err := ToCoverType(pbtypes.GetInt64(fields, "coverType"))
 
 	if err != nil {
@@ -56,51 +59,58 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 	coverX := pbtypes.GetFloat64(fields, "coverX")
 	coverY := pbtypes.GetFloat64(fields, "coverY")
 	coverScale := pbtypes.GetFloat64(fields, "coverScale")
+	class := fmt.Sprintf("type%d", coverType)
+
+	params := &CoverRenderParams{
+		Id:         coverId,
+		CoverType:  coverType,
+		CoverX:     coverX,
+		CoverY:     coverY,
+		CoverScale: coverScale,
+		Classes:    strings.Join([]string{class, coverId}, " "),
+	}
 
 	switch coverType {
-	case CoverType_Image:
-		fallthrough
-	case CoverType_Source:
+	case CoverType_Image, CoverType_Source:
 		src, err := r.getFileUrl(coverId)
 		if err != nil {
 			log.Warn("cover rendering failed", zap.Error(err))
 			return nil, err
 		}
 
-		params := &CoverRenderParams{
-			Id:        coverId,
-			Src:       src,
-			Classes:   "type1",
-			CoverType: coverType,
-			CoverX:    coverX,
-			CoverY:    coverY,
-			CoverScale: coverScale,
+		if withAuthor && coverType == CoverType_Source {
+			author, authorUrl := r.getUnsplashDetails(coverId)
+			if author != "" || authorUrl != "" {
+				params.UnsplashComponent = UnsplashReferral(author, templ.SafeURL(authorUrl))
+			}
+		}
+
+		params.Src = src
+		if asImage {
+			params.CoverTemplate = CoverImageTemplate(params)
+		} else {
+			params.CoverTemplate = CoverDefaultTemplate(params)
 		}
 
 		return params, nil
 
-	case CoverType_Color:
-		color := pbtypes.GetString(fields, "coverId")
-		params := &CoverRenderParams{
-			Id:        coverId,
-			Classes:   color,
-			CoverType: coverType,
-		}
-		return params, nil
+	case CoverType_Color, CoverType_Gradient:
+		params.CoverTemplate = CoverDefaultTemplate(params)
 
-	case CoverType_Gradient:
-		gradient := pbtypes.GetString(fields, "coverId")
-		params := &CoverRenderParams{
-			Id:        coverId,
-			Classes:   gradient,
-			CoverType: coverType,
-		}
 		return params, nil
 	}
 
 	err = fmt.Errorf("unknown cover type: %d", int(coverType))
 	log.Warn("cover rendering failed", zap.Error(err))
 	return nil, err
+}
+
+func (r *Renderer) getUnsplashDetails(coverId string) (string, string) {
+	fileSnapshot := r.getObjectSnapshot(coverId)
+	fileDetails := fileSnapshot.GetSnapshot().GetData().GetDetails()
+	author := pbtypes.GetString(fileDetails, "mediaArtistName")
+	authorUrl := pbtypes.GetString(fileDetails, "mediaArtistURL")
+	return author, authorUrl
 }
 
 func (r *Renderer) RenderPageCover() templ.Component {
@@ -113,17 +123,10 @@ func (r *Renderer) RenderPageCover() templ.Component {
 	}
 
 	switch params.CoverType {
-		case 
-			CoverType_Image,
-			CoverType_Source:
-			return CoverImageTemplate(r, params)
-		case CoverType_Color:
-			return CoverColorTemplate(r, params)
-		case CoverType_Gradient:
-			return CoverGradientTemplate(r, params)
+	case CoverType_Image, CoverType_Source, CoverType_Color, CoverType_Gradient:
+		return CoverBlockTemplate(r, params)
+	default:
+		log.Warn("cover rendering failed: unknown cover type", zap.Int("coverType", int(params.CoverType)))
+		return NoneTemplate("")
 	}
-
-	log.Warn("cover rendering failed: unknown cover type", zap.Int("coverType", int(params.CoverType)))
-	return NoneTemplate("")
-
 }
