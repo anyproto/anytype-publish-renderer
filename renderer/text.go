@@ -232,6 +232,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	var outerFlex []templ.Component
 	var innerFlex []templ.Component
 	switch style {
+
 	case model.BlockContentText_Toggle:
 		externalComp := ToggleMarkerTemplate(utils.GetColor(color))
 		innerFlex = append(innerFlex, externalComp, textComp)

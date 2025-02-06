@@ -108,11 +108,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				},
 			},
 			expected: &LinkRenderParams{
-				LayoutClass:   "isPage",
 				Name:          "Emoji Icon Block",
-				Icon:          "https://anytype-static.fra1.cdn.digitaloceanspaces.com/emojies/1f60a.png",
-				IconClass:     "c20 withIcon",
-				IconStyle:     "smileImage c20",
 				Url:           templ.SafeURL("anytype://object?objectId=emoji-icon-id&spaceId=spaceId"),
 			},
 		},
@@ -141,9 +137,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 			expected: &LinkRenderParams{
 				Name:          "Default Icon Block",
-				IconStyle:     "iconCommon icon page c28",
-				IconClass:     "c48",
-				LayoutClass:   "isPage",
 				Url:           templ.SafeURL("anytype://object?objectId=default-icon-id&spaceId=spaceId"),
 			},
 		},
@@ -171,9 +164,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 			expected: &LinkRenderParams{
 				Name:          "Collection Block",
-				LayoutClass:   "isCollection",
-				IconStyle:     "iconCommon icon collection c20",
-				IconClass:     "c20",
 				Url:           templ.SafeURL("anytype://object?objectId=collection-id&spaceId=spaceId"),
 			},
 		},
@@ -202,9 +192,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 			expected: &LinkRenderParams{
 				Name:          "Todo",
-				LayoutClass:   "isTask",
-				IconStyle:     "iconCheckbox c20 icon checkbox unset",
-				IconClass:     "c20",
 				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=spaceId"),
 			},
 		},
@@ -234,9 +221,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 			expected: &LinkRenderParams{
 				Name:          "Todo",
-				LayoutClass:   "isTask",
-				IconStyle:     "iconCheckbox c20 icon checkbox set",
-				IconClass:     "c20",
 				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=spaceId"),
 			},
 		},
