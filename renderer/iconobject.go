@@ -172,6 +172,7 @@ func fileIconName(details *types.Struct) string {
 }
 
 // TODO
+// - блок с иконкой не надо рисовать если нет иконки
 // - finish all layouts
 // - render user svg
 // - render files as inline link

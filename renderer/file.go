@@ -153,11 +153,18 @@ func (r *Renderer) MakeRenderFileParams(b *model.Block) (params *FileRenderParam
 	return
 }
 
-func (r *Renderer) InlineFileBlock(b *model.Block, params *FileRenderParams) templ.Component {
+func getFileClass(b *model.Block) string {
 	file := b.GetFile()
 	fileType := file.GetType()
 	fileTypeName := model.BlockContentFileType_name[int32(fileType)]
 	fileClass := fmt.Sprintf("is%s", fileTypeName)
+
+	return fileClass
+}
+
+func (r *Renderer) InlineFileBlock(b *model.Block, params *FileRenderParams) templ.Component {
+	file := b.GetFile()
+	fileClass := getFileClass(b)
 	details := r.findTargetDetails(file.TargetObjectId)
 
 	props := &IconObjectProps{}
@@ -191,32 +198,53 @@ func isInlineLink(b *model.Block) bool {
 	return isFile || isLink
 }
 
-func (r *Renderer) RenderFile(b *model.Block) (comp templ.Component) {
+func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 	params, err := r.MakeRenderFileParams(b)
 	if err != nil {
 		return NoneTemplate(err.Error())
 	}
 
 	if isInlineLink(b) {
-		comp = r.InlineFileBlock(b, params)
+		return r.InlineFileBlock(b, params)
 	} else {
 		align := GetAlignString(b)
 		classes := []string{align}
 		width := GetWidth(b.Fields)
 
 		mediaParams := params.ToFileMediaRenderParams(width, classes)
-
+		var comp templ.Component
 		switch b.GetFile().GetType() {
-		case model.BlockContentFile_Image:
-			return FileImageTemplate(r, mediaParams)
 		case model.BlockContentFile_PDF:
-			return FilePDFTemplate(r, mediaParams)
+			comp = FilePDFTemplate(r, mediaParams)
+			return comp
+		case model.BlockContentFile_Image:
+			comp = ImageTemplate(mediaParams)
 		case model.BlockContentFile_Audio:
-			return FileAudioTemplate(r, mediaParams)
+			comp = AudioTemplate(mediaParams)
 		case model.BlockContentFile_Video:
-			return FileVideoTemplate(r, mediaParams)
+			comp = VideoTemplate(mediaParams)
+		default:
+			fileTypeStr := b.GetFile().GetType().String()
+			log.Warn("file type is not supported", zap.String("type", fileTypeStr))
+			return NoneTemplate(fmt.Sprintf("file type is not supported: %s", fileTypeStr))
 		}
+		var styles map[string]string
+		if width != "" {
+			styles = map[string]string{
+				"width": width,
+			}
+		}
+
+		blockInnerParams := &BlockWrapperParams{
+			Classes:    []string{"wrap"},
+			Styles:     styles,
+			Components: []templ.Component{comp},
+		}
+		blockInner := BlocksWrapper(blockInnerParams)
+		blockParams := makeDefaultBlockParams(b)
+		blockParams.Content = blockInner
+
+		return BlockTemplate(r, blockParams)
 	}
 
-	return
 }

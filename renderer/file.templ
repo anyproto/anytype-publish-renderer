@@ -1,22 +1,25 @@
 package renderer
 
+
 func getStyle(width string) map[string]string {
     return map[string]string{
         "width": width,
     }
 }
+templ ImageTemplate(p *FileMediaRenderParams) {
+	<img src={ string(p.Src) } class="media" />
+}
+
+templ AudioTemplate(p *FileMediaRenderParams) {
+	<audio controls src={ string(p.Src) }></audio>
+}
+
+templ VideoTemplate(p *FileMediaRenderParams) {
+	<video controls src={ string(p.Src) }></video>
+}
 
 templ FileImageTemplate(r *Renderer, p *FileMediaRenderParams) {
-	<div id={"block" + p.Id } class={"block blockMedia isImage", p.Classes}>
-		<div class="content">
-			<div
-				class="wrap"
-				style={ getStyle(p.Width) }
-			>
-				<img src={ string(p.Src) } class="media" />
-			</div>
-		</div>
-	</div>
+	<img src={ string(p.Src) } class="media" />
 }
 
 templ FilePDFTemplate(r *Renderer, p *FileMediaRenderParams) {
@@ -42,29 +45,6 @@ templ FilePDFTemplate(r *Renderer, p *FileMediaRenderParams) {
 					<div class="icon arrow right"></div>
 					<div class="icon arrow end right"></div>
 				</div>
-			</div>
-		</div>
-	</div>
-}
-
-templ FileAudioTemplate(r *Renderer, p *FileMediaRenderParams) {
-	<div id={"block" + p.Id } class={"block blockMedia isAudio", p.Classes}>
-		<div class="content">
-			<div class="wrap">
-				<audio controls src={ string(p.Src) }></audio>
-			</div>
-		</div>
-	</div>
-}
-
-templ FileVideoTemplate(r *Renderer, p *FileMediaRenderParams) {
-	<div id={"block" + p.Id } class={"block blockMedia isVideo", p.Classes}>
-		<div class="content">
-			<div
-				class="wrap"
-				style={ getStyle(p.Width) }
-			>
-				<video controls src={ string(p.Src) }></video>
 			</div>
 		</div>
 	</div>
