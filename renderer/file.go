@@ -205,7 +205,17 @@ func (r *Renderer) RenderFile(b *model.Block) (comp templ.Component) {
 		width := GetWidth(b.Fields)
 
 		mediaParams := params.ToFileMediaRenderParams(width, classes)
-		return FileImageTemplate(r, mediaParams)
+
+		switch b.GetFile().GetType() {
+		case model.BlockContentFile_Image:
+			return FileImageTemplate(r, mediaParams)
+		case model.BlockContentFile_PDF:
+			return FilePDFTemplate(r, mediaParams)
+		case model.BlockContentFile_Audio:
+			return FileAudioTemplate(r, mediaParams)
+		case model.BlockContentFile_Video:
+			return FileVideoTemplate(r, mediaParams)
+		}
 	}
 
 	return
