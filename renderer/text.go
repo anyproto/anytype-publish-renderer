@@ -11,14 +11,14 @@ import (
 	"unicode/utf16"
 
 	"github.com/a-h/templ"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/anyproto/anytype-publish-renderer/renderer/markintervaltree"
 	"github.com/anyproto/anytype-publish-renderer/utils"
+	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
 )
-
-const bulbEmoji = 0x1F4A1
 
 type TextRenderParams struct {
 	Classes        string
@@ -197,6 +197,8 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 	style := blockText.GetStyle()
 	bgColor := b.GetBackgroundColor()
 	color := blockText.GetColor()
+	iconEmoji := blockText.GetIconEmoji()
+	iconImage := blockText.GetIconImage()
 	classes := []string{"block", "blockText"}
 	contentClasses := []string{"content"}
 
@@ -244,9 +246,19 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		externalComp := BulletMarkerTemplate(color)
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Callout:
-		emojiSrc := r.GetEmojiUrl(bulbEmoji)
-		externalComp := AdditionalEmojiTemplate(emojiSrc)
-		innerFlex = append(innerFlex, externalComp, textComp)
+		details := &types.Struct{ 
+			Fields: map[string]*types.Value{
+				bundle.RelationKeyIconEmoji.String(): pbtypes.String(iconEmoji), 
+				bundle.RelationKeyIconImage.String(): pbtypes.String(iconImage),
+				bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_basic)),
+			},
+		}
+
+		params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: 20 })
+		iconTemplate := IconObjectTemplate(r, params)
+		additionalTemplate := AdditionalIconTemplate(iconTemplate)
+
+		innerFlex = append(innerFlex, additionalTemplate, textComp)
 	case model.BlockContentText_Quote:
 		externalComp := AdditionalQuoteTemplate(color)
 		outerFlex = append(outerFlex, externalComp)
