@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 
@@ -43,10 +44,10 @@ func ToCoverType(val int64) (CoverType, error) {
 
 func (r *Renderer) MakeRenderPageCoverParams() (*CoverRenderParams, error) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
-	return r.getCoverParams(fields)
+	return r.getCoverParams(fields, true, true)
 }
 
-func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, error) {
+func (r *Renderer) getCoverParams(fields *types.Struct, asImage bool, withAuthor bool) (*CoverRenderParams, error) {
 	coverType, err := ToCoverType(pbtypes.GetInt64(fields, "coverType"))
 
 	if err != nil {
@@ -58,6 +59,7 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 	coverX := pbtypes.GetFloat64(fields, "coverX")
 	coverY := pbtypes.GetFloat64(fields, "coverY")
 	coverScale := pbtypes.GetFloat64(fields, "coverScale")
+	class := fmt.Sprintf("type%d", coverType)
 
 	params := &CoverRenderParams{
 		Id:         coverId,
@@ -65,7 +67,9 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 		CoverX:     coverX,
 		CoverY:     coverY,
 		CoverScale: coverScale,
+		Classes:    strings.Join([]string{class, coverId}, " "),
 	}
+
 	switch coverType {
 	case CoverType_Image, CoverType_Source:
 		src, err := r.getFileUrl(coverId)
@@ -73,25 +77,29 @@ func (r *Renderer) getCoverParams(fields *types.Struct) (*CoverRenderParams, err
 			log.Warn("cover rendering failed", zap.Error(err))
 			return nil, err
 		}
-		params.Src = src
-		if coverType == CoverType_Source {
+
+		if withAuthor && coverType == CoverType_Source {
 			author, authorUrl := r.getUnsplashDetails(coverId)
 			if author != "" || authorUrl != "" {
 				params.UnsplashComponent = UnsplashReferral(author, templ.SafeURL(authorUrl))
 			}
 		}
-		params.Classes = "type1"
-		params.CoverTemplate = CoverImageTemplate(params)
-		return params, nil
-	case CoverType_Color, CoverType_Gradient:
-		class := "type2 "
-		if coverType == CoverType_Gradient {
-			class = "type3 "
+
+		params.Src = src
+		if asImage {
+			params.CoverTemplate = CoverImageTemplate(params)
+		} else {
+			params.CoverTemplate = CoverDefaultTemplate(params)
 		}
-		params.Classes = class + coverId
-		params.CoverTemplate = CoverDefaultColor(params)
+
+		return params, nil
+
+	case CoverType_Color, CoverType_Gradient:
+		params.CoverTemplate = CoverDefaultTemplate(params)
+
 		return params, nil
 	}
+
 	err = fmt.Errorf("unknown cover type: %d", int(coverType))
 	log.Warn("cover rendering failed", zap.Error(err))
 	return nil, err

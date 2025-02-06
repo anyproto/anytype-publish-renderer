@@ -2,11 +2,6 @@
 
 .blocks {
 	.block.blockLink {
-		.isArchived {
-			.cardName { color: var(--color-control-active); }
-			.cardName span::before { display: none; }
-		}
-
 		.deleted { color: var(--color-control-active); display: flex; gap: 0px 6px; align-items: center; }
 		.deleted {
 			.name { display: inline-block; vertical-align: top; max-width: calc(100% - 26px); position: relative; @include text-overflow-nw; }
@@ -84,6 +79,11 @@
 		}
 
 		.linkCard.withCover.isVertical.text { padding-top: 0px; }
+	}
+
+	.block.blockLink.isArchived {
+		.cardName { color: var(--color-control-active); }
+		.cardName span::before { display: none; }
 	}
 
 	.block.blockLink.text {

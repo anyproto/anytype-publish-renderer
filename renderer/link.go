@@ -55,7 +55,7 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 	objectTypeName, coverTemplate, coverClass := r.getAdditionalParams(b, targetDetails)
 	spaceId := targetDetails.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 	link := fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
-	classes := []string{linkTypeClass}
+	classes := []string{linkTypeClass, archiveClass}
 	contentClasses := []string{"content"}
 	sidesClasses := []string{"sides"}
 	cardClasses := []string{"linkCard", iconClass, layoutClass, coverClass}
@@ -249,9 +249,10 @@ func (r *Renderer) getAdditionalParams(b *model.Block, details *types.Struct) (o
 			}
 			objectTypeName = snapshot.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeyName.String()].GetStringValue()
 		}
+
 		if relation == "cover" {
 			var err error
-			coverParams, err := r.getCoverParams(details)
+			coverParams, err := r.getCoverParams(details, false, false)
 			if err == nil {
 				coverClass = "withCover"
 				coverTemplate = coverParams.CoverTemplate

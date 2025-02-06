@@ -1,5 +1,9 @@
 package renderer
 
+import (
+	"fmt"
+)
+
 script coverParam(x float64, y float64, scale float64) {
 	window.CoverParam = {};
 
@@ -30,8 +34,16 @@ templ CoverImageTemplate(p *CoverRenderParams) {
      }
 }
 
-templ CoverDefaultColor(p *CoverRenderParams) {
-	<div class={"cover", p.Classes}></div>
+templ CoverDefaultTemplate(p *CoverRenderParams) {
+	<div 
+		class={"cover", p.Classes}
+		style={
+			map[string]string{
+				"background-image": fmt.Sprintf(`url(%s)`, p.Src),
+			}
+	 	}
+	>
+	</div>
 }
 
 templ UnsplashReferral(author string, authorUrl templ.SafeURL) {
