@@ -21,7 +21,12 @@ templ BlockTemplate(r *Renderer, p *BlockParams) {
 }
 // wraps multiple components
 templ BlocksWrapper(p *BlockWrapperParams) {
-	<div class={ p.Classes }>
+	<div class={ p.Classes }
+
+		 if p.Styles != nil {
+		 style={ p.Styles }
+		 }
+		>
 		for _, comp := range p.Components {
 			@comp
 		}
