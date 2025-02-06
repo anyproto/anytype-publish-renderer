@@ -19,9 +19,9 @@ type RelationRenderSetting struct {
 	IsFeatured       bool
 	EvaluateMore     bool
 	ShowRelationName bool
-	LastClass        string
-	FormatClass      string
 	Key              string
+	InitClass        string
+	Classes          []string
 }
 
 func (r *Renderer) MakeRelationRenderParams(b *model.Block) templ.Component {
@@ -30,7 +30,7 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) templ.Component {
 	if key == "" {
 		return nil
 	}
-	params := &RelationRenderSetting{Key: key, ShowRelationName: true}
+	params := &RelationRenderSetting{Key: key, ShowRelationName: true, InitClass: "sides"}
 	return r.fillRelationsParams(params)
 }
 
@@ -39,27 +39,29 @@ func (r *Renderer) fillRelationsParams(params *RelationRenderSetting) templ.Comp
 	if !found {
 		return nil
 	}
-	blockWrapperParams := &BlockWrapperParams{}
+	rootWrapper := &BlockWrapperParams{Classes: []string{params.InitClass}}
 	if params.ShowRelationName {
-		blockWrapperParams.Classes = []string{"info"}
-		blockWrapperParams.Components = []templ.Component{NameTemplate("name", name)}
+		rootWrapper.Components = append(rootWrapper.Components, BlocksWrapper(&BlockWrapperParams{
+			Classes:    []string{"info"},
+			Components: []templ.Component{NameTemplate("name", name)},
+		}))
 	}
 	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[params.Key]
 	if relationValue == nil {
-		blockWrapperParams.Classes = append(blockWrapperParams.Classes, "isEmpty")
-		blockWrapperParams.Components = append(blockWrapperParams.Components, CellTemplate(params, NameTemplate("empty", "")))
-		return BlocksWrapper(blockWrapperParams)
+		params.Classes = append(params.Classes, "isEmpty")
+		rootWrapper.Components = append(rootWrapper.Components, CellTemplate(params, NameTemplate("empty", "")))
+		return BlocksWrapper(rootWrapper)
 	}
 	formatClass := r.getFormatClass(format)
-	params.FormatClass = formatClass
+	params.Classes = append(params.Classes, formatClass)
 	switch format {
 	case model.RelationFormat_object, model.RelationFormat_tag, model.RelationFormat_status, model.RelationFormat_file:
 		listTemplate := r.getListComponent(params, format, relationValue)
-		blockWrapperParams.Components = append(blockWrapperParams.Components, CellTemplate(params, listTemplate))
+		rootWrapper.Components = append(rootWrapper.Components, CellTemplate(params, listTemplate))
 	default:
-		blockWrapperParams.Components = append(blockWrapperParams.Components, CellTemplate(params, r.populateRelationValue(format, relationValue)))
+		rootWrapper.Components = append(rootWrapper.Components, CellTemplate(params, r.populateRelationValue(format, relationValue)))
 	}
-	return BlocksWrapper(blockWrapperParams)
+	return BlocksWrapper(rootWrapper)
 }
 
 func (r *Renderer) getListComponent(params *RelationRenderSetting, format model.RelationFormat, relationValue *types.Value) templ.Component {
@@ -89,7 +91,6 @@ func (r *Renderer) fetchRelationMetadata(relation *model.Relation, relationKey d
 	if relation != nil {
 		return relation.Name, relation.Format, true
 	}
-
 	for _, snapshot := range r.UberSp.PbFiles {
 		sn, err := readJsonpbSnapshot(snapshot)
 		if err != nil || sn.SbType != model.SmartBlockType_STRelation {
@@ -222,7 +223,7 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 		}
 		icon := r.getIconFromDetails(details)
 		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
-		elements = append(elements, ListElement(ObjectElement(name, templ.URL(link)), icon))
+		elements = append(elements, ListElement(ObjectElement(name, templ.SafeURL(link)), icon))
 	}
 	return elements
 }
@@ -256,11 +257,7 @@ func (r *Renderer) RenderRelations(b *model.Block) templ.Component {
 		return NoneTemplate("")
 	}
 	blockParams := makeDefaultBlockParams(b)
-	blockWrapperParams := &BlockWrapperParams{
-		Classes:    []string{"sides"},
-		Components: []templ.Component{component},
-	}
-	blockParams.Content = BlocksWrapper(blockWrapperParams)
+	blockParams.Content = component
 
 	return BlockTemplate(r, blockParams)
 }

@@ -1,14 +1,12 @@
 package renderer
 
-import "github.com/a-h/templ"
-
 templ NameTemplate(classes string, name string) {
     <div class={ classes }> { name } </div>
 }
 
 templ CellTemplate(params *RelationRenderSetting, component templ.Component) {
     <div class={"cell " + params.FormatClass}>
-        <div class={"cellContent " + params.LastClass}>
+        <div class={"cellContent", params.Classes}>
             @component
         </div>
         if params.IsFeatured {
@@ -20,7 +18,7 @@ templ CellTemplate(params *RelationRenderSetting, component templ.Component) {
 templ ListTemplate(more string, components []templ.Component) {
     <div class="wrap">
             <div class="over">
-                for component := range components {
+                for _, component := range components {
                     @component
                 }
                 if more != "" {
@@ -30,7 +28,7 @@ templ ListTemplate(more string, components []templ.Component) {
     </div>
 }
 
-templ ListElement(component, icon templ.Component) {
+templ ListElement(component templ.Component, icon templ.Component) {
     <div class="element">
         <div class="flex">
             if icon != nil {

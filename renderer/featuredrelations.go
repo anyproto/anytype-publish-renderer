@@ -51,7 +51,7 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details
 	settings := &RelationRenderSetting{
 		IsFeatured:   true,
 		EvaluateMore: true,
-		LastClass:    lastClass,
+		Classes:      []string{lastClass},
 		Key:          relationKey,
 	}
 	cells = append(cells, r.fillRelationsParams(settings))
