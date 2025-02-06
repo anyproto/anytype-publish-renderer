@@ -16,7 +16,6 @@
         ANYTYPE_LOG_NOGELF="1";
         nativeBuildInputs = [
           pkgs.go_1_23
-          pkgs.templ
           pkgs.nodejs_22
         ];
       };

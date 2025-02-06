@@ -15,6 +15,7 @@ import (
 type BookmarkRendererParams struct {
 	Id          string
 	Classes     string
+	SideLeftClasses string
 	IsEmpty     bool
 	Url         string
 	Favicon     string
@@ -26,7 +27,13 @@ type BookmarkRendererParams struct {
 
 func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkRendererParams) {
 	bookmark := b.GetBookmark()
+	bgColor := b.GetBackgroundColor()
 	classes := []string{"block", "blockBookmark"}
+	sideLeftClasses := []string{"side", "left"}
+
+	if bgColor != "" {
+		sideLeftClasses = append(sideLeftClasses, "bgColor", "bgColor-" + bgColor)
+	}
 
 	if bookmark.GetUrl() == "" {
 		return &BookmarkRendererParams{IsEmpty: true}
@@ -78,12 +85,13 @@ func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkR
 	return &BookmarkRendererParams{
 		Id:          b.Id,
 		Classes:     strings.Join(classes, " "),
+		SideLeftClasses: strings.Join(sideLeftClasses, " "),
 		Url:         parsedUrl.Host,
 		Favicon:     favicon,
 		Name:        html.UnescapeString(name),
 		Description: html.UnescapeString(description),
 		Image:       image,
-		SafeUrl:     templ.SafeURL(bookmark.GetUrl()),
+		SafeUrl:     templ.URL(bookmark.GetUrl()),
 	}
 }
 
