@@ -142,11 +142,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-<<<<<<< Updated upstream
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" type=\"text/javascript\"></script></head><body><main>")
-=======
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" type=\"text/javascript\"></script><script type=\"text/javascript\">\n\t\t\t\twindow.addEventListener('message', e => window.onMessage(e.data));\n\t\t\t</script></head><body><main><header class=\"header\">")
->>>>>>> Stashed changes
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" type=\"text/javascript\"></script></head><body><main><header class=\"header\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
