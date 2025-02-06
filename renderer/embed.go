@@ -1,7 +1,6 @@
 package renderer
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -11,7 +10,6 @@ import (
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
-	"go.uber.org/zap"
 )
 
 type EmbedIframeData struct {
@@ -160,16 +158,6 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 			break
 
 		case model.BlockContentLatex_Graphviz:
-			jsObj := JsSVGString{
-				Content: text,
-			}
-			jsObjString, err := json.Marshal(jsObj)
-			if err != nil {
-				log.Error("svg json marshal error", zap.Error(err))
-				text = fmt.Sprintf("<script>window.svgSrc['%s'] = `digraph { graphviz -> render error }`</script>", "block-" + b.Id)
-			} else {
-				text = fmt.Sprintf("<script>window.svgSrc['%s'] = %s</script>", "block-" + b.Id, string(jsObjString))
-			}
 			break
 	}
 

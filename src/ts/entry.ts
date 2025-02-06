@@ -129,23 +129,16 @@ function renderMermaid () {
 };
 
 function renderGraphviz () {
-	/*
-    const gphBlocks = document.querySelectorAll(".isGraphviz");
-    gphBlocks.forEach(b => {
-        const gphFormula = window.svgSrc[b.id].content
-        try {
-            const viz = new Viz()
-            viz.renderSVGElement(gphFormula).then(svg => {
-                parent = b.querySelector(".content")
-                parent.appendChild(svg);
-            }, err => {
-                console.error("viz error:",err)
-            });
-        } catch (e) {
-            console.error("viz error:",e);
-        };
-    });
-	*/
+	const blocks = $(`.block.blockEmbed.isGraphviz > .content`);
+
+	blocks.each((i, block) => {
+		block = $(block);
+
+		viz().then(viz => {
+			const text = block.text();
+			block.html(viz.renderSVGElement(text));
+		});
+	});
 };
 
 function renderPrism () {
