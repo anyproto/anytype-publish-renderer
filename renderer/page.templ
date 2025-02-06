@@ -34,11 +34,13 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
         </head>
 		<body>
 			<main>
-				if r.joinSpaceLink() != "" {
-					<div class="joinSpace">
-						<a href={r.joinSpaceLink()} target="_blank" class="fathom" data-event="PublishJoinSpaceClick">Join Space</a>
-					</div>
-				}
+				<header class="header">
+					if r.joinSpaceLink() != "" {
+						<a href={r.joinSpaceLink()} target="_blank" class="button black c28 fathom" data-event="PublishJoinSpaceClick">
+							Join Space
+						</a>
+					}
+				</header>
 
 				<div class="coverWrapper">
 					@r.RenderPageCover()
