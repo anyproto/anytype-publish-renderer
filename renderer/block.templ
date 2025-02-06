@@ -19,3 +19,11 @@ templ BlockTemplate(r *Renderer, p *BlockParams) {
 		</div>
 	</div>
 }
+// wraps multiple components
+templ BlocksWrapper(p *BlockWrapperParams) {
+	<div class={ p.Classes }>
+		for _, comp := range p.Components {
+			@comp
+		}
+	</div>
+}

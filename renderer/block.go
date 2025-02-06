@@ -54,6 +54,11 @@ type BlockParams struct {
 	ChildrenIds []string
 }
 
+type BlockWrapperParams struct {
+	Classes    []string
+	Components []templ.Component
+}
+
 func makeDefaultBlockParams(b *model.Block) *BlockParams {
 	a := b.GetAlign()
 	align := fmt.Sprintf("align%d", a)

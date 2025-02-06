@@ -81,7 +81,7 @@ func (r *Renderer) getCoverParams(fields *types.Struct, asImage bool, withAuthor
 		if withAuthor && coverType == CoverType_Source {
 			author, authorUrl := r.getUnsplashDetails(coverId)
 			if author != "" || authorUrl != "" {
-				params.UnsplashComponent = UnsplashReferral(author, templ.SafeURL(authorUrl))
+				params.UnsplashComponent = UnsplashReferral(author, templ.URL(authorUrl))
 			}
 		}
 
