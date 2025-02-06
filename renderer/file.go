@@ -9,6 +9,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/anyproto/anytype-publish-renderer/utils"
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
 )
@@ -157,6 +158,7 @@ func getFileClass(b *model.Block) string {
 	file := b.GetFile()
 	fileType := file.GetType()
 	fileTypeName := model.BlockContentFileType_name[int32(fileType)]
+	fileTypeName = utils.Capitalize(strings.ToLower(fileTypeName))
 	fileClass := fmt.Sprintf("is%s", fileTypeName)
 
 	return fileClass
@@ -212,11 +214,13 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 		width := GetWidth(b.Fields)
 
 		mediaParams := params.ToFileMediaRenderParams(width, classes)
+
 		var comp templ.Component
 		switch b.GetFile().GetType() {
 		case model.BlockContentFile_PDF:
-			comp = FilePDFTemplate(r, mediaParams)
-			return comp
+			blockParams := makeDefaultBlockParams(b)
+			blockParams.Content = FilePDFTemplate(r, mediaParams)
+			return BlockTemplate(r, blockParams)
 		case model.BlockContentFile_Image:
 			comp = ImageTemplate(mediaParams)
 		case model.BlockContentFile_Audio:
@@ -228,6 +232,7 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 			log.Warn("file type is not supported", zap.String("type", fileTypeStr))
 			return NoneTemplate(fmt.Sprintf("file type is not supported: %s", fileTypeStr))
 		}
+
 		var styles map[string]string
 		if width != "" {
 			styles = map[string]string{

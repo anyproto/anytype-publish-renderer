@@ -23,29 +23,25 @@ templ FileImageTemplate(r *Renderer, p *FileMediaRenderParams) {
 }
 
 templ FilePDFTemplate(r *Renderer, p *FileMediaRenderParams) {
-	<div id={"block" + p.Id }  class={"block blockMedia isPdf", p.Classes}>
-		<div class="content">
-			<div
-				class="wrap"
-				style={ getStyle(p.Width) }
-				data-id={p.Id}
-				data-src={string(p.Src)}
-			>
-				<a href={p.Src} target="_blank" class="info">
-					<span class="name">{p.Name}</span>
-					<span class="size">{p.Size}</span>
-				</a>
+	<div
+	 class="wrap"
+	 style={ getStyle(p.Width) }
+	 data-id={p.Id}
+	 data-src={string(p.Src)}
+		>
+		<a href={p.Src} target="_blank" class="info">
+			<span class="name">{p.Name}</span>
+			<span class="size">{p.Size}</span>
+		</a>
 
-				<canvas id={"pdfCanvas-" + p.Id} />
+		<canvas id={"pdfCanvas-" + p.Id} />
 
-				<div class="pager">
-					<div class="icon arrow end left"></div>
-					<div class="icon arrow left"></div>
-					<div class="number"></div>
-					<div class="icon arrow right"></div>
-					<div class="icon arrow end right"></div>
-				</div>
-			</div>
+		<div class="pager">
+			<div class="icon arrow end left"></div>
+			<div class="icon arrow left"></div>
+			<div class="number"></div>
+			<div class="icon arrow right"></div>
+			<div class="icon arrow end right"></div>
 		</div>
 	</div>
 }
