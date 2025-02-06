@@ -83,7 +83,7 @@ func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkR
 		Name:        html.UnescapeString(name),
 		Description: html.UnescapeString(description),
 		Image:       image,
-		SafeUrl:     templ.SafeURL(bookmark.GetUrl()),
+		SafeUrl:     templ.URL(bookmark.GetUrl()),
 	}
 }
 

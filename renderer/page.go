@@ -84,8 +84,8 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	}
 
 	return &RenderPageParams{
-		Classes:	 strings.Join(classes, " "),
-		Name:   	 name,
+		Classes:     strings.Join(classes, " "),
+		Name:        name,
 		Description: descr,
 	}
 }
@@ -145,5 +145,5 @@ func (r *Renderer) RenderBlock(blockId string) templ.Component {
 }
 
 func (r *Renderer) joinSpaceLink() templ.SafeURL {
-	return templ.SafeURL(r.UberSp.Meta.InviteLink)
+	return templ.URL(r.UberSp.Meta.InviteLink)
 }
