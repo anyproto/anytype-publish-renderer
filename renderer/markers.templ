@@ -22,9 +22,11 @@ templ EmojiTemplate(emojiPath, sizeClass string) {
 	</div>
 }
 
-templ AdditionalEmojiTemplate(emojiPath string) {
+templ AdditionalIconTemplate(iconTemplate templ.Component) {
 	<div class="additional">
-		@EmojiTemplate(emojiPath, "c20")
+		if iconTemplate != nil {
+			@iconTemplate
+		}
 	</div>
 }
 

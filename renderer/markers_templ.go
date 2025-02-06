@@ -178,7 +178,7 @@ func EmojiTemplate(emojiPath, sizeClass string) templ.Component {
 	})
 }
 
-func AdditionalEmojiTemplate(emojiPath string) templ.Component {
+func AdditionalIconTemplate(iconTemplate templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -203,9 +203,11 @@ func AdditionalEmojiTemplate(emojiPath string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = EmojiTemplate(emojiPath, "c20").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
+		if iconTemplate != nil {
+			templ_7745c5c3_Err = iconTemplate.Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div>")
 		if templ_7745c5c3_Err != nil {
@@ -348,7 +350,7 @@ func NumberMarkerTemplate(number string) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(number)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 69, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 71, Col: 11}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -390,7 +392,7 @@ func ToggleMarkerTemplate(color string) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(color)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 79, Col: 383}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/markers.templ`, Line: 81, Col: 383}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {

@@ -67,10 +67,13 @@ func (r *Renderer) RenderTable(b *model.Block) templ.Component {
 }
 
 func (r *Renderer) MakeRenderTableRowCellParams(b *model.Block) (params *RenderTableRowCellParams) {
+	align := fmt.Sprintf("align-h%d", b.GetAlign())
+	vAlign := fmt.Sprintf("align-v%d", b.GetVerticalAlign())
+	classes := []string{"cell", align, vAlign}
 
 	textComp := r.RenderBlock(b.Id)
 	params = &RenderTableRowCellParams{
-		Classes:  "",
+		Classes:  strings.Join(classes, " "),
 		Id:       b.Id,
 		TextComp: textComp,
 	}
