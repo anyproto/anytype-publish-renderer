@@ -2,6 +2,9 @@ package renderer
 
 import (
 	"fmt"
+	"path/filepath"
+	"time"
+
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pb"
@@ -9,8 +12,6 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
-	"path/filepath"
-	"time"
 )
 
 const defaultName = "Untitled"
@@ -192,6 +193,27 @@ func (r *Renderer) extractRelationValues(relationValue *types.Value) []*types.Va
 		return relationValue.GetListValue().Values
 	}
 	return []*types.Value{relationValue}
+}
+
+func (r *Renderer) getIconFromDetails(details *types.Struct, iconClass string) (icon, updatedIconClass string) {
+	emojiField := details.GetFields()[bundle.RelationKeyIconEmoji.String()]
+	if emojiField != nil && emojiField.GetStringValue() != "" {
+		emojiRune := []rune(emojiField.GetStringValue())[0]
+		icon = r.GetEmojiUrl(emojiRune)
+		return icon, iconClass + " withIcon"
+	}
+
+	imageField := details.GetFields()[bundle.RelationKeyIconImage.String()]
+	if imageField != nil && imageField.GetStringValue() != "" {
+		icon, err := r.getFileUrl(imageField.GetStringValue())
+		if err != nil {
+			log.Error("Failed to get file URL for icon", zap.Error(err))
+			return "", iconClass
+		}
+		return icon, iconClass + " withImage"
+	}
+
+	return "", iconClass
 }
 
 func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Component {

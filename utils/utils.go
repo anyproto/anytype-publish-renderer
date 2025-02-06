@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"strings"
+	"unicode"
 
 	"github.com/a-h/templ"
 )
@@ -35,4 +36,14 @@ func GetColor(name string) string {
 		return hex
 	}
 	return Colors["default"]
+}
+
+// Capitalize the first letter of a string
+func Capitalize(s string) string {
+	if s == "" {
+		return s
+	}
+	runes := []rune(s)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
 }
