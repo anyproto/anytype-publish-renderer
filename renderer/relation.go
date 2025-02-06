@@ -233,7 +233,7 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 		icon, class := r.getIconFromDetails(details, "c20")
 		layoutClass := getLayoutClass(details)
 		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
-		elements = append(elements, ObjectsListElement(layoutClass, icon, class, name, templ.SafeURL(link)))
+		elements = append(elements, ObjectsListElement(layoutClass, icon, class, name, templ.URL(link)))
 	}
 	return elements
 }

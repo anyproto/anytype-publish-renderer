@@ -21,19 +21,27 @@ type FileFileRenderParams struct {
 }
 
 type FileMediaRenderParams struct {
-	Id         string
-	Src        string
-	Classes    string
-	Width      string
+	Id      string
+	Src     string
+	Classes string
+	Width   string
 }
 
 type FilePdfRenderParams struct {
-	Id         string
-	Src        string
-	Classes    string
-	Width      string
-	Name	   string
-	Size	   string
+	Id      string
+	Src     string
+	Classes string
+	Width   string
+	Name    string
+	Size    string
+}
+type SizeSpanRenderParams struct {
+	Size string
+}
+
+type NameLinkRenderParams struct {
+	Name string
+	Src  templ.SafeURL
 }
 
 func (r *Renderer) getFileUrl(id string) (url string, err error) {
@@ -96,19 +104,19 @@ func GetWidth(fields *types.Struct) string {
 	width := pbtypes.GetFloat64(fields, "width")
 	log.Debug("image width", zap.Float64("width", width))
 
-	if int(width * 100) != 0 {
+	if int(width*100) != 0 {
 		return strconv.Itoa(int(width*100)) + "%"
 	}
 	return ""
 }
 
 func GetAlign(align model.BlockAlign) string {
-	return "align" + strconv.Itoa(int(align));
+	return "align" + strconv.Itoa(int(align))
 }
 
 func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileMediaRenderParams, err error) {
 	file := b.GetFile()
-	
+
 	var src string
 	src, err = r.getFileUrl(file.TargetObjectId)
 	if err != nil {
@@ -119,10 +127,10 @@ func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileMediaR
 	align := "align" + strconv.Itoa(int(b.GetAlign()))
 
 	params = &FileMediaRenderParams{
-		Id:         b.Id,
-		Src:        src,
-		Classes:    align,
-		Width:		GetWidth(b.Fields),
+		Id:      b.Id,
+		Src:     src,
+		Classes: align,
+		Width:   GetWidth(b.Fields),
 	}
 
 	return
@@ -141,12 +149,12 @@ func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FilePdfRende
 	size := prettyByteSize(file.Size_)
 
 	params = &FilePdfRenderParams{
-		Id:         b.Id,
-		Src:        src,
-		Classes:    GetAlign(b.GetAlign()),
-		Width:		GetWidth(b.Fields),
-		Name:		name,
-		Size:		size,
+		Id:      b.Id,
+		Src:     src,
+		Classes: GetAlign(b.GetAlign()),
+		Width:   GetWidth(b.Fields),
+		Name:    name,
+		Size:    size,
 	}
 
 	return
@@ -162,10 +170,10 @@ func (r *Renderer) MakeRenderFileAudioParams(b *model.Block) (params *FileMediaR
 	}
 
 	params = &FileMediaRenderParams{
-		Id:         b.Id,
-		Src:        src,
-		Classes:    GetAlign(b.GetAlign()),
-		Width:		GetWidth(b.Fields),
+		Id:      b.Id,
+		Src:     src,
+		Classes: GetAlign(b.GetAlign()),
+		Width:   GetWidth(b.Fields),
 	}
 
 	return
@@ -181,10 +189,10 @@ func (r *Renderer) MakeRenderFileVideoParams(b *model.Block) (params *FileMediaR
 	}
 
 	params = &FileMediaRenderParams{
-		Id:         b.Id,
-		Src:        src,
-		Classes:    GetAlign(b.GetAlign()),
-		Width:		GetWidth(b.Fields),
+		Id:      b.Id,
+		Src:     src,
+		Classes: GetAlign(b.GetAlign()),
+		Width:   GetWidth(b.Fields),
 	}
 
 	return
@@ -215,7 +223,7 @@ func (r *Renderer) MakeRenderFileFileParams(b *model.Block) (params *FileFileRen
 
 	params = &FileFileRenderParams{
 		Id:   b.Id,
-		Src:  templ.SafeURL(src),
+		Src:  templ.URL(src),
 		Name: name,
 		Size: size,
 	}
@@ -226,6 +234,11 @@ func (r *Renderer) MakeRenderFileFileParams(b *model.Block) (params *FileFileRen
 func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 	file := b.GetFile()
 	fileType := file.GetType()
+	fileTypeName := model.BlockContentFileType_name[int32(fileType)]
+	fileClass := fmt.Sprintf("is%s", fileTypeName)
+
+	details := r.findTargetDetails(file.TargetObjectId)
+
 	switch fileType {
 	case model.BlockContentFile_Image:
 		params, err := r.MakeRenderFileImageParams(b)
@@ -256,7 +269,27 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 		if err != nil {
 			return NoneTemplate(err.Error())
 		}
-		return FileFileTemplate(r, params)
+		props := &IconObjectProps{}
+		iconParams := r.MakeRenderIconObjectParams(details, props)
+		iconParams.Classes = append(iconParams.Classes, fileClass)
+		iconComp := IconObjectTemplate(r, iconParams)
+		nameComp := NameLinkTemplate(&NameLinkRenderParams{
+			Name: params.Name,
+			Src:  params.Src,
+		})
+		sizeComp := SizeSpanTemplate(&SizeSpanRenderParams{
+			Size: params.Size,
+		})
+
+		blockInnerParams := &BlockWrapperParams{
+			Classes:    []string{"inner"},
+			Components: []templ.Component{iconComp, nameComp, sizeComp},
+		}
+		blockInner := BlocksWrapper(blockInnerParams)
+		blockParams := makeDefaultBlockParams(b)
+		blockParams.Content = blockInner
+
+		return BlockTemplate(r, blockParams)
 
 	default:
 		log.Warn("file type is not supported", zap.String("type", fileType.String()))

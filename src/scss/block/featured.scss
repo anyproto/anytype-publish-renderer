@@ -7,9 +7,6 @@
 	.block.blockFeatured {
 		> .content { width: 100%; }
 
-		.icon.checkbox { width: 20px; height: 20px; vertical-align: middle; margin-top: -4px; background-image: url('~img/icon/dataview/checkbox0.svg'); }
-		.icon.checkbox.active { background-image: url('~img/icon/dataview/checkbox1.svg'); }
-
 		.wrap { display: flex; flex-direction: row; align-items: center; gap: 0px 2px; flex-wrap: wrap; }
 		.bullet { width: 4px; height: 4px; border-radius: 50%; background: var(--color-text-secondary); }
 

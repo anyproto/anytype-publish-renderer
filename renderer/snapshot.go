@@ -21,6 +21,10 @@ type relType interface {
 
 type relTransformer[V relType] func(*types.Value) V
 
+func relationToString(field *types.Value) string {
+	return field.GetStringValue()
+}
+
 func (r *Renderer) relationToEmojiUrl(emojiField *types.Value) string {
 	if emojiField.GetStringValue() != "" {
 		emojiRune := []rune(emojiField.GetStringValue())[0]

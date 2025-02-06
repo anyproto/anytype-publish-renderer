@@ -64,7 +64,7 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 	size, iconSize := getLinkIconSize(b)
 
 	params := r.MakeRenderIconObjectParams(targetDetails, &IconObjectProps{
-		Size: int32(size),
+		Size:     int32(size),
 		IconSize: int32(iconSize),
 	})
 	iconTemplate := IconObjectTemplate(r, params)
@@ -77,12 +77,12 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 		cardClasses = append(cardClasses, "withCover")
 	}
 
-	n := 1;
+	n := 1
 	if description != "" {
-		n++;
+		n++
 	}
 	if objectTypeName != "" {
-		n++;
+		n++
 	}
 
 	cardClasses = append(cardClasses, fmt.Sprintf("c%d", n))
@@ -97,7 +97,7 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 		Name:           name,
 		Description:    description,
 		Type:           objectTypeName,
-		Url:            templ.SafeURL(link),
+		Url:            templ.URL(link),
 		CoverTemplate:  coverTemplate,
 		IconTemplate:   iconTemplate,
 	}
@@ -162,20 +162,20 @@ func getArchiveClass(details *types.Struct) string {
 	return ""
 }
 
-func getLinkIconSize (b *model.Block) (int, int) {
+func getLinkIconSize(b *model.Block) (int, int) {
 	link := b.GetLink()
 	cardStyle := link.GetCardStyle()
 	iconSize := link.GetIconSize()
 
-	newSize := 20;
-	newIconSize := 20;
+	newSize := 20
+	newIconSize := 20
 
 	if (cardStyle != model.BlockContentLink_Text) && (iconSize == model.BlockContentLink_SizeMedium) {
-		newSize = 48;
-		newIconSize = 28;
-	};
+		newSize = 48
+		newIconSize = 28
+	}
 
-	return newSize, newIconSize;
+	return newSize, newIconSize
 }
 
 func (r *Renderer) getAdditionalParams(b *model.Block, details *types.Struct) (objectTypeName string, coverTemplate templ.Component) {
