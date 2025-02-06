@@ -121,7 +121,7 @@ func (r *Renderer) populateRelationValue(format model.RelationFormat, relationVa
 	case model.RelationFormat_shorttext, model.RelationFormat_longtext:
 		return BasicTemplate(relationValue.GetStringValue())
 	case model.RelationFormat_number:
-		return BasicTemplate(fmt.Sprintf("%f", relationValue.GetNumberValue()))
+		return BasicTemplate(fmt.Sprintf("%g", relationValue.GetNumberValue()))
 	case model.RelationFormat_phone, model.RelationFormat_email, model.RelationFormat_url:
 		return BasicTemplate(relationValue.GetStringValue())
 	case model.RelationFormat_date:
