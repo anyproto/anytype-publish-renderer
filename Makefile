@@ -19,20 +19,28 @@ setup-go:
 	@echo 'Setting up go modules...'
 	@go mod download
 
-build: setup-go deps
-	npm run build
-	templ generate -lazy
-	go build -o $(EXEC) .
-
 deps:
 	echo $(TEMPL_VER)
 	go install github.com/a-h/templ/cmd/templ@$(TEMPL_VER)
 
+build-templ:
+	templ generate -lazy
+
+build-js-css:
+	npm run build
+
+build-go:
+	go build -o $(EXEC) .
+
+build: setup-go deps build-js-css build-templ build-go
+
 test: setup-go
 	go test -v ./...
 
+render-no-js-css: build-templ build-go
+	$(EXEC) $(SNAPSHOT_PATH) > index.html
+
 render: build
-	templ generate -lazy
 	$(EXEC) $(SNAPSHOT_PATH) > index.html
 
 clean-html:
