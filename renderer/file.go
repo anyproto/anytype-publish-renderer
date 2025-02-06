@@ -77,7 +77,7 @@ func (r *Renderer) getFileUrl(id string) (url string, err error) {
 
 }
 
-func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err error) {
+func (r *Renderer) getFileBlock(id string) (block *model.Block, err error) {
 	path := fmt.Sprintf("filesObjects/%s.pb", id)
 	var (
 		jsonPbSnapshot string
@@ -101,7 +101,7 @@ func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err e
 		if bl.GetFile() == nil {
 			continue
 		}
-		return bl.GetFile(), nil
+		return bl, nil
 	}
 	return
 }
@@ -164,7 +164,7 @@ func getFileClass(b *model.Block) string {
 	return fileClass
 }
 
-func (r *Renderer) InlineFileBlock(b *model.Block, params *FileRenderParams) templ.Component {
+func (r *Renderer) FileIconBlock(b *model.Block, params *FileRenderParams) templ.Component {
 	file := b.GetFile()
 	fileClass := getFileClass(b)
 	details := r.findTargetDetails(file.TargetObjectId)
@@ -173,6 +173,11 @@ func (r *Renderer) InlineFileBlock(b *model.Block, params *FileRenderParams) tem
 	iconParams := r.MakeRenderIconObjectParams(details, props)
 	iconParams.Classes = append(iconParams.Classes, fileClass)
 	iconComp := IconObjectTemplate(r, iconParams)
+	return iconComp
+}
+
+func (r *Renderer) InlineFileBlock(b *model.Block, params *FileRenderParams) templ.Component {
+	iconComp := r.FileIconBlock(b, params)
 	nameComp := NameLinkTemplate(&NameLinkRenderParams{
 		Name: params.Name,
 		Src:  params.Src,
