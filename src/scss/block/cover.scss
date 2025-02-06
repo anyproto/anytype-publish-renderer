@@ -1,8 +1,8 @@
 @use "../_mixins" as *;
 
-.block.blockCover { height: 312px; width: 100%; border-radius: 4px; overflow: hidden; margin: 0px auto; position: relative; }
+.block.blockCover { height: 312px; width: 100%; border-radius: 4px; overflow: hidden; margin: 0px auto; position: relative; padding: 16px 16px 0px 16px; }
 .block.blockCover {
-	> .content { position: relative; z-index: 1; width: 100%; height: 100%; }
+	> .content { position: relative; z-index: 1; width: 100%; height: 100%; padding: 0px; }
 	
 	.wrap { position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; overflow: hidden; }
 	.cover { position: absolute; left: 0px; top: 0px; transform-origin: 0px 0px; }
