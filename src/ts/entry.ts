@@ -30,8 +30,12 @@ declare global {
 window.svgSrc = {};
 
 function renderCover () {
-	const { x, y, scale } = window.CoverParam;
 	const block = $('.block.blockCover');
+	if (!block.length) {
+		return;
+	};
+
+	const { x, y, scale } = window.CoverParam || {};
 	const cover = block.find('#cover');
 	const bw = block.width();
 	const bh = block.height();
@@ -234,7 +238,7 @@ function renderPdf () {
 	});
 };
 
-document.addEventListener("DOMContentLoaded", function() {
+$(document).ready(() => {
 	const win = $(window);
     const renderFns = [ 
 		renderCover,
