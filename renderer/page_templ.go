@@ -142,12 +142,12 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" type=\"text/javascript\"></script><script type=\"text/javascript\">\n\t\t\t\twindow.addEventListener('message', e => window.onMessage(e.data));\n\t\t\t</script></head><body><main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" type=\"text/javascript\"></script><script type=\"text/javascript\">\n\t\t\t\twindow.addEventListener('message', e => window.onMessage(e.data));\n\t\t\t</script></head><body><main><header class=\"header\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if r.joinSpaceLink() != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"joinSpace\"><a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -156,12 +156,12 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" target=\"_blank\" class=\"fathom\" data-event=\"PublishJoinSpaceClick\">Join Space</a></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" target=\"_blank\" class=\"button black c28 fathom\" data-event=\"PublishJoinSpaceClick\">Join Space</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"coverWrapper\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</header><div class=\"coverWrapper\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -213,7 +213,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></div><a href=\"https://anytype.io/\" target=\"_blank\" class=\"madeInAnytype fathom\" data-event=\"PublishSiteClick\"><div class=\"icon\"></div><div class=\"text\">Crafted with Anytype</div></a></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></div><footer class=\"footer\"><a href=\"https://anytype.io/\" target=\"_blank\" class=\"button c36 fathom\" data-event=\"PublishSiteClick\"><div class=\"icon\"></div><div class=\"text\">Crafted with Anytype</div></a></footer></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

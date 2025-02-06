@@ -37,11 +37,13 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
         </head>
 		<body>
 			<main>
-				if r.joinSpaceLink() != "" {
-					<div class="joinSpace">
-						<a href={r.joinSpaceLink()} target="_blank" class="fathom" data-event="PublishJoinSpaceClick">Join Space</a>
-					</div>
-				}
+				<header class="header">
+					if r.joinSpaceLink() != "" {
+						<a href={r.joinSpaceLink()} target="_blank" class="button black c28 fathom" data-event="PublishJoinSpaceClick">
+							Join Space
+						</a>
+					}
+				</header>
 
 				<div class="coverWrapper">
 					@r.RenderPageCover()
@@ -58,10 +60,12 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 					</div>
 				</div>
 
-				<a href="https://anytype.io/" target="_blank" class="madeInAnytype fathom" data-event="PublishSiteClick">
-					<div class="icon"></div>
-					<div class="text">Crafted with Anytype</div>
-				</a>
+				<footer class="footer">
+					<a href="https://anytype.io/" target="_blank" class="button c36 fathom" data-event="PublishSiteClick">
+						<div class="icon"></div>
+						<div class="text">Crafted with Anytype</div>
+					</a>
+				</footer>
 
 			</main>
 
