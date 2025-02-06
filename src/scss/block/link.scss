@@ -2,6 +2,8 @@
 
 .blocks {
 	.block.blockLink {
+		> .content { padding: 0px; }
+
 		.deleted { color: var(--color-control-active); display: flex; gap: 0px 6px; align-items: center; }
 		.deleted {
 			.name { display: inline-block; vertical-align: top; max-width: calc(100% - 26px); position: relative; @include text-overflow-nw; }
@@ -41,7 +43,7 @@
 			}
 		}
 
-		.linkCard.c18.withIcon {
+		.linkCard.c20.withIcon {
 			.cardName { position: relative; }
 			.cardName {
 				.iconObject { position: absolute; left: 0; top: 0; }
