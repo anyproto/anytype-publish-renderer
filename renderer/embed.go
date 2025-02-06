@@ -140,6 +140,7 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 			}
 
 			if !allowScript {
+				text = regexp.MustCompile(`<script`).ReplaceAllString(text, "&lt;script")
 			}
 
 			// Update sanitization parameters
@@ -148,14 +149,12 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 			} else {
 				data.Html = text
 			}
-			break
 
 		case model.BlockContentLatex_Latex:
 			break
 
 		case model.BlockContentLatex_Mermaid:
 			text = fmt.Sprintf(`<pre class="mermaid">%s</pre>`, text)
-			break
 
 		case model.BlockContentLatex_Graphviz:
 			break
