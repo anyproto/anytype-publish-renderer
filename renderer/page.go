@@ -36,10 +36,7 @@ func (r *Renderer) hasPageIcon() bool {
 		return false
 	}
 
-	_, err := r.getFileUrl(iconImage)
-
-	return err == nil
-
+	return true
 }
 
 func (r *Renderer) hasPageCover() bool {
