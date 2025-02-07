@@ -1,0 +1,30 @@
+@use "../_mixins" as *;
+
+.blocks { width: 704px; margin: 0px auto; padding: 0px 0px 80px 0px; margin-top: 56px; }
+.blocks {
+	.block { @include text-paragraph; word-break: break-word; margin: 0px 0px 2px 0px; position: relative; }
+	.block {
+		> .content { padding-top: 2px; padding-bottom: 2px; }
+		> .content:empty { display: none; }
+		> .content {
+			.deleted { @include text-paragraph; color: var(--color-control-active); display: flex; gap: 0px 6px; align-items: center; }
+			.deleted {
+				.icon.ghost { width: 24px; height: 24px; }
+			}
+		}
+
+		> .children { padding-left: 48px; }
+	}
+	.block.bgColor { border-radius: 2px; }
+
+	.block.align0 > .content { text-align: left; }
+	.block.align1 > .content { text-align: center; }
+	.block.align2 > .content { text-align: right; }
+	.block.align3 > .content { text-align: justify; }
+
+	.block.isToggled > .children { display: block !important; }
+	.block.isToggled > .content > .flex > .markers > .marker.toggle { transform: rotateZ(90deg); }
+}
+
+.blocks.withCover { margin-top: 36px; }
+.blocks.withIconAndCover { margin-top: -76px; }

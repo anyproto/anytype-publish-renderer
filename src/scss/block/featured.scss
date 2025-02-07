@@ -1,0 +1,84 @@
+@use "../_mixins" as *;
+
+.blocks {
+	.block.blockFeatured { 
+		@include text-common; line-height: 28px; color: var(--color-text-secondary); padding: 0px 0px 24px 0px; white-space: nowrap; display: flex; 
+	}
+	.block.blockFeatured {
+		> .content { width: 100%; }
+
+		.wrap { display: flex; flex-direction: row; align-items: center; gap: 0px 2px; flex-wrap: wrap; }
+		.bullet { width: 4px; height: 4px; border-radius: 50%; background: var(--color-text-secondary); }
+
+		.cell { white-space: nowrap; display: inline-flex; flex-direction: row; align-items: center; gap: 0px 2px; height: 28px; }
+		.cell.canEdit {
+			.cellContent {
+				.empty { display: inline; }
+			}
+		}
+		.cell:last-child .bullet { display: none; }
+
+		.cellContent { 
+			height: 100%; display: flex; border-radius: 4px; vertical-align: top; padding: 0px 6px; transition: background $transitionCommon; 
+			cursor: default !important; 
+		}
+
+		.cellContent {
+			.element { line-height: inherit; background: none !important; cursor: default !important; }
+			.iconObject { display: none; margin: 0px; }
+			.name { vertical-align: baseline; line-height: inherit; display: inline; word-break: break-word; white-space: normal; }
+
+			.empty { vertical-align: top; }
+			.flex { display: inline-flex; flex-direction: row; align-items: center; }
+
+			.more { @include text-common; line-height: 18px; }
+			.label { display: inline; vertical-align: middle; }
+		}
+
+		.cellContent.c-select {
+			.over { display: flex; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 0px 6px; }
+			.tagItem { margin: 0px; max-width: 400px; }
+		}
+
+		.cellContent.c-file {
+			.over { display: flex; flex-direction: row; align-items: center; gap: 0px 2px; height: 28px; }
+			.element { flex-shrink: 0; display: flex; }
+			.iconObject { display: block; }
+			.name { display: none; }
+			.empty { padding: 0px 4px; }
+		}
+
+		.cellContent.c-object {
+			.over { display: flex; flex-direction: row; align-items: center; height: 28px; }
+			.iconObject { flex-shrink: 0; margin: 0px 6px 0px 0px !important; }
+		}
+
+		.cellContent.c-checkbox { display: flex; flex-direction: row; align-items: center; height: 28px; gap: 0px 4px; }
+
+		.cellContent.c-longText {
+			.name { display: inline-block; vertical-align: top; max-width: 220px; @include text-overflow-nw; }
+		}
+	}
+
+	.block.blockFeatured.align0 {
+		> .content > .wrap { margin-left: -6px; }
+	}
+
+	.block.blockFeatured.align1 {
+		.wrap { justify-content: center; }
+	}
+
+	.block.blockFeatured.align2 {
+		.wrap { justify-content: flex-end; }
+	}
+
+	.block.blockFeatured.small { @include text-common; padding: 0px; margin: 0px; line-height: 22px; }
+	.block.blockFeatured.small {
+		.cellContent { padding: 2.5px 6px; }
+		.more { margin-top: 1px; }
+	}
+}
+
+.editorWrapper.noSystemBlocks {
+	.blocks .block.blockFeatured { display: none; }
+}

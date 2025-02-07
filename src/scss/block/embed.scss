@@ -1,0 +1,21 @@
+@use "../_mixins" as *;
+
+.block.blockEmbed { padding: 6px 0px; }
+.block.blockEmbed {
+	iframe { width: 100%; aspect-ratio: 16/9; border: 0px; display: block; }
+}
+
+.block.blockEmbed:not(.isLatex) {
+	> .content {
+		svg { max-width: 100% !important; background: var(--color-bg-primary); }
+	}
+}
+
+.block.blockEmbed.isLatex {
+	> .content { border-radius: 0px; }
+
+	.katex-display { margin: 0px; text-align: inherit; }
+	.katex { line-height: 1.5em; text-align: inherit; }
+	.katex > .katex-html { white-space: normal; }
+	.katex .base { margin-top: 2px; margin-bottom: 2px; }
+}

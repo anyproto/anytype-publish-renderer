@@ -45,12 +45,13 @@ func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTablePar
 
 	rows := r.BlocksById[b.ChildrenIds[1]]
 
-	var classes string
+	classes := []string{"block", "blockTable"}
 	if b.BackgroundColor != "" {
-		classes = fmt.Sprintf("bgColor bgColor-%s", b.BackgroundColor)
+		classes = append(classes, fmt.Sprintf("bgColor bgColor-%s", b.BackgroundColor))
 	}
+
 	params = &RenderTableParams{
-		Classes:     classes,
+		Classes:     strings.Join(classes, " "),
 		Id:          b.Id,
 		Rows:        rows,
 		Columns:     columns,
@@ -66,10 +67,13 @@ func (r *Renderer) RenderTable(b *model.Block) templ.Component {
 }
 
 func (r *Renderer) MakeRenderTableRowCellParams(b *model.Block) (params *RenderTableRowCellParams) {
+	align := fmt.Sprintf("align-h%d", b.GetAlign())
+	vAlign := fmt.Sprintf("align-v%d", b.GetVerticalAlign())
+	classes := []string{"cell", align, vAlign}
 
 	textComp := r.RenderBlock(b.Id)
 	params = &RenderTableRowCellParams{
-		Classes:  "",
+		Classes:  strings.Join(classes, " "),
 		Id:       b.Id,
 		TextComp: textComp,
 	}
@@ -85,14 +89,12 @@ func (r *Renderer) RenderTableRowCell(cellId string) templ.Component {
 	return TableRowCellTemplate(r, params)
 }
 
-func gridSizes(sizes string) templ.SafeCSSProperty {
-	return templ.SafeCSSProperty(sizes)
-}
-
 func (r *Renderer) rowHeaderClass(rowId string) string {
-	var headerClass string
+	classes := []string{"row"}
+
 	if r.BlocksById[rowId].GetTableRow().IsHeader {
-		headerClass = "isHeader"
+		classes = append(classes, "isHeader")
 	}
-	return headerClass
+
+	return strings.Join(classes, " ")
 }

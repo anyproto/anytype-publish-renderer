@@ -3,6 +3,7 @@ package renderer
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
@@ -12,7 +13,9 @@ import (
 )
 
 type RenderPageParams struct {
-	Classes string
+	Classes     string
+	Name        string
+	Description string
 }
 
 func (r *Renderer) hasPageIcon() bool {
@@ -29,17 +32,61 @@ func (r *Renderer) hasPageIcon() bool {
 
 	_, err := r.getFileUrl(iconImageId)
 
-	return (err == nil)
+	return err == nil
 
 }
 
-func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
-	var classes string
-	if r.hasPageIcon() {
-		classes = "hasPageIcon"
+func (r *Renderer) hasPageCover() bool {
+	fields := r.Sp.Snapshot.Data.GetDetails()
+	coverType, err := ToCoverType(pbtypes.GetInt64(fields, "coverType"))
+	if err != nil {
+		return false
 	}
+	coverId := pbtypes.GetString(fields, "coverId")
+	if coverId != "" {
+		switch coverType {
+		case CoverType_Image, CoverType_Source:
+			_, err := r.getFileUrl(coverId)
+			return err == nil
+		default:
+			return true
+		}
+	}
+	return false
+}
+
+func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
+	fields := r.Sp.Snapshot.Data.GetDetails()
+	layoutAlign := pbtypes.GetInt64(fields, "layoutAlign")
+	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", layoutAlign)}
+	name := pbtypes.GetString(fields, "name")
+	description := pbtypes.GetString(fields, "description")
+	snippet := pbtypes.GetString(fields, "snippet")
+
+	hasPageIcon := r.hasPageIcon()
+	hasPageCover := r.hasPageCover()
+
+	class := ""
+	switch {
+	case hasPageIcon && hasPageCover:
+		class = "withIconAndCover"
+	case hasPageIcon:
+		class = "withIcon"
+	case hasPageCover:
+		class = "withCover"
+	}
+
+	classes = append(classes, class)
+
+	descr := description
+	if descr == "" {
+		descr = snippet
+	}
+
 	return &RenderPageParams{
-		Classes: classes,
+		Classes:     strings.Join(classes, " "),
+		Name:        name,
+		Description: descr,
 	}
 }
 
@@ -69,7 +116,7 @@ func (r *Renderer) RenderBlock(blockId string) templ.Component {
 	case *model.BlockContentOfLayout:
 		return r.RenderLayout(b)
 	case *model.BlockContentOfFeaturedRelations:
-		return NoneTemplate("")
+		return r.RenderFeaturedRelations(b)
 	case *model.BlockContentOfDiv:
 		return r.RenderDiv(b)
 	case *model.BlockContentOfFile:
@@ -85,6 +132,8 @@ func (r *Renderer) RenderBlock(blockId string) templ.Component {
 	case *model.BlockContentOfSmartblock:
 	case *model.BlockContentOfRelation:
 		return r.RenderRelations(b)
+	case *model.BlockContentOfTableOfContents:
+		return r.RenderTableOfContent(b)
 	default:
 
 	}
@@ -104,14 +153,5 @@ func (r *Renderer) supportLink() templ.SafeURL {
 }
 
 func (r *Renderer) joinSpaceLink() templ.SafeURL {
-	return templ.SafeURL(r.UberSp.Meta.InviteLink)
-}
-
-func (r *Renderer) titleText() string {
-	titleBlock, ok := r.BlocksById["title"]
-	if !ok {
-		return ""
-	}
-
-	return titleBlock.GetText().Text
+	return templ.URL(r.UberSp.Meta.InviteLink)
 }

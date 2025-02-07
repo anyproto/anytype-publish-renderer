@@ -1,44 +1,54 @@
 package renderer
 
-templ CoverImageTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-" + p.Id } class="block blockCover align1 index0 noPlus">
+import (
+	"fmt"
+)
+
+script coverParam(p CoverResizeParams) {
+	window.CoverParam = p;
+}
+
+templ CoverBlockTemplate(r *Renderer, p *CoverRenderParams) {
+	@coverParam(p.ResizeParams)
+	<div id={"block-" + p.Id } class="block blockCover">
 		<div class="content">
 			<div class="wrap">
-				<img id="cover" src={ p.Src }
-								class="cover type1"
-								style="opacity: 1; height: auto; width: 100%; transform: translate3d(0%, -25%, 0px);"
-				 />
+				@p.CoverTemplate
 			</div>
 		</div>
 	</div>
 }
 
-templ CoverColorTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
-		<div class="wrap">
-			<div class={"cover type2", p.Classes}></div>
-		</div>
+templ CoverImageTemplate(p *CoverRenderParams) {
+	 <img id="cover" src={ p.Src } class={"cover", p.Classes} />
+	 if p.UnsplashComponent != nil {
+        @p.UnsplashComponent
+     }
+}
+
+func getCoverStyle (p *CoverRenderParams) map[string]string {
+	ret := map[string]string{}
+
+	if p.Src != "" {
+		ret["background-image"] = fmt.Sprintf(`url(%s)`, p.Src)
+	}
+
+	return ret
+}
+
+templ CoverDefaultTemplate(p *CoverRenderParams) {
+	<div 
+		class={"cover", p.Classes}
+		style={getCoverStyle(p)}
+	>
 	</div>
 }
 
-templ CoverGradientTemplate(r *Renderer, p *CoverRenderParams) {
-	<div id={"block-cover-" + p.Id } class="block blockCover blockCover align1 index0 noPlus">
-		<div class="wrap">
-			<div class={"cover type3", p.Classes}></div>
-		</div>
-	</div>
-}
-
-templ EmptyCoverTemplate(id string) {
-	<div id={"block-cover-" + id } >
-	    <div class="empty" style="width: 100%; height: 72px; margin: 0px auto; line-height: 16px; opacity: 0;"> </div>
-	</div>
-}
-
-templ UnsplashReferral() {
+templ UnsplashReferral(author string, authorUrl templ.SafeURL) {
 	<div class="author label">
 		Photo by
-		<a href="https://unsplash.com/@santesson89?utm_source=Anytype&amp;utm_medium=referral">Andrea De Santis</a> on <a href="https://unsplash.com/?utm_source=Anytype&amp;utm_medium=referral">Unsplash</a>
+		<a href={authorUrl} target="_blank">{author}</a> 
+		on 
+		<a href="https://unsplash.com/?utm_source=Anytype&amp;utm_medium=referral" target="_blank">Unsplash</a>
 	</div>
-
 }

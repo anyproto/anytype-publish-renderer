@@ -2,15 +2,19 @@ package renderer
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/a-h/templ"
+	"go.uber.org/zap"
+
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
+	"github.com/anyproto/anytype-heart/pkg/lib/localstore/addr"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
-	"go.uber.org/zap"
-	"path/filepath"
-	"time"
 )
 
 const defaultName = "Untitled"
@@ -27,6 +31,12 @@ type RelationRenderParams struct {
 
 func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParams {
 	relationBlock := b.GetRelation()
+	key := relationBlock.GetKey()
+
+	if key == "" {
+		return nil
+	}
+
 	color := b.GetBackgroundColor()
 
 	params := &RelationRenderParams{
@@ -37,14 +47,7 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParam
 		params.BackgroundColor = fmt.Sprintf("bgColor bgColor-%s", color)
 	}
 
-	relationKey := domain.RelationKey(relationBlock.GetKey())
-	relation, _ := bundle.GetRelation(relationKey)
-
-	name, format, found := r.fetchRelationMetadata(relation, relationKey)
-	if name == "" {
-		name = defaultName
-	}
-
+	name, format, found := r.retrieveRelationInfo(key)
 	params.Name = name
 
 	if !found {
@@ -53,14 +56,31 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParam
 		return params
 	}
 
-	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[relationBlock.GetKey()]
+	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[key]
 	if relationValue == nil {
 		params.IsEmpty = "isEmpty"
 		return params
 	}
 
-	r.populateRelationValue(params, format, relationValue)
+	params.Format = r.getFormatClass(format)
+	switch params.Format {
+	case "c-object", "c-file", "c-select":
+		params.Value = ListTemplate(params.Format, r.populateRelationListValue(format, relationValue))
+	default:
+		params.Value = WrapToCellTemplate(params.Format, r.populateRelationValue(format, relationValue))
+	}
 	return params
+}
+
+func (r *Renderer) retrieveRelationInfo(key string) (string, model.RelationFormat, bool) {
+	relationKey := domain.RelationKey(key)
+	relation, _ := bundle.GetRelation(relationKey)
+
+	name, format, found := r.fetchRelationMetadata(relation, relationKey)
+	if name == "" {
+		name = defaultName
+	}
+	return name, format, found
 }
 
 func (r *Renderer) fetchRelationMetadata(relation *model.Relation, relationKey domain.RelationKey) (string, model.RelationFormat, bool) {
@@ -84,40 +104,32 @@ func (r *Renderer) fetchRelationMetadata(relation *model.Relation, relationKey d
 	return "", model.RelationFormat_longtext, false
 }
 
-func (r *Renderer) populateRelationValue(params *RelationRenderParams, format model.RelationFormat, relationValue *types.Value) {
+func (r *Renderer) populateRelationListValue(format model.RelationFormat, relationValue *types.Value) []templ.Component {
+	switch format {
+	case model.RelationFormat_status, model.RelationFormat_tag:
+		return r.generateSelectOptions(format, relationValue)
+	case model.RelationFormat_object:
+		return r.generateObjectLinks(relationValue)
+	case model.RelationFormat_file:
+		return r.generateFileIcons(relationValue)
+	}
+	return nil
+}
+
+func (r *Renderer) populateRelationValue(format model.RelationFormat, relationValue *types.Value) templ.Component {
 	switch format {
 	case model.RelationFormat_shorttext, model.RelationFormat_longtext:
-		params.Format = r.getFormatClass(format)
-		params.Value = BasicTemplate(params, relationValue.GetStringValue())
-
+		return BasicNameTemplate(relationValue.GetStringValue())
 	case model.RelationFormat_number:
-		params.Format = "c-number"
-		params.Value = BasicTemplate(params, fmt.Sprintf("%f", relationValue.GetNumberValue()))
-
-	case model.RelationFormat_status, model.RelationFormat_tag:
-		params.Format = "c-select"
-		params.Value = r.generateSelectOptions(params, format, relationValue)
-
-	case model.RelationFormat_object:
-		params.Format = "c-object"
-		params.Value = r.generateObjectLinks(params, relationValue)
-
-	case model.RelationFormat_file:
-		params.Format = "c-file"
-		params.Value = r.generateFileIcons(params, relationValue)
-
+		return BasicNameTemplate(fmt.Sprintf("%g", relationValue.GetNumberValue()))
 	case model.RelationFormat_phone, model.RelationFormat_email, model.RelationFormat_url:
-		params.Format = r.getFormatClass(format)
-		params.Value = BasicTemplate(params, relationValue.GetStringValue())
-
+		return BasicNameTemplate(relationValue.GetStringValue())
 	case model.RelationFormat_date:
-		params.Format = "c-date"
-		params.Value = BasicTemplate(params, r.formatDate(relationValue.GetNumberValue()))
-
+		return BasicNameTemplate(r.formatDate(relationValue.GetNumberValue()))
 	case model.RelationFormat_checkbox:
-		params.Format = "c-checkbox"
-		params.Value = r.generateCheckbox(params, relationValue.GetBoolValue())
+		return r.generateCheckbox(relationValue.GetBoolValue())
 	}
+	return nil
 }
 
 func (r *Renderer) getFormatClass(format model.RelationFormat) string {
@@ -132,8 +144,20 @@ func (r *Renderer) getFormatClass(format model.RelationFormat) string {
 		return "c-email"
 	case model.RelationFormat_url:
 		return "c-url"
+	case model.RelationFormat_object:
+		return "c-object"
+	case model.RelationFormat_file:
+		return "c-file"
+	case model.RelationFormat_checkbox:
+		return "c-checkbox"
+	case model.RelationFormat_date:
+		return "c-date"
+	case model.RelationFormat_tag, model.RelationFormat_status:
+		return "c-select"
+	case model.RelationFormat_number:
+		return "c-number"
 	default:
-		return ""
+		return "c-longText"
 	}
 }
 
@@ -144,14 +168,14 @@ func (r *Renderer) formatDate(timestamp float64) string {
 	return time.Unix(int64(timestamp), 0).Format("02 Jan 2006")
 }
 
-func (r *Renderer) generateCheckbox(params *RelationRenderParams, checked bool) templ.Component {
+func (r *Renderer) generateCheckbox(checked bool) templ.Component {
 	if checked {
-		return ActiveCheckBoxTemplate(params)
+		return ActiveCheckBoxTemplate()
 	}
-	return DisabledCheckBoxTemplate(params)
+	return DisabledCheckBoxTemplate()
 }
 
-func (r *Renderer) generateSelectOptions(params *RelationRenderParams, format model.RelationFormat, relationValue *types.Value) templ.Component {
+func (r *Renderer) generateSelectOptions(format model.RelationFormat, relationValue *types.Value) []templ.Component {
 	var elements []templ.Component
 	relationType := "isSelect"
 	if format == model.RelationFormat_tag {
@@ -170,7 +194,7 @@ func (r *Renderer) generateSelectOptions(params *RelationRenderParams, format mo
 		elements = append(elements, OptionElement(name, color, relationType))
 	}
 
-	return ListTemplate(params, elements)
+	return elements
 }
 
 func (r *Renderer) extractRelationValues(relationValue *types.Value) []*types.Value {
@@ -180,7 +204,28 @@ func (r *Renderer) extractRelationValues(relationValue *types.Value) []*types.Va
 	return []*types.Value{relationValue}
 }
 
-func (r *Renderer) generateObjectLinks(params *RelationRenderParams, relationValue *types.Value) templ.Component {
+func (r *Renderer) getIconFromDetails(details *types.Struct, iconClass string) (icon, updatedIconClass string) {
+	emojiField := details.GetFields()[bundle.RelationKeyIconEmoji.String()]
+	if emojiField != nil && emojiField.GetStringValue() != "" {
+		emojiRune := []rune(emojiField.GetStringValue())[0]
+		icon = r.GetEmojiUrl(emojiRune)
+		return icon, iconClass + " withIcon"
+	}
+
+	imageField := details.GetFields()[bundle.RelationKeyIconImage.String()]
+	if imageField != nil && imageField.GetStringValue() != "" {
+		icon, err := r.getFileUrl(imageField.GetStringValue())
+		if err != nil {
+			log.Error("Failed to get file URL for icon", zap.Error(err))
+			return "", iconClass
+		}
+		return icon, iconClass + " withImage"
+	}
+
+	return "", iconClass
+}
+
+func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Component {
 	var elements []templ.Component
 	for _, value := range r.extractRelationValues(relationValue) {
 		objectId := value.GetStringValue()
@@ -194,15 +239,22 @@ func (r *Renderer) generateObjectLinks(params *RelationRenderParams, relationVal
 		if name == "" {
 			name = defaultName
 		}
-		icon, class := r.getIconFromDetails(details, "c20")
-		layoutClass := getLayoutClass(details)
-		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
-		elements = append(elements, ObjectsListElement(layoutClass, icon, class, name, templ.SafeURL(link)))
+
+		link := templ.SafeURL(fmt.Sprintf(linkTemplate, objectId, spaceId))
+
+		props := &IconObjectProps{Size: 20}
+		iconParams := r.MakeRenderIconObjectParams(details, props)
+		iconComp := IconObjectTemplate(r, iconParams)
+		comp := RelationObjectIconTemplate(link, name, iconComp)
+		elements = append(elements, comp)
 	}
-	return ListTemplate(params, elements)
+	return elements
 }
 
 func (r *Renderer) getObjectSnapshot(objectId string) *pb.SnapshotWithType {
+	if strings.HasPrefix(objectId, addr.DatePrefix) {
+		return r.getDateSnapshot(objectId)
+	}
 	directories := []string{"objects", "relations", "types", "templates", "filesObjects"}
 	var (
 		snapshot *pb.SnapshotWithType
@@ -219,9 +271,8 @@ func (r *Renderer) getObjectSnapshot(objectId string) *pb.SnapshotWithType {
 	return nil
 }
 
-func (r *Renderer) generateFileIcons(params *RelationRenderParams, relationValue *types.Value) templ.Component {
+func (r *Renderer) generateFileIcons(relationValue *types.Value) []templ.Component {
 	var elements []templ.Component
-
 	for _, value := range r.extractRelationValues(relationValue) {
 		url, err := r.getFileUrl(value.GetStringValue())
 		if err != nil {
@@ -234,25 +285,23 @@ func (r *Renderer) generateFileIcons(params *RelationRenderParams, relationValue
 
 		elements = append(elements, r.createFileIcon(url, fileBlock))
 	}
-	return ListTemplate(params, elements)
+	return elements
 }
 
-func (r *Renderer) createFileIcon(url string, fileBlock *model.BlockContentFile) templ.Component {
-	filename := filepath.Base(url)
-
-	switch fileBlock.GetType() {
-	case model.BlockContentFile_Audio:
-		return AudioIconTemplate(filename)
-	case model.BlockContentFile_Image:
-		return ImageIconTemplate(url, filename)
-	case model.BlockContentFile_Video:
-		return VideoIconTemplate(url, filename)
-	default:
-		return FileIconTemplate(filename)
+func (r *Renderer) createFileIcon(url string, fileBlock *model.Block) templ.Component {
+	params, err := r.MakeRenderFileParams(fileBlock)
+	if err != nil {
+		return NoneTemplate(err.Error())
 	}
+
+	iconComp := r.FileIconBlock(fileBlock, params)
+	return RelationIconTemplate(string(params.Src), iconComp)
 }
 
 func (r *Renderer) RenderRelations(b *model.Block) templ.Component {
 	params := r.MakeRelationRenderParams(b)
+	if params == nil {
+		return NoneTemplate("")
+	}
 	return RelationTemplate(params)
 }

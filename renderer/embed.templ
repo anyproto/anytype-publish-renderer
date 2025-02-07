@@ -1,11 +1,17 @@
 package renderer
 
+script EmbedData(data EmbedIframeData) {
+	document.getElementById(`receiver${data.BlockId}`).contentWindow.postMessage(data, '*');
+}
+
 templ EmbedTemplate(r *Renderer, p *EmbedRenderParams) {
-	<div id={"block-"+p.Id} class={"block blockEmbed", p.Classes}>
-		<div class="wrapContent">
-			<div class="content">
+	<div id={"block-" + p.Id} class={"block blockEmbed", p.Classes}>
+		<div class="content">
+			if p.IsIframe {
+				<iframe id={"receiver" + p.Id} src="/static/embed/iframe.html" frameborder="0" scrolling="no" sandbox={p.Sandbox} allowtransparency="true" onload={EmbedData(p.Data)}></iframe>
+			} else {
 				@templ.Raw(p.Content)
-			</div>
+			}
 		</div>
 	</div>
 }

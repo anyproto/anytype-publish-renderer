@@ -1,0 +1,50 @@
+@use "../_mixins" as *;
+
+.block.blockMedia { padding: 6px 0px; }
+.block.blockMedia {
+	> .content { display: flex; flex-direction: row; }
+	> .content {
+		.wrap { width: 100%; max-width: 100%; position: relative; display: block; overflow: hidden; }
+		.wrap {
+			> img, 
+			> .media,
+			> audio,
+			> canvas,
+			> video { width: 100%; display: block; }
+
+			> iframe { width: 100%; aspect-ratio: 3/4; display: block; }
+		}
+	}
+}
+
+.block.blockMedia.isPdf {
+	> .content {
+		.wrap {
+			overflow: hidden; position: relative; padding: 12px; box-shadow: 0px 0px 0px 1px var(--color-shape-primary);
+			border-radius: 8px; display: inline-flex; flex-direction: column; gap: 6px 0px;
+		}
+
+		.info { @include text-common; flex-shrink: 0; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 0px 8px; }
+		.info {
+			.name { height: 24px; line-height: 24px; display: inline-block; vertical-align: top; @include text-overflow-nw; }
+			.size {
+				@include text-common; max-width: 100px; height: 24px; line-height: 24px; color: var(--color-control-active);
+				display: inline-block; vertical-align: top; flex-shrink: 0;
+			}
+		}
+	}
+}
+
+.block.blockMedia.isAudio {
+	> .content {
+		.wrap { width: 100%; }
+	}
+}
+
+.blockMedia.align1 {
+	.content { justify-content: center; }
+}
+
+.blockMedia.align2 {
+	.content { justify-content: flex-end; }
+}

@@ -9,8 +9,46 @@ import (
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/anyproto/anytype-publish-renderer/utils"
+	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
 )
+
+type FileRenderParams struct {
+	Id   string
+	Src  templ.SafeURL
+	Name string
+	Size string
+}
+
+func (params *FileRenderParams) ToFileMediaRenderParams(width string, classes []string) *FileMediaRenderParams {
+	return &FileMediaRenderParams{
+		Id:      params.Id,
+		Src:     params.Src,
+		Classes: classes,
+		Width:   width,
+		Name:    params.Name,
+		Size:    params.Size,
+	}
+}
+
+type FileMediaRenderParams struct {
+	Id      string
+	Src     templ.SafeURL
+	Classes []string
+	Width   string
+	Name    string
+	Size    string
+}
+
+type SizeSpanRenderParams struct {
+	Size string
+}
+
+type NameLinkRenderParams struct {
+	Name string
+	Src  templ.SafeURL
+}
 
 func (r *Renderer) getFileUrl(id string) (url string, err error) {
 	path := fmt.Sprintf("filesObjects/%s.pb", id)
@@ -39,7 +77,7 @@ func (r *Renderer) getFileUrl(id string) (url string, err error) {
 
 }
 
-func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err error) {
+func (r *Renderer) getFileBlock(id string) (block *model.Block, err error) {
 	path := fmt.Sprintf("filesObjects/%s.pb", id)
 	var (
 		jsonPbSnapshot string
@@ -63,117 +101,24 @@ func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err e
 		if bl.GetFile() == nil {
 			continue
 		}
-		return bl.GetFile(), nil
+		return bl, nil
 	}
 	return
 }
 
-type FileImageRenderParams struct {
-	Id         string
-	Src        string
-	Classes    string
-	ImageWidth string
-}
-
-func (r *Renderer) MakeRenderFileImageParams(b *model.Block) (params *FileImageRenderParams, err error) {
-	file := b.GetFile()
-	var src string
-	src, err = r.getFileUrl(file.TargetObjectId)
-	if err != nil {
-		err = fmt.Errorf("file not found %s", file.TargetObjectId)
-		return
-	}
-
-	align := "align" + strconv.Itoa(int(b.GetAlign()))
-
-	width := pbtypes.GetFloat64(b.Fields, "width")
+func GetWidth(fields *types.Struct) string {
+	width := pbtypes.GetFloat64(fields, "width")
 	log.Debug("image width", zap.Float64("width", width))
-	var imageWidth string
+
 	if int(width*100) != 0 {
-		imageWidth = strconv.Itoa(int(width*100)) + "%"
+		return strconv.Itoa(int(width*100)) + "%"
 	}
-
-	params = &FileImageRenderParams{
-		Id:         b.Id,
-		Src:        src,
-		Classes:    align,
-		ImageWidth: imageWidth,
-	}
-
-	return
+	return ""
 }
 
-type FilePDFRenderParams struct {
-	Id  string
-	Src string
-}
-
-func (r *Renderer) MakeRenderFilePDFParams(b *model.Block) (params *FilePDFRenderParams, err error) {
-	file := b.GetFile()
-	var src string
-	src, err = r.getFileUrl(file.TargetObjectId)
-	if err != nil {
-		err = fmt.Errorf("file not found %s", file.TargetObjectId)
-		return
-	}
-
-	params = &FilePDFRenderParams{
-		Id:  b.Id,
-		Src: src,
-	}
-
-	return
-}
-
-type FileAudioRenderParams struct {
-	Id  string
-	Src string
-}
-
-func (r *Renderer) MakeRenderFileAudioParams(b *model.Block) (params *FileAudioRenderParams, err error) {
-	file := b.GetFile()
-	var src string
-	src, err = r.getFileUrl(file.TargetObjectId)
-	if err != nil {
-		err = fmt.Errorf("file not found %s", file.TargetObjectId)
-		return
-	}
-
-	params = &FileAudioRenderParams{
-		Id:  b.Id,
-		Src: src,
-	}
-
-	return
-}
-
-type FileVideoRenderParams struct {
-	Id  string
-	Src string
-}
-
-func (r *Renderer) MakeRenderFileVideoParams(b *model.Block) (params *FileVideoRenderParams, err error) {
-	file := b.GetFile()
-	var src string
-	src, err = r.getFileUrl(file.TargetObjectId)
-	if err != nil {
-		err = fmt.Errorf("file not found %s", file.TargetObjectId)
-		return
-	}
-
-	params = &FileVideoRenderParams{
-		Id:  b.Id,
-		Src: src,
-	}
-
-	return
-}
-
-type FileFileRenderParams struct {
-	Id   string
-	Src  templ.SafeURL
-	Name string
-	Size string
+func GetAlignString(b *model.Block) string {
+	align := b.GetAlign()
+	return "align" + strconv.Itoa(int(align))
 }
 
 func prettyByteSize(b int64) string {
@@ -187,7 +132,7 @@ func prettyByteSize(b int64) string {
 	return fmt.Sprintf("%.1fYiB", bf)
 }
 
-func (r *Renderer) MakeRenderFileFileParams(b *model.Block) (params *FileFileRenderParams, err error) {
+func (r *Renderer) MakeRenderFileParams(b *model.Block) (params *FileRenderParams, err error) {
 	file := b.GetFile()
 	var src string
 	src, err = r.getFileUrl(file.TargetObjectId)
@@ -199,9 +144,9 @@ func (r *Renderer) MakeRenderFileFileParams(b *model.Block) (params *FileFileRen
 	name := file.Name
 	size := prettyByteSize(file.Size_)
 
-	params = &FileFileRenderParams{
+	params = &FileRenderParams{
 		Id:   b.Id,
-		Src:  templ.SafeURL(src),
+		Src:  templ.URL(src),
 		Name: name,
 		Size: size,
 	}
@@ -209,44 +154,107 @@ func (r *Renderer) MakeRenderFileFileParams(b *model.Block) (params *FileFileRen
 	return
 }
 
-func (r *Renderer) RenderFile(b *model.Block) templ.Component {
+func getFileClass(b *model.Block) string {
 	file := b.GetFile()
 	fileType := file.GetType()
-	switch fileType {
-	case model.BlockContentFile_Image:
-		params, err := r.MakeRenderFileImageParams(b)
-		if err != nil {
-			return NoneTemplate(err.Error())
-		}
-		return FileImageTemplate(r, params)
-	case model.BlockContentFile_PDF:
-		params, err := r.MakeRenderFilePDFParams(b)
-		if err != nil {
-			return NoneTemplate(err.Error())
-		}
-		return FilePDFTemplate(r, params)
-	case model.BlockContentFile_Audio:
-		params, err := r.MakeRenderFileAudioParams(b)
-		if err != nil {
-			return NoneTemplate(err.Error())
-		}
-		return FileAudioTemplate(r, params)
-	case model.BlockContentFile_Video:
-		params, err := r.MakeRenderFileVideoParams(b)
-		if err != nil {
-			return NoneTemplate(err.Error())
-		}
-		return FileVideoTemplate(r, params)
-	case model.BlockContentFile_File:
-		params, err := r.MakeRenderFileFileParams(b)
-		if err != nil {
-			return NoneTemplate(err.Error())
-		}
-		return FileFileTemplate(r, params)
+	fileTypeName := model.BlockContentFileType_name[int32(fileType)]
+	fileTypeName = utils.Capitalize(strings.ToLower(fileTypeName))
+	fileClass := fmt.Sprintf("is%s", fileTypeName)
 
-	default:
-		log.Warn("file type is not supported", zap.String("type", fileType.String()))
-		err := fmt.Errorf("file type is not supported: %s", fileType.String())
+	return fileClass
+}
+
+func (r *Renderer) FileIconBlock(b *model.Block, params *FileRenderParams) templ.Component {
+	file := b.GetFile()
+	fileClass := getFileClass(b)
+	details := r.findTargetDetails(file.TargetObjectId)
+
+	props := &IconObjectProps{}
+	iconParams := r.MakeRenderIconObjectParams(details, props)
+	iconParams.Classes = append(iconParams.Classes, fileClass)
+	iconComp := IconObjectTemplate(r, iconParams)
+	return iconComp
+}
+
+func (r *Renderer) InlineFileBlock(b *model.Block, params *FileRenderParams) templ.Component {
+	iconComp := r.FileIconBlock(b, params)
+	nameComp := NameLinkTemplate(&NameLinkRenderParams{
+		Name: params.Name,
+		Src:  params.Src,
+	})
+	sizeComp := SizeSpanTemplate(&SizeSpanRenderParams{
+		Size: params.Size,
+	})
+
+	blockInnerParams := &BlockWrapperParams{
+		Classes:    []string{"inner"},
+		Components: []templ.Component{iconComp, nameComp, sizeComp},
+	}
+	blockInner := BlocksWrapper(blockInnerParams)
+	blockParams := makeDefaultBlockParams(b)
+	blockParams.Content = blockInner
+
+	return BlockTemplate(r, blockParams)
+}
+
+func isInlineLink(b *model.Block) bool {
+	file := b.GetFile()
+	isFile := file.GetType() == model.BlockContentFile_File
+	isLink := file.Style == model.BlockContentFile_Link
+
+	return isFile || isLink
+}
+
+func (r *Renderer) RenderFile(b *model.Block) templ.Component {
+	params, err := r.MakeRenderFileParams(b)
+	if err != nil {
 		return NoneTemplate(err.Error())
 	}
+
+	if isInlineLink(b) {
+		return r.InlineFileBlock(b, params)
+	} else {
+		align := GetAlignString(b)
+		classes := []string{align}
+		width := GetWidth(b.Fields)
+
+		mediaParams := params.ToFileMediaRenderParams(width, classes)
+
+		var comp templ.Component
+		switch b.GetFile().GetType() {
+		case model.BlockContentFile_PDF:
+			blockParams := makeDefaultBlockParams(b)
+			blockParams.Content = FilePDFTemplate(r, mediaParams)
+			return BlockTemplate(r, blockParams)
+		case model.BlockContentFile_Image:
+			comp = ImageTemplate(mediaParams)
+		case model.BlockContentFile_Audio:
+			comp = AudioTemplate(mediaParams)
+		case model.BlockContentFile_Video:
+			comp = VideoTemplate(mediaParams)
+		default:
+			fileTypeStr := b.GetFile().GetType().String()
+			log.Warn("file type is not supported", zap.String("type", fileTypeStr))
+			return NoneTemplate(fmt.Sprintf("file type is not supported: %s", fileTypeStr))
+		}
+
+		var styles map[string]string
+		if width != "" {
+			styles = map[string]string{
+				"width": width,
+			}
+		}
+
+		blockInnerParams := &BlockWrapperParams{
+			Classes:    []string{"wrap"},
+			Styles:     styles,
+			Components: []templ.Component{comp},
+		}
+		blockInner := BlocksWrapper(blockInnerParams)
+		blockParams := makeDefaultBlockParams(b)
+		blockParams.Content = blockInner
+
+		return BlockTemplate(r, blockParams)
+	}
+
 }

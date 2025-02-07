@@ -12,7 +12,7 @@ func TestMakeRenderFileParams(t *testing.T) {
 		id := "66c7055b7e4bcd7bc81f3f37"
 		imageBlock := r.BlocksById[id]
 
-		expected := &FileImageRenderParams{
+		expected := &FileMediaRenderParams{
 			Id:      id,
 			Classes: "align0",
 			Src:     "../test_snapshots/Anytype.WebPublish.20241217.112212.67/files/img_5296.jpeg",

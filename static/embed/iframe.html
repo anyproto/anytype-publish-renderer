@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="/static/js/jquery.js"></script>
+		<style type="text/css">
+			* { margin: 0px; padding: 0px; box-sizing: border-box; user-select: none; }
+
+			body { background-color: #fff; }
+			html.dark body { background-color: #171717; }
+
+			html.align1 body { text-align: center; }
+			html.align2 body { text-align: right; }
+
+			html:not(.allowIframeResize) { height: 100%; }
+			html:not(.allowIframeResize) {
+				body, #root { height: 100%; }
+				iframe { width: 100% !important; height: 100% !important; border: 0px !important; }
+			}
+
+			#root { font-size: 0px; }
+			iframe { margin: 0px !important; display: inline-block !important; }
+
+			.twitter-tweet, .instagram-media { margin: 0px !important; display: inline-flex !important; }
+			.gist-file { margin: 0px 0px 16px 0px !important; }
+			.gist-file:last-child { margin-bottom: 0px !important; }
+
+			.cp_embed_iframe { border: 0px !important; height: auto; aspect-ratio: 16/9; }
+
+			html.align1 .twitter-tweet, body.align1 .instagram-media { justify-content: center; }
+			html.align2 .twitter-tweet, body.align2 .instagram-media { justify-content: flex-end; }
+
+			html.isChart canvas { background: #fff; }
+			html.isKroki #root img { max-width: 100%; background: #fff; }
+		</style>
+	</head>
+	<body>
+		<div id="root"></div>
+		<div id="scripts"></div>
+
+		<script type="text/javascript">
+			$(() => {
+				const Processor = {
+					Latex:			 0,
+					Mermaid:		 1,
+					Chart:			 2,
+					Youtube:		 3,
+					Vimeo:			 4,
+					Soundcloud:		 5,
+					GoogleMaps:		 6,
+					Miro:			 7,
+					Figma:			 8,
+					Twitter:		 9,
+					OpenStreetMap:	 10,
+					Reddit:			 11,
+					Facebook:		 12,
+					Instagram:		 13,
+					Telegram:		 14,
+					GithubGist:		 15,
+					Codepen:		 16,
+					Bilibili:		 17,
+					Excalidraw:		 18,
+					Kroki:			 19,
+					Graphviz:		 20,
+					Sketchfab:		 21,
+					Image:			 22,
+				};
+
+				const win = $(window);
+				const htmlEl = $('html');
+				const head = $('head');
+				const body = $('body');
+				const root = $('#root');
+				const scripts = $('#scripts');
+				const param = getParam();
+				const allowedOrigins = [
+					'//localhost:',
+					'file://',
+				];
+
+				let processor = 0;
+				let useRootHeight = false;
+				let allowIframeResize = false
+				let cachedHtml = '';
+				let height = 0;
+				let blockId = '';
+				let player;
+
+				win.off('message resize');
+
+				win.on('message', e => {
+					const oe = e.originalEvent;
+					if (!oe.origin.match(location.hostname)) {
+						return;
+					};
+
+					const data = oe.data;
+
+					let html = data.Html;
+					let js = data.Js;
+					let className = data.ClassName;
+					let insertBeforeLoad = data.InsertBeforeLoad;
+					let align = data.Align;
+
+					libs = oe.data.Libs || [];
+					blockId = oe.data.BlockId;
+					processor = oe.data.Processor;
+					allowIframeResize = data.AllowIframeResize;
+					useRootHeight = oe.data.UseRootHeight;
+
+					const envContent = getEnvironmentContent(processor);
+
+					if (envContent.html) {
+						html = envContent.html;
+					};
+
+					if (envContent.libs && envContent.libs.length) {
+						libs = libs.concat(envContent.libs);
+					};
+
+					scripts.html('');
+					htmlEl.attr({ class: '' });
+
+					if (param.theme) {
+						htmlEl.addClass(param.theme);
+					};
+					if (className) {
+						htmlEl.addClass(className);
+					};
+					if (allowIframeResize) {
+						htmlEl.addClass('allowIframeResize');
+					};
+					htmlEl.addClass(`align${align}`);
+
+					if (allowIframeResize) {
+						setInterval(resize, 300);
+					};
+
+					// Github Gist
+					if (processor == Processor.GithubGist) {
+						loadGithubGist(html);
+					} else
+					if (processor == Processor.Kroki) {
+						loadKroki(html);
+					} else {
+						if ((processor == Processor.Telegram) && !html.match(/<script/)) {
+							const post = html.replace(/^https:\/\/t.me\//, '');
+							html = '<' + `script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="${post}" data-width="100%"></script` + '>';
+						};
+
+						if (insertBeforeLoad) {
+							insertHtml(html);
+						};
+
+						if (processor == Processor.Youtube) {
+							window.onYouTubeIframeAPIReady = () => {
+								player = new YT.Player('player', {
+									events: {
+										onReady,
+										onStateChange,
+									}
+								});
+							};
+
+							const onReady = (event) => {
+							};
+
+							const onStateChange = (event) => {
+							};
+						};
+
+						loadLibs(libs, () => {
+							if (!insertBeforeLoad) {
+								insertHtml(html);
+							};
+
+							if (js) {
+								try {
+									eval(js);
+								} catch (e) {
+									console.error(e);
+								};
+							};
+
+							resize();
+						});
+					};
+				});
+
+				win.on('resize', resize);
+
+				function resize () {
+					if (!allowIframeResize) {
+						return;
+					};
+
+					const height = useRootHeight ? root.height() : document.documentElement.scrollHeight;
+					window.parent.postMessage({ type: 'resize', height, blockId }, '*');
+				};
+
+				function insertHtml (html) {
+					if (cachedHtml !== html) {
+						root.html(html);
+						cachedHtml = html;
+					};
+				};
+
+				function loadLibs (list, callBack) {
+					if (!list.length) {
+						if (callBack) {
+							callBack();
+						};
+						return;
+					};
+
+					const src = list.shift();
+					const script = document.createElement('script');
+
+					scripts.append(script);
+					script.onload = function (e) {
+						if (list.length) {
+							loadLibs(list, callBack);
+						} else 
+						if (callBack) {
+							callBack();
+						};
+					};
+
+					script.type = 'text/javascript';
+					script.src = src;
+				};
+
+				function getParam () {
+					const a = location.search.replace(/^\?/, '').split('&');
+					const param = {};
+
+					a.forEach((s) => {
+						const kv = s.split('=');
+						param[kv[0]] = kv[1];
+					});
+					return param;
+				};
+
+				function loadGithubGist (html) {
+					const m = html.match(/src="([^"]+)"/); 
+					if (!m || (m.length < 1)) {
+						return;
+					};
+
+					$.ajax({
+						url: m[1].replace(/\.js$/, '.json'),
+						dataType: 'jsonp',
+						timeout: 1000,
+						success: (data) => {
+							if (!head.find('#gist-css').length) {
+								head.append(`<link id="gist-css" href="${data.stylesheet}" rel="stylesheet">`);
+							};
+
+							root.html(data.div);
+							resize();
+						}
+					});
+				};
+
+				function loadKroki (html) {
+					if (!html) {
+						return;
+					};
+
+					$.ajax({
+						url: html,
+						dataType: 'text',
+						timeout: 1000,
+						success: (data) => {
+							root.html(data);
+
+							root.find('a').off('click').on('click', function (e) {
+								e.preventDefault();
+								window.parent.postMessage({ type: 'openUrl', url: $(this).attr('href') }, '*');
+							});
+						}
+					});
+				};
+
+				function getEnvironmentContent (processor) {
+					const libs = [];
+
+					let html = '';
+					switch (processor) {
+						case Processor.Chart: {
+							html = `<canvas id="chart"></canvas>`;
+							libs.push('https://cdn.jsdelivr.net/npm/chart.js');
+							break;
+						};
+
+						case Processor.Twitter: {
+							libs.push('https://platform.twitter.com/widgets.js');
+							break;
+						};
+
+						case Processor.Reddit: {
+							libs.push('https://embed.reddit.com/widgets.js');
+							break;
+						};
+
+						case Processor.Instagram: {
+							libs.push('https://www.instagram.com/embed.js');
+							break;
+						};
+
+						case Processor.Codepen: {
+							libs.push('https://cpwebassets.codepen.io/assets/embed/ei.js');
+							break;
+						};
+
+						case Processor.Youtube:
+							libs.push('https://www.youtube.com/iframe_api');
+							break;
+					};
+
+					return { 
+						html, 
+						libs, 
+					};
+				};
+
+			});
+		</script>
+	</body>
+</html>

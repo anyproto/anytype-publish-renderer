@@ -1,0 +1,32 @@
+@use "../_mixins" as *;
+
+.block.blockLayout:not(.blockLayout.layoutDiv):not(.blockLayout.layoutHeader) {
+	> .children {
+		> .block.first { padding-top: 0px !important; margin-top: 0px !important; }
+		> .block.last { padding-bottom: 0px !important; margin-bottom: 0px !important; }
+	}
+}
+
+/* Row */
+.block.blockLayout.layoutRow { padding: 14px 0px; }
+.block.blockLayout.layoutRow {
+	> .children { display: flex; flex-direction: row; align-items: stretch; padding: 0px; gap: 0px 48px; }
+}
+
+/* Column */
+.block.blockLayout.layoutColumn { padding: 0px; margin: 0px; flex-grow: 1; }
+.block.blockLayout.layoutColumn {
+	> .content { width: 100%; display: flex; flex-flow: column; }
+	> .children { padding: 0px; }
+}
+
+.block.blockLayout.layoutDiv, 
+.block.blockLayout.layoutHeader, 
+.block.blockLayout.layoutFooter { margin: 0px !important; }
+
+.block.blockLayout.layoutDiv, 
+.block.blockLayout.layoutHeader, 
+.block.blockLayout.layoutFooter {
+	> .content { width: 100%; overflow: visible; padding: 0px; }
+	> .children { padding: 0px; }
+}

@@ -1,3 +1,6 @@
 /.direnv/
 /.envrc
 /bin/
+node_modules/
+static/js/build/
+static/js/loader.js

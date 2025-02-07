@@ -1,11 +1,12 @@
 package renderer
 
 import (
+	"path/filepath"
+	"testing"
+
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
-	"path/filepath"
-	"testing"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -70,6 +71,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 							bundle.RelationKeyId.String():         pbtypes.String("archived-id"),
 							bundle.RelationKeyIsArchived.String(): pbtypes.Bool(true),
 							bundle.RelationKeyName.String():       pbtypes.String("Archived Block"),
+							bundle.RelationKeySpaceId.String():    pbtypes.String("spaceId"),
 						}},
 					}},
 				},
@@ -79,8 +81,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				IsArchived:    "isArchived",
 				Name:          "Archived Block",
 				IconClass:     "c20",
-				LinkTypeClass: "text",
-				Url:           templ.SafeURL("anytype://object?objectId=archived-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url:           templ.SafeURL("anytype://object?objectId=archived-id&spaceId=spaceId"),
 			},
 		},
 		{
@@ -101,18 +102,14 @@ func TestMakeLinkRenderParams(t *testing.T) {
 							bundle.RelationKeyId.String():        pbtypes.String("emoji-icon-id"),
 							bundle.RelationKeyName.String():      pbtypes.String("Emoji Icon Block"),
 							bundle.RelationKeyIconEmoji.String(): pbtypes.String("😊"),
+							bundle.RelationKeySpaceId.String():   pbtypes.String("spaceId"),
 						}},
 					}},
 				},
 			},
 			expected: &LinkRenderParams{
-				LayoutClass:   "isPage",
 				Name:          "Emoji Icon Block",
-				Icon:          "https://anytype-static.fra1.cdn.digitaloceanspaces.com/emojies/1f60a.png",
-				IconClass:     "c20 withIcon",
-				IconStyle:     "smileImage c20",
-				LinkTypeClass: "text",
-				Url:           templ.SafeURL("anytype://object?objectId=emoji-icon-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url:           templ.SafeURL("anytype://object?objectId=emoji-icon-id&spaceId=spaceId"),
 			},
 		},
 		{
@@ -131,19 +128,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					SbType: model.SmartBlockType_Page,
 					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 						Details: &types.Struct{Fields: map[string]*types.Value{
-							bundle.RelationKeyId.String():   pbtypes.String("default-icon-id"),
-							bundle.RelationKeyName.String(): pbtypes.String("Default Icon Block"),
+							bundle.RelationKeyId.String():      pbtypes.String("default-icon-id"),
+							bundle.RelationKeyName.String():    pbtypes.String("Default Icon Block"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
 						}},
 					}},
 				},
 			},
 			expected: &LinkRenderParams{
 				Name:          "Default Icon Block",
-				IconStyle:     "iconCommon icon page c28",
-				IconClass:     "c48",
-				LinkTypeClass: "card",
-				LayoutClass:   "isPage",
-				Url:           templ.SafeURL("anytype://object?objectId=default-icon-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url:           templ.SafeURL("anytype://object?objectId=default-icon-id&spaceId=spaceId"),
 			},
 		},
 		{
@@ -161,19 +155,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					SbType: model.SmartBlockType_Page,
 					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 						Details: &types.Struct{Fields: map[string]*types.Value{
-							bundle.RelationKeyId.String():     pbtypes.String("collection-id"),
-							bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_collection)),
-							bundle.RelationKeyName.String():   pbtypes.String("Collection Block")},
+							bundle.RelationKeyId.String():      pbtypes.String("collection-id"),
+							bundle.RelationKeyLayout.String():  pbtypes.Float64(float64(model.ObjectType_collection)),
+							bundle.RelationKeyName.String():    pbtypes.String("Collection Block"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId")},
 						}},
 					}},
 			},
 			expected: &LinkRenderParams{
 				Name:          "Collection Block",
-				LayoutClass:   "isCollection",
-				IconStyle:     "iconCommon icon collection c20",
-				IconClass:     "c20",
-				LinkTypeClass: "text",
-				Url:           templ.SafeURL("anytype://object?objectId=collection-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url:           templ.SafeURL("anytype://object?objectId=collection-id&spaceId=spaceId"),
 			},
 		},
 		{
@@ -191,20 +182,17 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					SbType: model.SmartBlockType_Page,
 					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 						Details: &types.Struct{Fields: map[string]*types.Value{
-							bundle.RelationKeyId.String():     pbtypes.String("todo-id"),
-							bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
-							bundle.RelationKeyName.String():   pbtypes.String("Todo"),
+							bundle.RelationKeyId.String():      pbtypes.String("todo-id"),
+							bundle.RelationKeyLayout.String():  pbtypes.Float64(float64(model.ObjectType_todo)),
+							bundle.RelationKeyName.String():    pbtypes.String("Todo"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
 						}},
 					}},
 				},
 			},
 			expected: &LinkRenderParams{
 				Name:          "Todo",
-				LayoutClass:   "isTask",
-				IconStyle:     "iconCheckbox c20 icon checkbox unset",
-				IconClass:     "c20",
-				LinkTypeClass: "text",
-				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=spaceId"),
 			},
 		},
 		{
@@ -222,21 +210,18 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					SbType: model.SmartBlockType_Page,
 					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 						Details: &types.Struct{Fields: map[string]*types.Value{
-							bundle.RelationKeyId.String():     pbtypes.String("todo-id"),
-							bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
-							bundle.RelationKeyName.String():   pbtypes.String("Todo"),
-							bundle.RelationKeyDone.String():   pbtypes.Bool(true),
+							bundle.RelationKeyId.String():      pbtypes.String("todo-id"),
+							bundle.RelationKeyLayout.String():  pbtypes.Float64(float64(model.ObjectType_todo)),
+							bundle.RelationKeyName.String():    pbtypes.String("Todo"),
+							bundle.RelationKeyDone.String():    pbtypes.Bool(true),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
 						}},
 					}},
 				},
 			},
 			expected: &LinkRenderParams{
 				Name:          "Todo",
-				LayoutClass:   "isTask",
-				IconStyle:     "iconCheckbox c20 icon checkbox set",
-				IconClass:     "c20",
-				LinkTypeClass: "text",
-				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url:           templ.SafeURL("anytype://object?objectId=todo-id&spaceId=spaceId"),
 			},
 		},
 		{
@@ -258,6 +243,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 							bundle.RelationKeyLayout.String():      pbtypes.Float64(float64(model.ObjectType_profile)),
 							bundle.RelationKeyName.String():        pbtypes.String("Test"),
 							bundle.RelationKeyDescription.String(): pbtypes.String("description"),
+							bundle.RelationKeySpaceId.String():     pbtypes.String("spaceId"),
 						}},
 					}},
 				},
@@ -266,9 +252,8 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Test",
 				LayoutClass:   "isHuman",
 				Description:   "description",
-				LinkTypeClass: "text",
 				IconClass:     "c20",
-				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=spaceId"),
 			},
 		},
 		{
@@ -291,6 +276,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 							bundle.RelationKeyLayout.String():  pbtypes.Float64(float64(model.ObjectType_participant)),
 							bundle.RelationKeyName.String():    pbtypes.String("Test"),
 							bundle.RelationKeySnippet.String(): pbtypes.String("snippet"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
 						}},
 					}},
 				},
@@ -299,9 +285,8 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Test",
 				LayoutClass:   "isParticipant",
 				Description:   "snippet",
-				LinkTypeClass: "card",
 				IconClass:     "c20",
-				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=spaceId"),
 			},
 		},
 		{
@@ -324,6 +309,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 							bundle.RelationKeyName.String():      pbtypes.String("Test"),
 							bundle.RelationKeyCoverType.String(): pbtypes.Int64(2),
 							bundle.RelationKeyCoverId.String():   pbtypes.String("gray"),
+							bundle.RelationKeySpaceId.String():   pbtypes.String("spaceId"),
 						}},
 					}},
 				},
@@ -332,7 +318,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Test",
 				LayoutClass:   "isSet",
 				IconClass:     "c20",
-				LinkTypeClass: "text",
 				CoverClass:    "withCover",
 				CoverParams: &CoverRenderParams{
 					Id:        "gray",
@@ -340,7 +325,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					Classes:   "gray",
 					CoverType: 2,
 				},
-				Url: templ.SafeURL("anytype://object?objectId=test-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url: templ.SafeURL("anytype://object?objectId=test-id&spaceId=spaceId"),
 			},
 		},
 		{
@@ -358,10 +343,11 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					SbType: model.SmartBlockType_Page,
 					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 						Details: &types.Struct{Fields: map[string]*types.Value{
-							bundle.RelationKeyId.String():     pbtypes.String("test-id"),
-							bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_set)),
-							bundle.RelationKeyName.String():   pbtypes.String("Test"),
-							bundle.RelationKeyType.String():   pbtypes.String("type")},
+							bundle.RelationKeyId.String():      pbtypes.String("test-id"),
+							bundle.RelationKeyLayout.String():  pbtypes.Float64(float64(model.ObjectType_set)),
+							bundle.RelationKeyName.String():    pbtypes.String("Test"),
+							bundle.RelationKeyType.String():    pbtypes.String("type"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId")},
 						}},
 					}},
 				filepath.Join("types", "type.pb"): {
@@ -377,9 +363,8 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				Name:          "Test",
 				LayoutClass:   "isSet",
 				IconClass:     "c20",
-				LinkTypeClass: "text",
 				Type:          "Type",
-				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=bafyreiholtkdzlvc5ahtgzgbb3ftyszrpad6swilhkfzrgnvsah2rz6zke.35ssi7ciufxuc"),
+				Url:           templ.SafeURL("anytype://object?objectId=test-id&spaceId=spaceId"),
 			},
 		},
 	}
