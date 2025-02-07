@@ -8,3 +8,5 @@
 .icon.withBackground { 
 	&:hover, &.hover { background-color: var(--color-shape-highlight-medium) !important; }
 };
+
+.icon.more { background-image: url('~img/icon/more.svg'); }
