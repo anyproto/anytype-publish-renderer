@@ -119,13 +119,13 @@ func (r *Renderer) populateRelationListValue(format model.RelationFormat, relati
 func (r *Renderer) populateRelationValue(format model.RelationFormat, relationValue *types.Value) templ.Component {
 	switch format {
 	case model.RelationFormat_shorttext, model.RelationFormat_longtext:
-		return BasicTemplate(relationValue.GetStringValue())
+		return BasicNameTemplate(relationValue.GetStringValue())
 	case model.RelationFormat_number:
-		return BasicTemplate(fmt.Sprintf("%g", relationValue.GetNumberValue()))
+		return BasicNameTemplate(fmt.Sprintf("%g", relationValue.GetNumberValue()))
 	case model.RelationFormat_phone, model.RelationFormat_email, model.RelationFormat_url:
-		return BasicTemplate(relationValue.GetStringValue())
+		return BasicNameTemplate(relationValue.GetStringValue())
 	case model.RelationFormat_date:
-		return BasicTemplate(r.formatDate(relationValue.GetNumberValue()))
+		return BasicNameTemplate(r.formatDate(relationValue.GetNumberValue()))
 	case model.RelationFormat_checkbox:
 		return r.generateCheckbox(relationValue.GetBoolValue())
 	}
@@ -239,10 +239,14 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 		if name == "" {
 			name = defaultName
 		}
-		icon, class := r.getIconFromDetails(details, "c20")
-		layoutClass := getLayoutClass(details)
-		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
-		elements = append(elements, ObjectsListElement(layoutClass, icon, class, name, templ.URL(link)))
+
+		link := templ.SafeURL(fmt.Sprintf(linkTemplate, objectId, spaceId))
+
+		props := &IconObjectProps{Size: 20}
+		iconParams := r.MakeRenderIconObjectParams(details, props)
+		iconComp := IconObjectTemplate(r, iconParams)
+		comp := RelationObjectIconTemplate(link, name, iconComp)
+		elements = append(elements, comp)
 	}
 	return elements
 }
@@ -284,19 +288,14 @@ func (r *Renderer) generateFileIcons(relationValue *types.Value) []templ.Compone
 	return elements
 }
 
-func (r *Renderer) createFileIcon(url string, fileBlock *model.BlockContentFile) templ.Component {
-	filename := filepath.Base(url)
-
-	switch fileBlock.GetType() {
-	case model.BlockContentFile_Audio:
-		return AudioIconTemplate(filename)
-	case model.BlockContentFile_Image:
-		return ImageIconTemplate(url, filename)
-	case model.BlockContentFile_Video:
-		return VideoIconTemplate(url, filename)
-	default:
-		return FileIconTemplate(filename)
+func (r *Renderer) createFileIcon(url string, fileBlock *model.Block) templ.Component {
+	params, err := r.MakeRenderFileParams(fileBlock)
+	if err != nil {
+		return NoneTemplate(err.Error())
 	}
+
+	iconComp := r.FileIconBlock(fileBlock, params)
+	return RelationIconTemplate(string(params.Src), iconComp)
 }
 
 func (r *Renderer) RenderRelations(b *model.Block) templ.Component {
