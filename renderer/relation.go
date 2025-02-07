@@ -156,7 +156,7 @@ func getUrlScheme(format model.RelationFormat, value string) string {
 		return "mailto:"
 	}
 	if format == model.RelationFormat_phone {
-		return "tel:'"
+		return "tel:"
 	}
 	return ""
 }
