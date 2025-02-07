@@ -90,6 +90,7 @@ func (r *Renderer) fetchRelationMetadata(relation *model.Relation, relationKey d
 	if relation != nil {
 		return relation.Name, relation.Format, true
 	}
+
 	for _, snapshot := range r.UberSp.PbFiles {
 		sn, err := readJsonpbSnapshot(snapshot)
 		if err != nil || sn.SbType != model.SmartBlockType_STRelation {
@@ -243,10 +244,9 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 		if name == "" {
 			name = defaultName
 		}
-		icon, class := r.getIconFromDetails(details, "c20")
-		layoutClass := getLayoutClass(details)
+		icon := r.getIconFromDetails(details)
 		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
-		elements = append(elements, ObjectsListElement(layoutClass, icon, class, name, templ.URL(link)))
+		elements = append(elements, ListElement(ObjectElement(name, templ.SafeURL(link)), icon))
 	}
 	return elements
 }
@@ -254,32 +254,32 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 func (r *Renderer) generateFileComponent(relationValue *types.Value) []templ.Component {
 	var elements []templ.Component
 	for _, value := range r.extractRelationValues(relationValue) {
-		details := r.findTargetDetails(value.GetStringValue())
-		if details == nil || len(details.GetFields()) == 0 {
-			continue
-		}
-		icon := r.getIconFromDetails(details)
 		url, err := r.getFileUrl(value.GetStringValue())
 		if err != nil {
 			continue
 		}
+		fileBlock, err := r.getFileBlock(value.GetStringValue())
+		if err != nil {
+			continue
+		}
+		icon := r.createFileIcon(fileBlock)
 		elements = append(elements, ListElement(NameTemplate("name", filepath.Base(url)), icon))
 	}
 	return elements
 }
 
-func (r *Renderer) createFileIcon(url string, fileBlock *model.Block) templ.Component {
+func (r *Renderer) createFileIcon(fileBlock *model.Block) templ.Component {
 	params, err := r.MakeRenderFileParams(fileBlock)
 	if err != nil {
 		return NoneTemplate(err.Error())
 	}
 
 	iconComp := r.FileIconBlock(fileBlock, params)
-	return RelationIconTemplate(string(params.Src), iconComp)
+	return iconComp
 }
 
 func (r *Renderer) getIconFromDetails(details *types.Struct) templ.Component {
-	props := &IconObjectProps{}
+	props := &IconObjectProps{Size: 20}
 	iconParams := r.MakeRenderIconObjectParams(details, props)
 	return IconObjectTemplate(r, iconParams)
 }
