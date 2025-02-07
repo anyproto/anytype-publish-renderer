@@ -60,6 +60,10 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details
 
 func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
 	blockParams := makeDefaultBlockParams(block)
-	blockParams.Content = r.MakeFeaturedRelationsComponent()
+	params := r.MakeFeaturedRelationsComponent()
+	if params == nil {
+		return NoneTemplate("")
+	}
+	blockParams.Content = params
 	return BlockTemplate(r, blockParams)
 }
