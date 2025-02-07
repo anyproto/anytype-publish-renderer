@@ -20,7 +20,7 @@ type RelationRenderSetting struct {
 	Key          string
 	Featured     bool
 	LimitDisplay bool
-	CssClasses   []string
+	Classes      []string
 }
 
 func (r *Renderer) MakeRelationRenderParams(b *model.Block) templ.Component {
@@ -31,6 +31,9 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) templ.Component {
 	}
 	params := &RelationRenderSetting{Key: key}
 	relationComponent := r.buildRelationComponents(params)
+	if relationComponent == nil {
+		return nil
+	}
 	return BlocksWrapper(&BlockWrapperParams{Classes: []string{"sides"}, Components: relationComponent})
 }
 
@@ -48,9 +51,9 @@ func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []temp
 	}
 	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[params.Key]
 	formatClass := r.getFormatClass(format)
-	params.CssClasses = append(params.CssClasses, formatClass)
+	params.Classes = append(params.Classes, formatClass)
 	if relationValue == nil {
-		params.CssClasses = append(params.CssClasses, "isEmpty")
+		params.Classes = append(params.Classes, "isEmpty")
 		return append(components, CellTemplate(params, NameTemplate("empty", "")))
 	}
 	switch format {
@@ -290,6 +293,10 @@ func (r *Renderer) RenderRelations(b *model.Block) templ.Component {
 		return NoneTemplate("")
 	}
 	blockParams := makeDefaultBlockParams(b)
+	color := b.GetBackgroundColor()
+	if color != "" {
+		blockParams.Classes = append(blockParams.Classes, fmt.Sprintf("bgColor bgColor-%s", color))
+	}
 	blockParams.Content = component
 
 	return BlockTemplate(r, blockParams)

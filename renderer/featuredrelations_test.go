@@ -1,74 +1,85 @@
 package renderer
 
 import (
+	"path/filepath"
+	"testing"
+
+	"github.com/gogo/protobuf/jsonpb"
+	"github.com/gogo/protobuf/types"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
-	"github.com/gogo/protobuf/jsonpb"
-	"github.com/gogo/protobuf/types"
-	"github.com/stretchr/testify/assert"
-	"path/filepath"
-	"testing"
 )
 
-func TestMakeFeaturedRelationsParams(t *testing.T) {
-	r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
-
-	t.Run("empty details should return empty params", func(t *testing.T) {
+func TestMakeFeaturedRelationsComponent(t *testing.T) {
+	t.Run("empty details", func(t *testing.T) {
 		// given
-		block := &model.Block{Id: "block1"}
-		r.Sp = &pb.SnapshotWithType{}
+		r := &Renderer{Sp: &pb.SnapshotWithType{Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{}}}}
 
 		// when
-		params := r.MakeFeaturedRelationsComponent(block)
+		result := r.MakeFeaturedRelationsComponent()
 
 		// then
-		assert.Equal(t, "block1", params.Id)
-		assert.Empty(t, params.Cells)
+		assert.Nil(t, result)
 	})
 
-	t.Run("no featured relations in details should return empty params", func(t *testing.T) {
+	t.Run("no featured relations", func(t *testing.T) {
 		// given
-		r.Sp = &pb.SnapshotWithType{
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{
-				Fields: map[string]*types.Value{},
-			}}},
-		}
-		block := &model.Block{Id: "block2"}
+		r := &Renderer{Sp: &pb.SnapshotWithType{Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{Fields: map[string]*types.Value{}}}}}}
 
 		// when
-		params := r.MakeFeaturedRelationsComponent(block)
+		result := r.MakeFeaturedRelationsComponent()
 
-		// theb
-		assert.Equal(t, "block2", params.Id)
-		assert.Empty(t, params.Cells)
+		// then
+		assert.Nil(t, result)
 	})
-
-	t.Run("empty featured relations list should return empty params", func(t *testing.T) {
+	t.Run("no featured relations", func(t *testing.T) {
 		// given
+		r := &Renderer{Sp: &pb.SnapshotWithType{Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{Fields: map[string]*types.Value{
+			bundle.RelationKeyFeaturedRelations.String(): pbtypes.StringList(nil),
+		}}}}}}
+
+		// when
+		result := r.MakeFeaturedRelationsComponent()
+
+		// then
+		assert.Nil(t, result)
+	})
+	t.Run("skip backlinks and links", func(t *testing.T) {
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+
 		r.Sp = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{
 				Fields: map[string]*types.Value{
 					bundle.RelationKeyFeaturedRelations.String(): {
-						Kind: &types.Value_ListValue{ListValue: &types.ListValue{Values: []*types.Value{}}},
+						Kind: &types.Value_ListValue{
+							ListValue: &types.ListValue{
+								Values: []*types.Value{
+									{Kind: &types.Value_StringValue{StringValue: bundle.RelationKeyBacklinks.String()}},
+									{Kind: &types.Value_StringValue{StringValue: bundle.RelationKeyLinks.String()}},
+								},
+							},
+						},
 					},
+					bundle.RelationKeyBacklinks.String(): {},
+					bundle.RelationKeyLinks.String():     {},
 				},
-			},
-			}}}
-		block := &model.Block{Id: "block3"}
+			}}},
+		}
 
 		// when
-		params := r.MakeFeaturedRelationsComponent(block)
+		result := r.MakeFeaturedRelationsComponent()
 
 		// then
-		assert.Equal(t, "block3", params.Id)
-		assert.Empty(t, params.Cells)
+		assert.Nil(t, result)
 	})
+	t.Run("featured relations", func(t *testing.T) {
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 
-	t.Run("valid featured relations should return populated params", func(t *testing.T) {
-		// given
 		r.Sp = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{
 				Fields: map[string]*types.Value{
@@ -118,13 +129,10 @@ func TestMakeFeaturedRelationsParams(t *testing.T) {
 		assert.NoError(t, err)
 		r.UberSp.PbFiles[filepath.Join("relations", "relation2.pb")] = json
 
-		block := &model.Block{Id: "block4"}
-
 		// when
-		params := r.MakeFeaturedRelationsComponent(block)
+		result := r.MakeFeaturedRelationsComponent()
 
 		// then
-		assert.Equal(t, "block4", params.Id)
-		assert.Len(t, params.Cells, 2)
+		assert.NotNil(t, result)
 	})
 }

@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"fmt"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/types"
 
@@ -16,7 +17,7 @@ func (r *Renderer) MakeFeaturedRelationsComponent() templ.Component {
 		return nil
 	}
 	featuredRelationsList := details.GetFields()[bundle.RelationKeyFeaturedRelations.String()].GetListValue()
-	if featuredRelationsList == nil {
+	if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
 		return nil
 	}
 	cells := make([]templ.Component, 0, len(featuredRelationsList.Values))
@@ -26,6 +27,9 @@ func (r *Renderer) MakeFeaturedRelationsComponent() templ.Component {
 			lastClass = "last"
 		}
 		cells = r.processFeatureRelation(featuredRelation, details, lastClass, cells)
+	}
+	if len(cells) == 0 {
+		return nil
 	}
 	wrapper := BlocksWrapper(&BlockWrapperParams{
 		Classes:    []string{"wrap"},
@@ -51,7 +55,7 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details
 	settings := &RelationRenderSetting{
 		Featured:     true,
 		LimitDisplay: true,
-		CssClasses:   []string{lastClass},
+		Classes:      []string{lastClass},
 		Key:          relationKey,
 	}
 	cells = append(cells, r.buildRelationComponents(settings)...)
@@ -60,6 +64,10 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details
 
 func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
 	blockParams := makeDefaultBlockParams(block)
+	color := block.GetBackgroundColor()
+	if color != "" {
+		blockParams.Classes = append(blockParams.Classes, fmt.Sprintf("bgColor bgColor-%s", color))
+	}
 	params := r.MakeFeaturedRelationsComponent()
 	if params == nil {
 		return NoneTemplate("")

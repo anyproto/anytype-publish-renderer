@@ -74,12 +74,6 @@ func makeDefaultBlockParams(b *model.Block) *BlockParams {
 	if blockType := blockContentTypeToName(b); blockType != "" {
 		classes = append(classes, fmt.Sprintf("block%s", blockType))
 	}
-
-	color := b.GetBackgroundColor()
-	if color != "" {
-		classes = append(classes, fmt.Sprintf("bgColor bgColor-%s", color))
-	}
-
 	return &BlockParams{
 		Id:          b.Id,
 		Classes:     classes,
