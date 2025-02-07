@@ -262,18 +262,22 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		innerFlex = append(innerFlex, additionalTemplate, textComp)
 	case model.BlockContentText_Title:
 		details := r.Sp.Snapshot.Data.GetDetails()
+		layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 		done := getRelationField(details, bundle.RelationKeyDone, relationToBool)
+		additionalTemplate := NoneTemplate("")
 
-		iconDetails := &types.Struct{ 
-			Fields: map[string]*types.Value{
-				bundle.RelationKeyDone.String(): pbtypes.Bool(done), 
-				bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
-			},
+		if isTodoLayout(layout) {
+			iconDetails := &types.Struct{ 
+				Fields: map[string]*types.Value{
+					bundle.RelationKeyDone.String(): pbtypes.Bool(done), 
+					bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
+				},
+			}
+
+			params := r.MakeRenderIconObjectParams(iconDetails, &IconObjectProps{ Size: 30 })
+			iconTemplate := IconObjectTemplate(r, params)
+			additionalTemplate = AdditionalIconTemplate(iconTemplate)
 		}
-
-		params := r.MakeRenderIconObjectParams(iconDetails, &IconObjectProps{ Size: 30 })
-		iconTemplate := IconObjectTemplate(r, params)
-		additionalTemplate := AdditionalIconTemplate(iconTemplate)
 
 		innerFlex = append(innerFlex, additionalTemplate, textComp)
 	case model.BlockContentText_Quote:

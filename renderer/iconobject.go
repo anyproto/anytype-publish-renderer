@@ -158,7 +158,7 @@ func getIconSize(props *IconObjectProps, layout model.ObjectTypeLayout, gsProps 
 	if gsProps.IsDeleted {
 		return s
 	}
-	if props.Size == 18 && layout == model.ObjectType_todo {
+	if props.Size == 18 && isTodoLayout(layout) {
 		s = 16
 	} else if props.Size == 48 && layout == model.ObjectType_relation {
 		s = 28
@@ -173,7 +173,7 @@ func getIconSize(props *IconObjectProps, layout model.ObjectTypeLayout, gsProps 
 			if layout == model.ObjectType_set || layout == model.ObjectType_objectType {
 				s = props.Size
 			}
-			if layout == model.ObjectType_todo && layout == model.ObjectType_relation && props.ForceLetter {
+			if isTodoLayout(layout) && layout == model.ObjectType_relation && props.ForceLetter {
 				s = props.Size
 			}
 		}

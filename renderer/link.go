@@ -191,7 +191,7 @@ func (r *Renderer) getAdditionalParams(b *model.Block, details *types.Struct) (o
 
 		if relation == "cover" {
 			var err error
-			coverParams, err := r.getCoverParams(details, false, false)
+			coverParams, err := r.getCoverParams(details, false, false, true)
 			if err == nil {
 				coverTemplate = coverParams.CoverTemplate
 			}

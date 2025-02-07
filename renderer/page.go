@@ -24,7 +24,7 @@ func (r *Renderer) hasPageIcon() bool {
 	iconEmoji := getRelationField(details, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(details, bundle.RelationKeyIconImage, r.relationToFileUrl)
 
-	if layout == model.ObjectType_todo {
+	if isTodoLayout(layout) {
 		return false
 	}
 
@@ -36,18 +36,17 @@ func (r *Renderer) hasPageIcon() bool {
 		return false
 	}
 
-	_, err := r.getFileUrl(iconImage)
-
-	return err == nil
-
+	return true
 }
 
 func (r *Renderer) hasPageCover() bool {
 	fields := r.Sp.Snapshot.Data.GetDetails()
 	coverType, err := ToCoverType(pbtypes.GetInt64(fields, "coverType"))
+
 	if err != nil {
 		return false
 	}
+
 	coverId := pbtypes.GetString(fields, "coverId")
 	if coverId != "" {
 		switch coverType {

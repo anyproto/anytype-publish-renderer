@@ -10,6 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
+	"math"
 )
 
 func coverParam(p CoverResizeParams) templ.ComponentScript {
@@ -54,7 +55,7 @@ func CoverBlockTemplate(r *Renderer, p *CoverRenderParams) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("block-" + p.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 13, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 14, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -109,7 +110,7 @@ func CoverImageTemplate(p *CoverRenderParams) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Src)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 23, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 24, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -149,6 +150,8 @@ func getCoverStyle(p *CoverRenderParams) map[string]string {
 		ret["background-image"] = fmt.Sprintf(`url(%s)`, p.Src)
 	}
 
+	ret["background-position"] = fmt.Sprintf("%g", math.Abs(p.ResizeParams.CoverX*100)) + "% " + fmt.Sprintf("%g", math.Abs(p.ResizeParams.CoverY*100)) + "%"
+	ret["background-size"] = fmt.Sprintf("%g", ((p.ResizeParams.CoverScale+1)*100)) + "%"
 	return ret
 }
 
@@ -198,7 +201,7 @@ func CoverDefaultTemplate(p *CoverRenderParams) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(getCoverStyle(p))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 42, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 45, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -249,7 +252,7 @@ func UnsplashReferral(author string, authorUrl templ.SafeURL) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(author)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 50, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/cover.templ`, Line: 53, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
