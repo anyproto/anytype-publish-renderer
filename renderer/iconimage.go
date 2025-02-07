@@ -43,7 +43,10 @@ func (r *Renderer) RenderPageIconImage() templ.Component {
 		return NoneTemplate("")
 	}
 
-	params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: pageIconInitSize(layout)})
+	params := r.MakeRenderIconObjectParams(details, &IconObjectProps{
+		NoDefault: true,
+		Size:      pageIconInitSize(layout),
+	})
 	if params.Src == "" {
 		return NoneTemplate("")
 	}

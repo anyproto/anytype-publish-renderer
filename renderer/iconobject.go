@@ -70,6 +70,9 @@ type IconObjectParams struct {
 }
 
 type IconObjectProps struct {
+	// because bool default value is true..
+	// we can wrap it with constructor in future
+	NoDefault   bool
 	ClassName   string
 	IconClass   string
 	Size        int32
@@ -301,9 +304,11 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			classes = append(classes, "withImage")
 			iconClasses = append(iconClasses, "iconImage")
 		} else {
-			classes = append(classes, "withDefault")
-			iconClasses = append(iconClasses, "iconCommon")
-			src = r.getDefaultIconPath(defaultIcon)
+			if !props.NoDefault {
+				classes = append(classes, "withDefault")
+				iconClasses = append(iconClasses, "iconCommon")
+				src = r.getDefaultIconPath(defaultIcon)
+			}
 		}
 
 		if props.ForceLetter {
@@ -339,19 +344,23 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/object/checkbox%d.svg", checkIconNum))
 		iconClasses = append(iconClasses, "iconCheckbox")
 	case model.ObjectType_note:
-		defaultIcon = "page"
-		classes = append(classes, "withDefault")
-		iconClasses = append(iconClasses, "iconCommon")
-		src = r.getDefaultIconPath(defaultIcon)
+		if !props.NoDefault {
+			defaultIcon = "page"
+			classes = append(classes, "withDefault")
+			iconClasses = append(iconClasses, "iconCommon")
+			src = r.getDefaultIconPath(defaultIcon)
+		}
 	case model.ObjectType_objectType:
 		if hasIconEmoji {
 			iconClasses = append(iconClasses, "smileImage")
 			src = iconEmoji
 		} else {
-			defaultIcon = "type"
-			classes = append(classes, "withDefault")
-			iconClasses = append(iconClasses, "iconCommon")
-			src = r.getDefaultIconPath(defaultIcon)
+			if !props.NoDefault {
+				defaultIcon = "type"
+				classes = append(classes, "withDefault")
+				iconClasses = append(iconClasses, "iconCommon")
+				src = r.getDefaultIconPath(defaultIcon)
+			}
 		}
 	case model.ObjectType_relation:
 		format := getRelationField(targetDetails, bundle.RelationKeyRelationFormat, relationToRelationFormat)
