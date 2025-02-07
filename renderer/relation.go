@@ -234,13 +234,16 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 		if details == nil || len(details.GetFields()) == 0 {
 			continue
 		}
+
+		layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+
 		spaceId := details.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 		name := details.GetFields()[bundle.RelationKeyName.String()].GetStringValue()
 		if name == "" {
 			name = defaultName
 		}
 		icon, class := r.getIconFromDetails(details, "c20")
-		layoutClass := getLayoutClass(details)
+		layoutClass := getLayoutClass(layout)
 		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
 		elements = append(elements, ObjectsListElement(layoutClass, icon, class, name, templ.URL(link)))
 	}

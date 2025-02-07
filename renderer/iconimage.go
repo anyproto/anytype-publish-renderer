@@ -94,6 +94,10 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 
 }
 
+func isTodoLayout(layout model.ObjectTypeLayout) bool {
+	return layout == model.ObjectType_todo
+}
+
 func isHumanLayout(layout model.ObjectTypeLayout) bool {
 	return layout == model.ObjectType_profile || layout == model.ObjectType_participant
 }
@@ -109,10 +113,14 @@ func (r *Renderer) RenderPageIconImage() templ.Component {
 	details := r.Sp.Snapshot.Data.GetDetails()
 	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 
+	if isTodoLayout(layout) {
+		return NoneTemplate("")
+	}
+
 	props := &IconObjectProps{
 		Size: pageIconInitSize(layout),
 	}
-	params := r.MakeRenderIconObjectParams(details, props)
+	params := r.MakeRenderIconObjectParams(details, props, false)
 	content := IconObjectTemplate(r, params)
 
 	classes := []string{}

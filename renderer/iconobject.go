@@ -177,7 +177,8 @@ func fileIconName(details *types.Struct) string {
 // - render user svg
 // - render files as inline link
 // - https://linear.app/anytype/issue/GO-5052/add-marker-to-text-block-with-style=title-when-object-layout-is-task
-func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
+// - withDefault - should default icon be rendered, false for IconImage
+func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps, withDefault bool) (params *IconObjectParams) {
 	var src string
 	classes := []string{"iconObject"}
 	iconClasses := []string{}
@@ -189,6 +190,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 	iconEmoji := getRelationField(targetDetails, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(targetDetails, bundle.RelationKeyIconImage, r.relationToFileUrl)
+	done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
 	// done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
 	hasIconEmoji := iconEmoji != ""
 	hasIconImage := iconImage != ""
@@ -225,8 +227,16 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			iconClasses = append(iconClasses, "iconImage")
 		}
 
+	case model.ObjectType_todo:
+		i := 0
+		if done {
+			i = 1
+		}
+
+		iconClasses = append(iconClasses, "iconCheckbox")
+		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/task/%d.svg", i))
+
 		// case model.ObjectType_set:
-		// case model.ObjectType_todo:
 		// case model.ObjectType_dashboard:
 		// case model.ObjectType_note:
 		// case model.ObjectType_objectType:

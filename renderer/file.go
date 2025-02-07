@@ -170,7 +170,7 @@ func (r *Renderer) InlineFileBlock(b *model.Block, params *FileRenderParams) tem
 	details := r.findTargetDetails(file.TargetObjectId)
 
 	props := &IconObjectProps{}
-	iconParams := r.MakeRenderIconObjectParams(details, props)
+	iconParams := r.MakeRenderIconObjectParams(details, props, true)
 	iconParams.Classes = append(iconParams.Classes, fileClass)
 	iconComp := IconObjectTemplate(r, iconParams)
 	nameComp := NameLinkTemplate(&NameLinkRenderParams{

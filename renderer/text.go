@@ -85,7 +85,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		class := ""
 
 		if details != nil || len(details.Fields) != 0 {
-			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
+			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize}, true)
 
 			var err error
 			iconHtml, err = utils.TemplToString(IconObjectTemplate(r, params))
@@ -255,7 +255,23 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 			},
 		}
 
-		params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: 20 })
+		params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: 20 }, true)
+		iconTemplate := IconObjectTemplate(r, params)
+		additionalTemplate := AdditionalIconTemplate(iconTemplate)
+
+		innerFlex = append(innerFlex, additionalTemplate, textComp)
+	case model.BlockContentText_Title:
+		details := r.Sp.Snapshot.Data.GetDetails()
+		done := getRelationField(details, bundle.RelationKeyDone, relationToBool)
+
+		iconDetails := &types.Struct{ 
+			Fields: map[string]*types.Value{
+				bundle.RelationKeyDone.String(): pbtypes.Bool(done), 
+				bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
+			},
+		}
+
+		params := r.MakeRenderIconObjectParams(iconDetails, &IconObjectProps{ Size: 30 }, true)
 		iconTemplate := IconObjectTemplate(r, params)
 		additionalTemplate := AdditionalIconTemplate(iconTemplate)
 
