@@ -9,6 +9,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/anyproto/anytype-publish-renderer/utils"
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
 )
@@ -76,7 +77,7 @@ func (r *Renderer) getFileUrl(id string) (url string, err error) {
 
 }
 
-func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err error) {
+func (r *Renderer) getFileBlock(id string) (block *model.Block, err error) {
 	path := fmt.Sprintf("filesObjects/%s.pb", id)
 	var (
 		jsonPbSnapshot string
@@ -100,7 +101,7 @@ func (r *Renderer) getFileBlock(id string) (block *model.BlockContentFile, err e
 		if bl.GetFile() == nil {
 			continue
 		}
-		return bl.GetFile(), nil
+		return bl, nil
 	}
 	return
 }
@@ -153,17 +154,30 @@ func (r *Renderer) MakeRenderFileParams(b *model.Block) (params *FileRenderParam
 	return
 }
 
-func (r *Renderer) InlineFileBlock(b *model.Block, params *FileRenderParams) templ.Component {
+func getFileClass(b *model.Block) string {
 	file := b.GetFile()
 	fileType := file.GetType()
 	fileTypeName := model.BlockContentFileType_name[int32(fileType)]
+	fileTypeName = utils.Capitalize(strings.ToLower(fileTypeName))
 	fileClass := fmt.Sprintf("is%s", fileTypeName)
+
+	return fileClass
+}
+
+func (r *Renderer) FileIconBlock(b *model.Block, params *FileRenderParams) templ.Component {
+	file := b.GetFile()
+	fileClass := getFileClass(b)
 	details := r.findTargetDetails(file.TargetObjectId)
 
 	props := &IconObjectProps{}
 	iconParams := r.MakeRenderIconObjectParams(details, props)
 	iconParams.Classes = append(iconParams.Classes, fileClass)
 	iconComp := IconObjectTemplate(r, iconParams)
+	return iconComp
+}
+
+func (r *Renderer) InlineFileBlock(b *model.Block, params *FileRenderParams) templ.Component {
+	iconComp := r.FileIconBlock(b, params)
 	nameComp := NameLinkTemplate(&NameLinkRenderParams{
 		Name: params.Name,
 		Src:  params.Src,
@@ -191,14 +205,14 @@ func isInlineLink(b *model.Block) bool {
 	return isFile || isLink
 }
 
-func (r *Renderer) RenderFile(b *model.Block) (comp templ.Component) {
+func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 	params, err := r.MakeRenderFileParams(b)
 	if err != nil {
 		return NoneTemplate(err.Error())
 	}
 
 	if isInlineLink(b) {
-		comp = r.InlineFileBlock(b, params)
+		return r.InlineFileBlock(b, params)
 	} else {
 		align := GetAlignString(b)
 		classes := []string{align}
@@ -206,17 +220,41 @@ func (r *Renderer) RenderFile(b *model.Block) (comp templ.Component) {
 
 		mediaParams := params.ToFileMediaRenderParams(width, classes)
 
+		var comp templ.Component
 		switch b.GetFile().GetType() {
-		case model.BlockContentFile_Image:
-			return FileImageTemplate(r, mediaParams)
 		case model.BlockContentFile_PDF:
-			return FilePDFTemplate(r, mediaParams)
+			blockParams := makeDefaultBlockParams(b)
+			blockParams.Content = FilePDFTemplate(r, mediaParams)
+			return BlockTemplate(r, blockParams)
+		case model.BlockContentFile_Image:
+			comp = ImageTemplate(mediaParams)
 		case model.BlockContentFile_Audio:
-			return FileAudioTemplate(r, mediaParams)
+			comp = AudioTemplate(mediaParams)
 		case model.BlockContentFile_Video:
-			return FileVideoTemplate(r, mediaParams)
+			comp = VideoTemplate(mediaParams)
+		default:
+			fileTypeStr := b.GetFile().GetType().String()
+			log.Warn("file type is not supported", zap.String("type", fileTypeStr))
+			return NoneTemplate(fmt.Sprintf("file type is not supported: %s", fileTypeStr))
 		}
+
+		var styles map[string]string
+		if width != "" {
+			styles = map[string]string{
+				"width": width,
+			}
+		}
+
+		blockInnerParams := &BlockWrapperParams{
+			Classes:    []string{"wrap"},
+			Styles:     styles,
+			Components: []templ.Component{comp},
+		}
+		blockInner := BlocksWrapper(blockInnerParams)
+		blockParams := makeDefaultBlockParams(b)
+		blockParams.Content = blockInner
+
+		return BlockTemplate(r, blockParams)
 	}
 
-	return
 }

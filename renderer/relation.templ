@@ -58,3 +58,23 @@ templ ActiveCheckBoxTemplate() {
 templ DisabledCheckBoxTemplate() {
     <div class="icon checkbox"> </div>
 }
+
+templ RelationIconTemplate(name string, icon templ.Component) {
+    <div class="element">
+        <div class="flex relicon1">
+			@icon
+            <div class="name"> { name } </div>
+         </div>
+    </div>
+}
+
+templ RelationObjectIconTemplate(url templ.SafeURL, name string, icon templ.Component) {
+    <div class="element">
+        <div class="flex relobject2">
+			@icon
+            <div class="name">
+				<a href={ url }>{ name }</a>
+			</div>
+         </div>
+    </div>
+}

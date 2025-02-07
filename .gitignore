@@ -2,5 +2,5 @@
 /.envrc
 /bin/
 node_modules/
-static/js/main.js
-static/js/main.js.map
+static/js/build/
+static/js/loader.js

@@ -27,6 +27,6 @@
 .block.blockLayout.layoutDiv, 
 .block.blockLayout.layoutHeader, 
 .block.blockLayout.layoutFooter {
-	> .content { width: 100%; overflow: visible; }
+	> .content { width: 100%; overflow: visible; padding: 0px; }
 	> .children { padding: 0px; }
 }

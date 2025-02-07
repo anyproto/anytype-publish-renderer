@@ -88,8 +88,8 @@
 
 				win.on('message', e => {
 					const oe = e.originalEvent;
-					if (!allowedOrigins.some(it => oe.origin.match(it))) {
-						//return;
+					if (!oe.origin.match(location.hostname)) {
+						return;
 					};
 
 					const data = oe.data;

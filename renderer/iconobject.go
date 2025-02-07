@@ -171,11 +171,6 @@ func fileIconName(details *types.Struct) string {
 	return icon
 }
 
-// TODO
-// - finish all layouts
-// - render user svg
-// - render files as inline link
-// - https://linear.app/anytype/issue/GO-5052/add-marker-to-text-block-with-style=title-when-object-layout-is-task
 func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
 	var src string
 	classes := []string{"iconObject"}
@@ -224,12 +219,13 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			iconClasses = append(iconClasses, "iconImage")
 		}
 
-		// case model.ObjectType_set:
-		// case model.ObjectType_todo:
-		// case model.ObjectType_dashboard:
-		// case model.ObjectType_note:
-		// case model.ObjectType_objectType:
-		// case model.ObjectType_relation:
+	// case model.ObjectType_set:
+
+	// case model.ObjectType_todo:
+	// case model.ObjectType_dashboard:
+	// case model.ObjectType_note:
+	// case model.ObjectType_objectType:
+	// case model.ObjectType_relation:
 	// case model.ObjectType_bookmark:
 	// case model.ObjectType_spaceView:
 	case model.ObjectType_image:

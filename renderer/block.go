@@ -25,7 +25,13 @@ func blockContentTypeToName(b *model.Block) string {
 	case *model.BlockContentOfDiv:
 		return "Div"
 	case *model.BlockContentOfFile:
-		return "File"
+		if isInlineLink(b) {
+			return "File"
+		} else {
+			fileClass := getFileClass(b)
+			return "Media " + fileClass
+		}
+
 	case *model.BlockContentOfTable:
 		return "Table"
 	case *model.BlockContentOfLatex:
@@ -56,6 +62,7 @@ type BlockParams struct {
 
 type BlockWrapperParams struct {
 	Classes    []string
+	Styles     map[string]string
 	Components []templ.Component
 }
 

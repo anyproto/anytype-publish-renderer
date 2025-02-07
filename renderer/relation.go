@@ -243,9 +243,10 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 		if name == "" {
 			name = defaultName
 		}
-		icon := r.getIconFromDetails(details)
+		icon, class := r.getIconFromDetails(details, "c20")
+		layoutClass := getLayoutClass(details)
 		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
-		elements = append(elements, ListElement(ObjectElement(name, templ.SafeURL(link)), icon))
+		elements = append(elements, ObjectsListElement(layoutClass, icon, class, name, templ.URL(link)))
 	}
 	return elements
 }
@@ -265,6 +266,16 @@ func (r *Renderer) generateFileComponent(relationValue *types.Value) []templ.Com
 		elements = append(elements, ListElement(NameTemplate("name", filepath.Base(url)), icon))
 	}
 	return elements
+}
+
+func (r *Renderer) createFileIcon(url string, fileBlock *model.Block) templ.Component {
+	params, err := r.MakeRenderFileParams(fileBlock)
+	if err != nil {
+		return NoneTemplate(err.Error())
+	}
+
+	iconComp := r.FileIconBlock(fileBlock, params)
+	return RelationIconTemplate(string(params.Src), iconComp)
 }
 
 func (r *Renderer) getIconFromDetails(details *types.Struct) templ.Component {
