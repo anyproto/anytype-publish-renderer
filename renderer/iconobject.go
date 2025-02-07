@@ -8,6 +8,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-publish-renderer/utils"
 	"github.com/gogo/protobuf/types"
 )
 
@@ -188,20 +189,19 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 	iconEmoji := getRelationField(targetDetails, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(targetDetails, bundle.RelationKeyIconImage, r.relationToFileUrl)
-	done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
-	// done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
 	hasIconEmoji := iconEmoji != ""
 	hasIconImage := iconImage != ""
+	defaultIcon := "page"
 
-	//iconClass
-	//done
-	//relationFormat
 	if hasIconImage {
 		src = iconImage
 	}
 
 	switch layout {
 	default:
+		fallthrough
+	case model.ObjectType_collection, model.ObjectType_set:
+		defaultIcon = "set"
 		fallthrough
 	case model.ObjectType_basic:
 		if hasIconEmoji {
@@ -211,7 +211,6 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			classes = append(classes, "withImage")
 			iconClasses = append(iconClasses, "iconImage")
 		} else {
-			defaultIcon := "page"
 			classes = append(classes, "withDefault")
 			iconClasses = append(iconClasses, "iconCommon")
 			src = r.getDefaultIconPath(defaultIcon)
@@ -221,37 +220,55 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			classes = append(classes, "withLetter")
 			// todo: commonsvg
 		}
-	case model.ObjectType_participant:
-		fallthrough
-	case model.ObjectType_profile:
+	case model.ObjectType_participant, model.ObjectType_profile:
 		classes = append(classes, "isHuman")
 		if hasIconImage {
 			classes = append(classes, "withImage")
 			iconClasses = append(iconClasses, "iconImage")
 		}
-
+		// TODO: svg user icon
+	case model.ObjectType_date:
+		defaultIcon = "date"
+		classes = append(classes, "withDefault")
+		iconClasses = append(iconClasses, "iconCommon")
+		src = r.getDefaultIconPath(defaultIcon)
 	case model.ObjectType_todo:
-		i := 0
+		done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
+		checkIconNum := 0
 		if done {
-			i = 1
+			checkIconNum = 2
 		}
-
+		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/object/checkbox%d.svg", checkIconNum))
 		iconClasses = append(iconClasses, "iconCheckbox")
-		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/task/%d.svg", i))
-
-	// case model.ObjectType_set:
-
-	// case model.ObjectType_todo:
-	// case model.ObjectType_dashboard:
-	// case model.ObjectType_note:
-	// case model.ObjectType_objectType:
-	// case model.ObjectType_relation:
-	// case model.ObjectType_bookmark:
-	// case model.ObjectType_spaceView:
+	case model.ObjectType_note:
+		defaultIcon = "page"
+		classes = append(classes, "withDefault")
+		iconClasses = append(iconClasses, "iconCommon")
+		src = r.getDefaultIconPath(defaultIcon)
+	case model.ObjectType_objectType:
+		if hasIconEmoji {
+			iconClasses = append(iconClasses, "smileImage")
+			src = iconEmoji
+		} else {
+			defaultIcon = "type"
+			classes = append(classes, "withDefault")
+			iconClasses = append(iconClasses, "iconCommon")
+			src = r.getDefaultIconPath(defaultIcon)
+		}
+	case model.ObjectType_relation:
+		format := getRelationField(targetDetails, bundle.RelationKeyRelationFormat, relationToRelationFormat)
+		if format != model.RelationFormat_relations && format != model.RelationFormat_emoji {
+			iconClasses = append(iconClasses, "iconCommon")
+			typeName := utils.Capitalize(model.RelationFormat_name[int32(format)])
+			src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/relation/%s.svg", typeName))
+		}
+	case model.ObjectType_bookmark:
+		// TODO: should show image preview when we will have cropped images in snapshot
+		iconClasses = append(iconClasses, "iconFile")
+		iconName := "image"
+		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/file/%s.svg", iconName))
 	case model.ObjectType_image:
-		iconClasses = append(iconClasses, "iconImage")
-		// TODO: should show image preview
-		// getFileUrl
+		// TODO: should show image preview when we will have cropped images in snapshot
 		fallthrough
 	case model.ObjectType_video:
 		fallthrough
@@ -263,6 +280,10 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		iconClasses = append(iconClasses, "iconFile")
 		iconName := fileIconName(targetDetails)
 		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/file/%s.svg", iconName))
+
+	case model.ObjectType_spaceView, model.ObjectType_dashboard:
+		break
+
 	}
 
 	if props.Size != 0 {
