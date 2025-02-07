@@ -171,6 +171,11 @@ func fileIconName(details *types.Struct) string {
 	return icon
 }
 
+func (r *Renderer) getDefaultIconPath(name string) (path string) {
+	path = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/default/%s.svg", name))
+	return
+}
+
 func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
 	var src string
 	classes := []string{"iconObject"}
@@ -204,6 +209,11 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		} else if hasIconImage {
 			classes = append(classes, "withImage")
 			iconClasses = append(iconClasses, "iconImage")
+		} else {
+			defaultIcon := "page"
+			classes = append(classes, "withDefault")
+			iconClasses = append(iconClasses, "iconCommon")
+			src = r.getDefaultIconPath(defaultIcon)
 		}
 
 		if props.ForceLetter {
