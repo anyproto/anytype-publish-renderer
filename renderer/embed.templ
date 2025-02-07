@@ -1,7 +1,9 @@
 package renderer
 
 script EmbedData(data EmbedIframeData) {
-	document.getElementById(`receiver${data.BlockId}`).contentWindow.postMessage(data, '*');
+	setTimeout(() => {
+		document.getElementById(`receiver${data.BlockId}`).contentWindow.postMessage(data, '*');
+	}, 10);
 }
 
 templ EmbedTemplate(r *Renderer, p *EmbedRenderParams) {

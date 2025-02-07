@@ -5,8 +5,6 @@
 	const chunks = %CHUNKS%;
 	const length = chunks.length;
 
-	console.log("Chunks to be loaded:", chunks);
-
 	let n = 0;
 
 	const hide = () => {
@@ -40,8 +38,6 @@
 			if (n === length) {
 				loaded();
 			};
-
-			console.log(`Chunk ${chunk} loaded successfully.`);
 		};
 
 		script.onerror = function() {
