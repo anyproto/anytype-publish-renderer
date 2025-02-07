@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"math"
 )
 
 script coverParam(p CoverResizeParams) {
@@ -33,6 +34,8 @@ func getCoverStyle (p *CoverRenderParams) map[string]string {
 		ret["background-image"] = fmt.Sprintf(`url(%s)`, p.Src)
 	}
 
+    ret["background-position"] = fmt.Sprintf("%g", math.Abs(p.ResizeParams.CoverX*100)) + "% " + fmt.Sprintf("%g", math.Abs(p.ResizeParams.CoverY*100)) + "%"
+    ret["background-size"] = fmt.Sprintf("%g", ((p.ResizeParams.CoverScale +  1) * 100)) + "%"
 	return ret
 }
 
