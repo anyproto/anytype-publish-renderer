@@ -12,9 +12,10 @@ import (
 )
 
 type CoverResizeParams struct {
-	CoverX            float64
-	CoverY            float64
-	CoverScale        float64
+	CoverX     float64
+	CoverY     float64
+	CoverScale float64
+	WithScale  bool
 }
 
 type CoverRenderParams struct {
@@ -48,10 +49,10 @@ func ToCoverType(val int64) (CoverType, error) {
 
 func (r *Renderer) MakeRenderPageCoverParams() (*CoverRenderParams, error) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
-	return r.getCoverParams(fields, true, true)
+	return r.getCoverParams(fields, true, true, false)
 }
 
-func (r *Renderer) getCoverParams(fields *types.Struct, asImage bool, withAuthor bool) (*CoverRenderParams, error) {
+func (r *Renderer) getCoverParams(fields *types.Struct, asImage bool, withAuthor, withScale bool) (*CoverRenderParams, error) {
 	coverType, err := ToCoverType(pbtypes.GetInt64(fields, "coverType"))
 
 	if err != nil {
@@ -66,13 +67,14 @@ func (r *Renderer) getCoverParams(fields *types.Struct, asImage bool, withAuthor
 	class := fmt.Sprintf("type%d", coverType)
 
 	params := &CoverRenderParams{
-		Id:         coverId,
-		CoverType:  coverType,
-		Classes:    strings.Join([]string{class, coverId}, " "),
+		Id:        coverId,
+		CoverType: coverType,
+		Classes:   strings.Join([]string{class, coverId}, " "),
 		ResizeParams: CoverResizeParams{
 			CoverX:     coverX,
 			CoverY:     coverY,
 			CoverScale: coverScale,
+			WithScale:  withScale,
 		},
 	}
 

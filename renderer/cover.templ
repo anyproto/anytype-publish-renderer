@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"math"
 )
 
 script coverParam(p CoverResizeParams) {
@@ -26,11 +27,19 @@ templ CoverImageTemplate(p *CoverRenderParams) {
      }
 }
 
-func getCoverStyle (p *CoverRenderParams) map[string]string {
-	ret := map[string]string{}
+func getCoverStyle (p *CoverRenderParams) map[string]templ.SafeCSSProperty {
+	ret := map[string]templ.SafeCSSProperty{}
 
 	if p.Src != "" {
-		ret["background-image"] = fmt.Sprintf(`url(%s)`, p.Src)
+		ret["background-image"] = templ.SafeCSSProperty(fmt.Sprintf(`url(%s)`, p.Src))
+	}
+
+    if (p.ResizeParams.WithScale) {
+       x := math.Abs(p.ResizeParams.CoverX * 100)
+       y := math.Abs(p.ResizeParams.CoverY * 100)
+       scale := (p.ResizeParams.CoverScale +  1) * 100
+       ret["background-position"] = templ.SafeCSSProperty(fmt.Sprintf("%g", x) + "% " + fmt.Sprintf("%g", y) + "%")
+       ret["background-size"] = templ.SafeCSSProperty(fmt.Sprintf("%g", scale) + "%")
 	}
 
 	return ret
