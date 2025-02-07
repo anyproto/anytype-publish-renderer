@@ -1,8 +1,8 @@
 @media (max-width: 736px) {
 
-	.blocks { width: 100% !important; padding-left: 16px; padding-right: 16px; }
+	.blocks { width: 100% !important; padding-left: 24px; padding-right: 24px; }
 
-	.block.blockCover { height: 208px; }
+	.block.blockCover { height: 208px; padding: 8px 8px 0px 8px; }
 
 	.block.blockTable {
 		.scrollWrap { overflow-x: auto; padding-bottom: 8px; }
