@@ -3,110 +3,27 @@ package renderer
 import (
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pb"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/jsonpb"
+	"github.com/gogo/protobuf/types"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-	"github.com/gogo/protobuf/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMakeRelationRenderParams(t *testing.T) {
-	renderer := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
-
-	t.Run("Default case with no relation and no color", func(t *testing.T) {
+func TestMakeRelationRenderParams_ShortText(t *testing.T) {
+	t.Run("short text", func(t *testing.T) {
 		// given
-		block := &model.Block{
-			Id: "test-block-id",
-			Content: &model.BlockContentOfRelation{
-				Relation: &model.BlockContentRelation{
-					Key: "nonexistent-key",
-				},
-			},
-		}
-
-		// when
-		params := renderer.MakeRelationRenderParams(block)
-
-		// then
-		assert.Equal(t, "test-block-id", params.Id)
-		assert.Equal(t, "", params.BackgroundColor)
-		assert.Equal(t, "isDeleted", params.IsDeleted)
-		assert.Equal(t, "isEmpty", params.IsEmpty)
-		assert.Equal(t, defaultName, params.Name)
-		assert.Equal(t, "", params.Format)
-		assert.Nil(t, params.Value)
-	})
-
-	t.Run("Block with background color", func(t *testing.T) {
-		// given
-		block := &model.Block{
-			Id:              "test-block-id",
-			BackgroundColor: "red",
-			Content: &model.BlockContentOfRelation{
-				Relation: &model.BlockContentRelation{
-					Key: "nonexistent-key",
-				},
-			},
-		}
-
-		// when
-		params := renderer.MakeRelationRenderParams(block)
-
-		// then
-		assert.Equal(t, "bgColor bgColor-red", params.BackgroundColor)
-	})
-
-	t.Run("Block with existing relation metadata", func(t *testing.T) {
-		// given
-		block := &model.Block{
-			Id: "test-block-id",
-			Content: &model.BlockContentOfRelation{
-				Relation: &model.BlockContentRelation{
-					Key: bundle.RelationKeyName.String(),
-				},
-			},
-		}
-
-		renderer.Sp = &pb.SnapshotWithType{
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+		r.Sp = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 				Details: &types.Struct{
 					Fields: map[string]*types.Value{
-						bundle.RelationKeyName.String(): pbtypes.String("test"),
-					},
-				},
-			}},
-		}
-
-		// when
-		params := renderer.MakeRelationRenderParams(block)
-
-		// then
-		assert.Equal(t, "Name", params.Name)
-		assert.Equal(t, "", params.IsDeleted)
-		assert.Equal(t, "c-shortText", params.Format)
-	})
-
-	t.Run("Block with relation value", func(t *testing.T) {
-		// given
-		relationKey := "relation-with-value"
-		block := &model.Block{
-			Id: "test-block-id",
-			Content: &model.BlockContentOfRelation{
-				Relation: &model.BlockContentRelation{
-					Key: relationKey,
-				},
-			},
-		}
-		renderer.Sp = &pb.SnapshotWithType{
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-				Details: &types.Struct{
-					Fields: map[string]*types.Value{
-						relationKey: pbtypes.Int64(1),
+						"shortTextKey": pbtypes.String("test"),
 					},
 				},
 			}},
@@ -116,8 +33,82 @@ func TestMakeRelationRenderParams(t *testing.T) {
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 				Details: &types.Struct{
 					Fields: map[string]*types.Value{
-						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("relation-with-value").URL()),
-						bundle.RelationKeyName.String():           pbtypes.String("Value Relation"),
+						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("shortTextKey").URL()),
+						bundle.RelationKeyName.String():           pbtypes.String("Short text Relation"),
+						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_shorttext)),
+					},
+				},
+			}},
+		}
+		marshaler := jsonpb.Marshaler{}
+		json, err := marshaler.MarshalToString(sn)
+		assert.NoError(t, err)
+		r.UberSp.PbFiles[filepath.Join("relations", "shortTextKey.pb")] = json
+
+		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "shortTextKey"}}}
+
+		// when
+		component := r.MakeRelationRenderParams(block)
+
+		// then
+		assert.NotNil(t, component)
+	})
+	t.Run("long text", func(t *testing.T) {
+		// given
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+		r.Sp = &pb.SnapshotWithType{
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						"longTextKey": pbtypes.String("test"),
+					},
+				},
+			}},
+		}
+		sn := &pb.SnapshotWithType{
+			SbType: model.SmartBlockType_STRelation,
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("longTextKey").URL()),
+						bundle.RelationKeyName.String():           pbtypes.String("Long text Relation"),
+						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_longtext)),
+					},
+				},
+			}},
+		}
+		marshaler := jsonpb.Marshaler{}
+		json, err := marshaler.MarshalToString(sn)
+		assert.NoError(t, err)
+		r.UberSp.PbFiles[filepath.Join("relations", "longTextKey.pb")] = json
+
+		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "longTextKey"}}}
+
+		// when
+		component := r.MakeRelationRenderParams(block)
+
+		// then
+		assert.NotNil(t, component)
+	})
+	t.Run("number", func(t *testing.T) {
+		// given
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+		r.Sp = &pb.SnapshotWithType{
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						"numberKey": pbtypes.Int64(4),
+					},
+				},
+			}},
+		}
+		sn := &pb.SnapshotWithType{
+			SbType: model.SmartBlockType_STRelation,
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("numberKey").URL()),
+						bundle.RelationKeyName.String():           pbtypes.String("Number Relation"),
 						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_number)),
 					},
 				},
@@ -126,20 +117,116 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		marshaler := jsonpb.Marshaler{}
 		json, err := marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "relation-with-value.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("relations", "numberKey.pb")] = json
+
+		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "numberKey"}}}
 
 		// when
-		params := renderer.MakeRelationRenderParams(block)
+		component := r.MakeRelationRenderParams(block)
 
 		// then
-		assert.Equal(t, "Value Relation", params.Name)
-		assert.Equal(t, "c-number", params.Format)
-		assert.NotNil(t, params.Value)
+		assert.NotNil(t, component)
 	})
+	t.Run("phone", func(t *testing.T) {
+		// given
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+		r.Sp = &pb.SnapshotWithType{
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						"phone": pbtypes.Int64(12345),
+					},
+				},
+			}},
+		}
+		sn := &pb.SnapshotWithType{
+			SbType: model.SmartBlockType_STRelation,
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("phone").URL()),
+						bundle.RelationKeyName.String():           pbtypes.String("Phone Relation"),
+						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_phone)),
+					},
+				},
+			}},
+		}
+		marshaler := jsonpb.Marshaler{}
+		json, err := marshaler.MarshalToString(sn)
+		assert.NoError(t, err)
+		r.UberSp.PbFiles[filepath.Join("relations", "phone.pb")] = json
 
-	t.Run("Block with date relation value", func(t *testing.T) {
+		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "phone"}}}
+
+		// when
+		component := r.MakeRelationRenderParams(block)
+
+		// then
+		assert.NotNil(t, component)
+	})
+	t.Run("email", func(t *testing.T) {
+		// given
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+		r.Sp = &pb.SnapshotWithType{
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						"email": pbtypes.String("email"),
+					},
+				},
+			}},
+		}
+		sn := &pb.SnapshotWithType{
+			SbType: model.SmartBlockType_STRelation,
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("email").URL()),
+						bundle.RelationKeyName.String():           pbtypes.String("Email Relation"),
+						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_email)),
+					},
+				},
+			}},
+		}
+		marshaler := jsonpb.Marshaler{}
+		json, err := marshaler.MarshalToString(sn)
+		assert.NoError(t, err)
+		r.UberSp.PbFiles[filepath.Join("relations", "email.pb")] = json
+
+		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "email"}}}
+
+		// when
+		component := r.MakeRelationRenderParams(block)
+
+		// then
+		assert.NotNil(t, component)
+	})
+	t.Run("empty key", func(t *testing.T) {
+		// given
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: ""}}}
+
+		// when
+		component := r.MakeRelationRenderParams(block)
+
+		// then
+		assert.Nil(t, component)
+	})
+	t.Run("unknown key", func(t *testing.T) {
+		// given
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "unknown key"}}}
+
+		// when
+		component := r.MakeRelationRenderParams(block)
+
+		// then
+		assert.Nil(t, component)
+	})
+	t.Run("date value", func(t *testing.T) {
 		// given
 		relationKey := "date-relation"
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 
 		block := &model.Block{
 			Id: "test-block-id",
@@ -151,7 +238,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		}
 
 		timestamp := float64(time.Now().Unix())
-		renderer.Sp = &pb.SnapshotWithType{
+		r.Sp = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 				Details: &types.Struct{
 					Fields: map[string]*types.Value{
@@ -175,19 +262,18 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		marshaler := jsonpb.Marshaler{}
 		json, err := marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "date-relation.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("relations", "date-relation.pb")] = json
 
 		// when
-		params := renderer.MakeRelationRenderParams(block)
+		params := r.MakeRelationRenderParams(block)
 
 		// then
-		assert.Equal(t, "Date Relation", params.Name)
-		assert.Equal(t, "c-date", params.Format)
-		assert.NotNil(t, params.Value)
+		assert.NotNil(t, params)
 	})
 	t.Run("Block with checkbox relation value", func(t *testing.T) {
 		// given
 		relationKey := "checkbox-relation"
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 
 		block := &model.Block{
 			Id: "checkbox-value",
@@ -198,7 +284,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 			},
 		}
 
-		renderer.Sp = &pb.SnapshotWithType{
+		r.Sp = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 				Details: &types.Struct{
 					Fields: map[string]*types.Value{
@@ -223,19 +309,18 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		marshaler := jsonpb.Marshaler{}
 		json, err := marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "checkbox-relation.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("relations", "checkbox-relation.pb")] = json
 
 		// when
-		params := renderer.MakeRelationRenderParams(block)
+		params := r.MakeRelationRenderParams(block)
 
 		// then
-		assert.Equal(t, "Checkbox Relation", params.Name)
-		assert.Equal(t, "c-checkbox", params.Format)
-		assert.NotNil(t, params.Value)
+		assert.NotNil(t, params)
 	})
 	t.Run("Block with c-object relation value", func(t *testing.T) {
 		// given
 		relationKey := "object-relation"
+		r := &Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 
 		block := &model.Block{
 			Id: "object-value",
@@ -246,7 +331,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 			},
 		}
 
-		renderer.Sp = &pb.SnapshotWithType{
+		r.Sp = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 				Details: &types.Struct{
 					Fields: map[string]*types.Value{relationKey: pbtypes.StringList([]string{"object1", "object2"})},
@@ -269,7 +354,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		marshaler := jsonpb.Marshaler{}
 		json, err := marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "object-relation.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("relations", "object-relation.pb")] = json
 
 		sn = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
@@ -285,20 +370,19 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		}
 		json, err = marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("objects", "object1.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("objects", "object1.pb")] = json
 
 		// when
-		params := renderer.MakeRelationRenderParams(block)
+		params := r.MakeRelationRenderParams(block)
 
 		// then
-		assert.Equal(t, "Object Relation", params.Name)
-		assert.Equal(t, "c-object", params.Format)
-		assert.NotNil(t, params.Value)
+		assert.NotNil(t, params)
 	})
 
 	t.Run("Block with c-select relation value (status)", func(t *testing.T) {
 		// given
 		relationKey := "status-relation"
+		r := &Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 
 		block := &model.Block{
 			Id: "status-value",
@@ -309,7 +393,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 			},
 		}
 
-		renderer.Sp = &pb.SnapshotWithType{
+		r.Sp = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 				Details: &types.Struct{
 					Fields: map[string]*types.Value{
@@ -335,7 +419,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		marshaler := jsonpb.Marshaler{}
 		json, err := marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "status-relation.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("relations", "status-relation.pb")] = json
 
 		sn = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
@@ -351,20 +435,19 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		}
 		json, err = marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relationsOptions", "status1.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("relationsOptions", "status1.pb")] = json
 
 		// when
-		params := renderer.MakeRelationRenderParams(block)
+		params := r.MakeRelationRenderParams(block)
 
 		// then
-		assert.Equal(t, "Status Relation", params.Name)
-		assert.Equal(t, "c-select", params.Format)
-		assert.NotNil(t, params.Value)
+		assert.NotNil(t, params)
 	})
 
 	t.Run("Block with c-select relation value (tag)", func(t *testing.T) {
 		// given
 		relationKey := "tag-relation"
+		r := &Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 
 		block := &model.Block{
 			Id: "tag-value",
@@ -375,7 +458,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 			},
 		}
 
-		renderer.Sp = &pb.SnapshotWithType{
+		r.Sp = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 				Details: &types.Struct{
 					Fields: map[string]*types.Value{
@@ -401,7 +484,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		marshaler := jsonpb.Marshaler{}
 		json, err := marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "tag-relation.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("relations", "tag-relation.pb")] = json
 
 		sn = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
@@ -417,7 +500,7 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		}
 		json, err = marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relationsOptions", "tag1.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("relationsOptions", "tag1.pb")] = json
 
 		sn = &pb.SnapshotWithType{
 			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
@@ -433,193 +516,12 @@ func TestMakeRelationRenderParams(t *testing.T) {
 		}
 		json, err = marshaler.MarshalToString(sn)
 		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relationsOptions", "tag2.pb")] = json
+		r.UberSp.PbFiles[filepath.Join("relationsOptions", "tag2.pb")] = json
 
 		// when
-		params := renderer.MakeRelationRenderParams(block)
+		params := r.MakeRelationRenderParams(block)
 
 		// then
-		assert.Equal(t, "Tag Relation", params.Name)
-		assert.Equal(t, "c-select", params.Format)
-		assert.NotNil(t, params.Value)
-	})
-	t.Run("Block with long text value", func(t *testing.T) {
-		// given
-		relationKey := "text-relation"
-		block := &model.Block{
-			Id: "test-block-id",
-			Content: &model.BlockContentOfRelation{
-				Relation: &model.BlockContentRelation{
-					Key: relationKey,
-				},
-			},
-		}
-		renderer.Sp = &pb.SnapshotWithType{
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-				Details: &types.Struct{
-					Fields: map[string]*types.Value{
-						relationKey: pbtypes.String("test"),
-					},
-				},
-			}},
-		}
-		sn := &pb.SnapshotWithType{
-			SbType: model.SmartBlockType_STRelation,
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-				Details: &types.Struct{
-					Fields: map[string]*types.Value{
-						bundle.RelationKeyUniqueKey.String(): pbtypes.String(domain.RelationKey("text-relation").URL()),
-						bundle.RelationKeyName.String():      pbtypes.String("Text Relation"),
-					},
-				},
-			}},
-		}
-		marshaler := jsonpb.Marshaler{}
-		json, err := marshaler.MarshalToString(sn)
-		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "text-relation.pb")] = json
-
-		// when
-		params := renderer.MakeRelationRenderParams(block)
-
-		// then
-		assert.Equal(t, "Text Relation", params.Name)
-		assert.Equal(t, "c-longText", params.Format)
-		assert.NotNil(t, params.Value)
-	})
-	t.Run("Block with url text value", func(t *testing.T) {
-		// given
-		relationKey := "url-relation"
-		block := &model.Block{
-			Id: "test-block-id",
-			Content: &model.BlockContentOfRelation{
-				Relation: &model.BlockContentRelation{
-					Key: relationKey,
-				},
-			},
-		}
-		renderer.Sp = &pb.SnapshotWithType{
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-				Details: &types.Struct{
-					Fields: map[string]*types.Value{
-						relationKey: pbtypes.String("url"),
-					},
-				},
-			}},
-		}
-		sn := &pb.SnapshotWithType{
-			SbType: model.SmartBlockType_STRelation,
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-				Details: &types.Struct{
-					Fields: map[string]*types.Value{
-						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("url-relation").URL()),
-						bundle.RelationKeyName.String():           pbtypes.String("Url Relation"),
-						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_url)),
-					},
-				},
-			}},
-		}
-		marshaler := jsonpb.Marshaler{}
-		json, err := marshaler.MarshalToString(sn)
-		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "url-relation.pb")] = json
-
-		// when
-		params := renderer.MakeRelationRenderParams(block)
-
-		// then
-		assert.Equal(t, "Url Relation", params.Name)
-		assert.Equal(t, "c-url", params.Format)
-		assert.NotNil(t, params.Value)
-	})
-	t.Run("Block with email text value", func(t *testing.T) {
-		// given
-		relationKey := "email-relation"
-		block := &model.Block{
-			Id: "test-block-id",
-			Content: &model.BlockContentOfRelation{
-				Relation: &model.BlockContentRelation{
-					Key: relationKey,
-				},
-			},
-		}
-		renderer.Sp = &pb.SnapshotWithType{
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-				Details: &types.Struct{
-					Fields: map[string]*types.Value{
-						relationKey: pbtypes.String("email"),
-					},
-				},
-			}},
-		}
-		sn := &pb.SnapshotWithType{
-			SbType: model.SmartBlockType_STRelation,
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-				Details: &types.Struct{
-					Fields: map[string]*types.Value{
-						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("email-relation").URL()),
-						bundle.RelationKeyName.String():           pbtypes.String("Email Relation"),
-						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_email)),
-					},
-				},
-			}},
-		}
-		marshaler := jsonpb.Marshaler{}
-		json, err := marshaler.MarshalToString(sn)
-		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "email-relation.pb")] = json
-
-		// when
-		params := renderer.MakeRelationRenderParams(block)
-
-		// then
-		assert.Equal(t, "Email Relation", params.Name)
-		assert.Equal(t, "c-email", params.Format)
-		assert.NotNil(t, params.Value)
-	})
-	t.Run("Block with phone text value", func(t *testing.T) {
-		// given
-		relationKey := "phone-relation"
-		block := &model.Block{
-			Id: "test-block-id",
-			Content: &model.BlockContentOfRelation{
-				Relation: &model.BlockContentRelation{
-					Key: relationKey,
-				},
-			},
-		}
-		renderer.Sp = &pb.SnapshotWithType{
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-				Details: &types.Struct{
-					Fields: map[string]*types.Value{
-						relationKey: pbtypes.String("phone"),
-					},
-				},
-			}},
-		}
-		sn := &pb.SnapshotWithType{
-			SbType: model.SmartBlockType_STRelation,
-			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-				Details: &types.Struct{
-					Fields: map[string]*types.Value{
-						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("phone-relation").URL()),
-						bundle.RelationKeyName.String():           pbtypes.String("Phone Relation"),
-						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_phone)),
-					},
-				},
-			}},
-		}
-		marshaler := jsonpb.Marshaler{}
-		json, err := marshaler.MarshalToString(sn)
-		assert.NoError(t, err)
-		renderer.UberSp.PbFiles[filepath.Join("relations", "phone-relation.pb")] = json
-
-		// when
-		params := renderer.MakeRelationRenderParams(block)
-
-		// then
-		assert.Equal(t, "Phone Relation", params.Name)
-		assert.Equal(t, "c-phone", params.Format)
-		assert.NotNil(t, params.Value)
+		assert.NotNil(t, params)
 	})
 }

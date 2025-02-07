@@ -2,9 +2,7 @@ package renderer
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-
+	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/types"
 
 	"github.com/a-h/templ"
@@ -12,124 +10,68 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 )
 
-type FeaturedRelationsParams struct {
-	Id             string
-	Classes        string
-	ContentClasses string
-	Cells          []templ.Component
-}
-
-func (r *Renderer) MakeFeaturedRelationsParams(b *model.Block) *FeaturedRelationsParams {
-	id := b.GetId()
+func (r *Renderer) MakeFeaturedRelationsComponent() templ.Component {
 	details := r.Sp.GetSnapshot().GetData().GetDetails()
-	align := "align" + strconv.Itoa(int(b.GetAlign()))
-	bgColor := b.GetBackgroundColor()
-	classes := []string{"block", "blockFeatured", align}
-	contentClasses := []string{"content"}
-
-	if bgColor != "" {
-		contentClasses = append(contentClasses, "bgColor", "bgColor-"+bgColor)
-	}
-
-	param := &FeaturedRelationsParams{
-		Id:             id,
-		Classes:        strings.Join(classes, " "),
-		ContentClasses: strings.Join(contentClasses, " "),
-	}
 
 	if details == nil || len(details.GetFields()) == 0 {
-		return param
+		return nil
 	}
-
 	featuredRelationsList := details.GetFields()[bundle.RelationKeyFeaturedRelations.String()].GetListValue()
-	if featuredRelationsList == nil {
-		return param
+	if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
+		return nil
 	}
-
 	cells := make([]templ.Component, 0, len(featuredRelationsList.Values))
 	for i, featuredRelation := range featuredRelationsList.Values {
 		var lastClass string
-
 		if i == len(featuredRelationsList.Values)-1 {
 			lastClass = "last"
 		}
-
-		cells = r.processFeatureRelation(featuredRelation, lastClass, details, cells)
+		cells = r.processFeatureRelation(featuredRelation, details, lastClass, cells)
 	}
-
-	param.Cells = cells
-	return param
+	if len(cells) == 0 {
+		return nil
+	}
+	wrapper := BlocksWrapper(&BlockWrapperParams{
+		Classes:    []string{"wrap"},
+		Components: cells,
+	})
+	return wrapper
 }
 
-func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, lastClass string, details *types.Struct, cells []templ.Component) []templ.Component {
+func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details *types.Struct, lastClass string, cells []templ.Component) []templ.Component {
 	if featuredRelation == nil {
 		return cells
 	}
-
 	relationKey := featuredRelation.GetStringValue()
-
 	if relationKey == bundle.RelationKeyDescription.String() {
 		return cells
 	}
-
-	name, format, found := r.retrieveRelationInfo(relationKey)
-
-	if !found {
-		return cells
-	}
-	relationValue, exists := details.GetFields()[relationKey]
-	formatClass := r.getFormatClass(format)
-
-	if !exists || relationValue == nil {
-		return append(cells, EmptyCellTemplate(name, formatClass, lastClass))
-	}
-
-	switch format {
-	case
-		model.RelationFormat_object,
-		model.RelationFormat_file,
-		model.RelationFormat_tag,
-		model.RelationFormat_status:
-		return r.processObjectList(relationKey, relationValue, format, cells, name, formatClass, lastClass)
-	default:
-		return r.processOneObject(relationValue, format, cells, name, lastClass, formatClass)
-	}
-}
-
-func (r *Renderer) processObjectList(key string, relationValue *types.Value, format model.RelationFormat, cells []templ.Component, name, formatClass, lastClass string) []templ.Component {
-	objectsList := r.populateRelationListValue(format, relationValue)
-
-	if len(objectsList) == 0 {
-		if key == bundle.RelationKeyBacklinks.String() || key == bundle.RelationKeyLinks.String() {
+	if relationKey == bundle.RelationKeyBacklinks.String() || relationKey == bundle.RelationKeyLinks.String() {
+		list := pbtypes.GetStringList(details, relationKey)
+		if len(list) == 0 {
 			return cells
 		}
-		return append(cells, EmptyCellTemplate(name, formatClass, lastClass))
 	}
-
-	var more string
-	if len(objectsList) > 1 {
-		more = fmt.Sprintf("+%s", strconv.FormatInt(int64(len(objectsList)-1), 10))
+	settings := &RelationRenderSetting{
+		Featured:     true,
+		LimitDisplay: true,
+		Classes:      []string{lastClass},
+		Key:          relationKey,
 	}
-
-	cells = append(cells, ListCellTemplate(formatClass, lastClass, more, objectsList[0]))
-	return cells
-}
-
-func (r *Renderer) processOneObject(relationValue *types.Value, format model.RelationFormat, cells []templ.Component, name, lastClass, formatClass string) []templ.Component {
-	cell := r.populateRelationValue(format, relationValue)
-	if cell != nil {
-		if format == model.RelationFormat_checkbox {
-			cells = append(cells, CheckBoxCellTemplate(name, lastClass, cell))
-		} else {
-			cells = append(cells, CellTemplate(formatClass, lastClass, cell))
-		}
-	} else {
-		cells = append(cells, EmptyCellTemplate(name, formatClass, lastClass))
-	}
+	cells = append(cells, r.buildRelationComponents(settings)...)
 	return cells
 }
 
 func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
-	params := r.MakeFeaturedRelationsParams(block)
-	return FeaturedRelationTemplate(params)
+	blockParams := makeDefaultBlockParams(block)
+	color := block.GetBackgroundColor()
+	if color != "" {
+		blockParams.Classes = append(blockParams.Classes, fmt.Sprintf("bgColor bgColor-%s", color))
+	}
+	params := r.MakeFeaturedRelationsComponent()
+	if params == nil {
+		return NoneTemplate("")
+	}
+	blockParams.Content = params
+	return BlockTemplate(r, blockParams)
 }
