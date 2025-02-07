@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"net/url"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -16,12 +17,10 @@ import (
 const defaultName = "Untitled"
 
 type RelationRenderSetting struct {
-	IsFeatured       bool
-	EvaluateMore     bool
-	ShowRelationName bool
-	Key              string
-	InitClass        string
-	Classes          []string
+	Key          string
+	Featured     bool
+	LimitDisplay bool
+	CssClasses   []string
 }
 
 func (r *Renderer) MakeRelationRenderParams(b *model.Block) templ.Component {
@@ -30,44 +29,44 @@ func (r *Renderer) MakeRelationRenderParams(b *model.Block) templ.Component {
 	if key == "" {
 		return nil
 	}
-	params := &RelationRenderSetting{Key: key, ShowRelationName: true, InitClass: "sides"}
-	return r.fillRelationsParams(params)
+	params := &RelationRenderSetting{Key: key}
+	relationComponent := r.buildRelationComponents(params)
+	return BlocksWrapper(&BlockWrapperParams{Classes: []string{"sides"}, Components: relationComponent})
 }
 
-func (r *Renderer) fillRelationsParams(params *RelationRenderSetting) templ.Component {
+func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []templ.Component {
 	name, format, found := r.retrieveRelationInfo(params.Key)
 	if !found {
 		return nil
 	}
-	rootWrapper := &BlockWrapperParams{Classes: []string{params.InitClass}}
-	if params.ShowRelationName {
-		rootWrapper.Components = append(rootWrapper.Components, BlocksWrapper(&BlockWrapperParams{
+	var components []templ.Component
+	if !params.Featured {
+		components = append(components, BlocksWrapper(&BlockWrapperParams{
 			Classes:    []string{"info"},
 			Components: []templ.Component{NameTemplate("name", name)},
 		}))
 	}
 	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[params.Key]
-	if relationValue == nil {
-		params.Classes = append(params.Classes, "isEmpty")
-		rootWrapper.Components = append(rootWrapper.Components, CellTemplate(params, NameTemplate("empty", "")))
-		return BlocksWrapper(rootWrapper)
-	}
 	formatClass := r.getFormatClass(format)
-	params.Classes = append(params.Classes, formatClass)
+	params.CssClasses = append(params.CssClasses, formatClass)
+	if relationValue == nil {
+		params.CssClasses = append(params.CssClasses, "isEmpty")
+		return append(components, CellTemplate(params, NameTemplate("empty", "")))
+	}
 	switch format {
 	case model.RelationFormat_object, model.RelationFormat_tag, model.RelationFormat_status, model.RelationFormat_file:
-		listTemplate := r.getListComponent(params, format, relationValue)
-		rootWrapper.Components = append(rootWrapper.Components, CellTemplate(params, listTemplate))
+		listTemplate := r.buildListComponent(params, format, relationValue)
+		components = append(components, CellTemplate(params, listTemplate))
 	default:
-		rootWrapper.Components = append(rootWrapper.Components, CellTemplate(params, r.populateRelationValue(format, relationValue)))
+		components = append(components, CellTemplate(params, r.populateRelationValue(format, relationValue)))
 	}
-	return BlocksWrapper(rootWrapper)
+	return components
 }
 
-func (r *Renderer) getListComponent(params *RelationRenderSetting, format model.RelationFormat, relationValue *types.Value) templ.Component {
+func (r *Renderer) buildListComponent(params *RelationRenderSetting, format model.RelationFormat, relationValue *types.Value) templ.Component {
 	components := r.populateRelationListValue(format, relationValue)
 	var listTemplate templ.Component
-	if params.EvaluateMore && len(components) > 1 {
+	if params.LimitDisplay && (format == model.RelationFormat_object || format == model.RelationFormat_file) && len(components) > 1 {
 		more := fmt.Sprintf("+%s", strconv.FormatInt(int64(len(components)-1), 10))
 		listTemplate = ListTemplate(more, components[0:1])
 	} else {
@@ -126,13 +125,36 @@ func (r *Renderer) populateRelationValue(format model.RelationFormat, relationVa
 	case model.RelationFormat_number:
 		return NameTemplate("name", fmt.Sprintf("%g", relationValue.GetNumberValue()))
 	case model.RelationFormat_phone, model.RelationFormat_email, model.RelationFormat_url:
-		return NameTemplate("name", relationValue.GetStringValue())
+		url := getUrlScheme(format, relationValue.GetStringValue()) + relationValue.GetStringValue()
+		return ObjectElement(relationValue.GetStringValue(), templ.SafeURL(url))
 	case model.RelationFormat_date:
 		return NameTemplate("name", r.formatDate(relationValue.GetNumberValue()))
 	case model.RelationFormat_checkbox:
 		return r.generateCheckbox(relationValue.GetBoolValue())
 	}
 	return nil
+}
+
+func getUrlScheme(format model.RelationFormat, value string) string {
+	if value == "" {
+		return ""
+	}
+	if format == model.RelationFormat_url {
+		parsedUrl, err := url.Parse(value)
+		if err != nil {
+			return ""
+		}
+		if parsedUrl.Scheme == "" {
+			return "http://"
+		}
+	}
+	if format == model.RelationFormat_email {
+		return "mailto:"
+	}
+	if format == model.RelationFormat_phone {
+		return "tel:'"
+	}
+	return ""
 }
 
 func (r *Renderer) getFormatClass(format model.RelationFormat) string {

@@ -1,15 +1,15 @@
 package renderer
 
-templ NameTemplate(classes string, name string) {
-    <div class={ classes }> { name } </div>
+templ NameTemplate(class string, name string) {
+    <div class={ class }> { name } </div>
 }
 
 templ CellTemplate(params *RelationRenderSetting, component templ.Component) {
-    <div class={"cell " + params.FormatClass}>
-        <div class={"cellContent", params.Classes}>
+    <div class={"cell ", params.CssClasses}>
+        <div class={"cellContent", params.CssClasses}>
             @component
         </div>
-        if params.IsFeatured {
+        if params.Featured {
             <div class="bullet"></div>
         }
     </div>

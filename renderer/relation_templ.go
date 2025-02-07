@@ -8,7 +8,7 @@ package renderer
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func NameTemplate(classes string, name string) templ.Component {
+func NameTemplate(class string, name string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,7 +29,7 @@ func NameTemplate(classes string, name string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{classes}
+		var templ_7745c5c3_Var2 = []any{class}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -54,7 +54,7 @@ func NameTemplate(classes string, name string) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/relation.templ`, Line: 4, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/relation.templ`, Line: 4, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -89,7 +89,7 @@ func CellTemplate(params *RelationRenderSetting, component templ.Component) temp
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var6 = []any{"cell " + params.FormatClass}
+		var templ_7745c5c3_Var6 = []any{"cell ", params.CssClasses}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -111,7 +111,7 @@ func CellTemplate(params *RelationRenderSetting, component templ.Component) temp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 = []any{"cellContent", params.Classes}
+		var templ_7745c5c3_Var8 = []any{"cellContent", params.CssClasses}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -141,7 +141,7 @@ func CellTemplate(params *RelationRenderSetting, component templ.Component) temp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if params.IsFeatured {
+		if params.Featured {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"bullet\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
