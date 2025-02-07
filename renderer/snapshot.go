@@ -20,7 +20,7 @@ func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
 }
 
 type relType interface {
-	string | bool | model.ObjectTypeLayout
+	string | bool | model.ObjectTypeLayout | model.RelationFormat
 }
 
 type relTransformer[V relType] func(*types.Value) V
@@ -86,6 +86,14 @@ func relationToObjectTypeLayout(layout *types.Value) model.ObjectTypeLayout {
 	}
 
 	return model.ObjectType_basic
+}
+
+func relationToRelationFormat(format *types.Value) model.RelationFormat {
+	if format != nil {
+		return model.RelationFormat(format.GetNumberValue())
+	}
+
+	return model.RelationFormat_longtext
 }
 
 func getRelationField[V relType](targetDetails *types.Struct, relationKey domain.RelationKey, tr relTransformer[V]) V {
