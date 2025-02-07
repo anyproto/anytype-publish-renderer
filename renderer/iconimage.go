@@ -113,12 +113,18 @@ func pageIconInitSize(layout model.ObjectTypeLayout) int32 {
 func (r *Renderer) RenderPageIconImage() templ.Component {
 	details := r.Sp.Snapshot.Data.GetDetails()
 	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	iconEmoji := getRelationField(details, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
+	iconImage := getRelationField(details, bundle.RelationKeyIconImage, r.relationToFileUrl)
 
 	if isTodoLayout(layout) {
 		return NoneTemplate("")
 	}
 
-	params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: pageIconInitSize(layout) }, false)
+	if iconEmoji != "" && iconImage != "" {
+		return NoneTemplate("")
+	}
+
+	params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: pageIconInitSize(layout) })
 	if params.Src == "" {
 		return NoneTemplate("")
 	}

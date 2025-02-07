@@ -178,7 +178,7 @@ func fileIconName(details *types.Struct) string {
 // - render files as inline link
 // - https://linear.app/anytype/issue/GO-5052/add-marker-to-text-block-with-style=title-when-object-layout-is-task
 // - withDefault - should default icon be rendered, false for IconImage
-func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps, withDefault bool) (params *IconObjectParams) {
+func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
 	var src string
 	classes := []string{"iconObject"}
 	iconClasses := []string{}

@@ -85,7 +85,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		class := ""
 
 		if details != nil || len(details.Fields) != 0 {
-			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize}, true)
+			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
 
 			var err error
 			iconHtml, err = utils.TemplToString(IconObjectTemplate(r, params))
@@ -255,7 +255,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 			},
 		}
 
-		params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: 20 }, true)
+		params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: 20 })
 		iconTemplate := IconObjectTemplate(r, params)
 		additionalTemplate := AdditionalIconTemplate(iconTemplate)
 
@@ -271,7 +271,7 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 			},
 		}
 
-		params := r.MakeRenderIconObjectParams(iconDetails, &IconObjectProps{ Size: 30 }, true)
+		params := r.MakeRenderIconObjectParams(iconDetails, &IconObjectProps{ Size: 30 })
 		iconTemplate := IconObjectTemplate(r, params)
 		additionalTemplate := AdditionalIconTemplate(iconTemplate)
 

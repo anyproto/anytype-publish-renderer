@@ -67,7 +67,7 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 	params := r.MakeRenderIconObjectParams(targetDetails, &IconObjectProps{
 		Size:     int32(size),
 		IconSize: int32(iconSize),
-	}, true)
+	})
 	iconTemplate := IconObjectTemplate(r, params)
 
 	if iconTemplate != nil {
