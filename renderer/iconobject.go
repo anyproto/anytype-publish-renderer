@@ -183,6 +183,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 	iconEmoji := getRelationField(targetDetails, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(targetDetails, bundle.RelationKeyIconImage, r.relationToFileUrl)
+	done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
 	// done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
 	hasIconEmoji := iconEmoji != ""
 	hasIconImage := iconImage != ""
@@ -219,6 +220,15 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			iconClasses = append(iconClasses, "iconImage")
 		}
 
+	case model.ObjectType_todo:
+		i := 0
+		if done {
+			i = 1
+		}
+
+		iconClasses = append(iconClasses, "iconCheckbox")
+		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/task/%d.svg", i))
+
 	// case model.ObjectType_set:
 
 	// case model.ObjectType_todo:
@@ -254,6 +264,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		HasIconImage: hasIconImage,
 		IsDeleted:    isDeleted,
 	}
+
 	iconSize := getIconSize(props, layout, gsProps)
 	if iconSize != 0 {
 		iconClasses = append(iconClasses, fmt.Sprintf("c%d", iconSize))

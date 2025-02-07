@@ -94,9 +94,14 @@ func (r *Renderer) MakeRenderPageIconImageParams() (params *IconImageRenderParam
 
 }
 
+func isTodoLayout(layout model.ObjectTypeLayout) bool {
+	return layout == model.ObjectType_todo
+}
+
 func isHumanLayout(layout model.ObjectTypeLayout) bool {
 	return layout == model.ObjectType_profile || layout == model.ObjectType_participant
 }
+
 func pageIconInitSize(layout model.ObjectTypeLayout) int32 {
 	if isHumanLayout(layout) {
 		return 128
@@ -108,11 +113,22 @@ func pageIconInitSize(layout model.ObjectTypeLayout) int32 {
 func (r *Renderer) RenderPageIconImage() templ.Component {
 	details := r.Sp.Snapshot.Data.GetDetails()
 	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	iconEmoji := getRelationField(details, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
+	iconImage := getRelationField(details, bundle.RelationKeyIconImage, r.relationToFileUrl)
 
-	props := &IconObjectProps{
-		Size: pageIconInitSize(layout),
+	if isTodoLayout(layout) {
+		return NoneTemplate("")
 	}
-	params := r.MakeRenderIconObjectParams(details, props)
+
+	if iconEmoji != "" && iconImage != "" {
+		return NoneTemplate("")
+	}
+
+	params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: pageIconInitSize(layout) })
+	if params.Src == "" {
+		return NoneTemplate("")
+	}
+
 	content := IconObjectTemplate(r, params)
 
 	classes := []string{}

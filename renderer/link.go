@@ -46,7 +46,8 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 
 	bgColor := b.GetBackgroundColor()
 	name := getFieldValue(targetDetails, bundle.RelationKeyName.String(), defaultName)
-	layoutClass := getLayoutClass(targetDetails)
+	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	layoutClass := getLayoutClass(layout)
 	archiveClass := getArchiveClass(targetDetails)
 	objectTypeName, coverTemplate := r.getAdditionalParams(b, targetDetails)
 	spaceId := targetDetails.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
@@ -135,9 +136,15 @@ func getFieldValue(details *types.Struct, key, defaultValue string) string {
 	return value.GetStringValue()
 }
 
-func getLayoutClass(details *types.Struct) string {
-	layout := model.ObjectTypeLayout(details.GetFields()[bundle.RelationKeyLayout.String()].GetNumberValue())
+func getArchiveClass(details *types.Struct) string {
+	archivedValue := details.GetFields()[bundle.RelationKeyIsArchived.String()]
+	if archivedValue != nil && archivedValue.GetBoolValue() {
+		return "isArchived"
+	}
+	return ""
+}
 
+func getLayoutClass(layout model.ObjectTypeLayout) string {
 	switch layout {
 	case model.ObjectType_participant:
 		return "isParticipant"
@@ -152,14 +159,6 @@ func getLayoutClass(details *types.Struct) string {
 	default:
 		return "isPage"
 	}
-}
-
-func getArchiveClass(details *types.Struct) string {
-	archivedValue := details.GetFields()[bundle.RelationKeyIsArchived.String()]
-	if archivedValue != nil && archivedValue.GetBoolValue() {
-		return "isArchived"
-	}
-	return ""
 }
 
 func getLinkIconSize(b *model.Block) (int, int) {

@@ -132,3 +132,10 @@
 .block.blockText.textToggle {
 	> .children { display: none; }
 }
+
+.blocks.isTask {
+	.block.blockText.textTitle { @include text-header1; }
+	.block.blockText.textTitle {
+		.flex { gap: 0px 8px; }
+	}
+}

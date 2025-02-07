@@ -242,6 +242,7 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 		if details == nil || len(details.GetFields()) == 0 {
 			continue
 		}
+
 		spaceId := details.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 		name := details.GetFields()[bundle.RelationKeyName.String()].GetStringValue()
 		if name == "" {
