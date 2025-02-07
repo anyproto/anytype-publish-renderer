@@ -269,6 +269,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		HasIconImage: hasIconImage,
 		IsDeleted:    isDeleted,
 	}
+
 	iconSize := getIconSize(props, layout, gsProps)
 	if iconSize != 0 {
 		iconClasses = append(iconClasses, fmt.Sprintf("c%d", iconSize))

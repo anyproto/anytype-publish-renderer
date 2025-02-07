@@ -101,6 +101,7 @@ func isTodoLayout(layout model.ObjectTypeLayout) bool {
 func isHumanLayout(layout model.ObjectTypeLayout) bool {
 	return layout == model.ObjectType_profile || layout == model.ObjectType_participant
 }
+
 func pageIconInitSize(layout model.ObjectTypeLayout) int32 {
 	if isHumanLayout(layout) {
 		return 128
@@ -117,10 +118,11 @@ func (r *Renderer) RenderPageIconImage() templ.Component {
 		return NoneTemplate("")
 	}
 
-	props := &IconObjectProps{
-		Size: pageIconInitSize(layout),
+	params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: pageIconInitSize(layout) }, false)
+	if params.Src == "" {
+		return NoneTemplate("")
 	}
-	params := r.MakeRenderIconObjectParams(details, props, false)
+
 	content := IconObjectTemplate(r, params)
 
 	classes := []string{}

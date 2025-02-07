@@ -1,5 +1,7 @@
 package renderer
 
 templ NoneTemplate(text string) {
-	@Comment(text)
+	if text != "" {
+		@Comment(text)
+	}
 }
