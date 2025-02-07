@@ -235,6 +235,8 @@ function renderPdf () {
 window.onMessage = (data) => {
 	const { type, height, blockId, url } = data;
 
+	console.log('TYPE', type, 'BLOCK ID', blockId, 'HEIGHT', height);
+
 	switch (type) {
 		case 'resize': {
 			$(`#receiver${blockId}`).css({ height: Math.max(80, height) });
