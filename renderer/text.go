@@ -84,7 +84,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		iconHtml := ""
 		class := ""
 
-		if details != nil || len(details.Fields) != 0 {
+		if details != nil && len(details.Fields) != 0 {
 			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
 
 			var err error
@@ -247,15 +247,15 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		externalComp := BulletMarkerTemplate(color)
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Callout:
-		details := &types.Struct{ 
+		details := &types.Struct{
 			Fields: map[string]*types.Value{
-				bundle.RelationKeyIconEmoji.String(): pbtypes.String(iconEmoji), 
+				bundle.RelationKeyIconEmoji.String(): pbtypes.String(iconEmoji),
 				bundle.RelationKeyIconImage.String(): pbtypes.String(iconImage),
-				bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_basic)),
+				bundle.RelationKeyLayout.String():    pbtypes.Float64(float64(model.ObjectType_basic)),
 			},
 		}
 
-		params := r.MakeRenderIconObjectParams(details, &IconObjectProps{ Size: 20 })
+		params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: 20})
 		iconTemplate := IconObjectTemplate(r, params)
 		additionalTemplate := AdditionalIconTemplate(iconTemplate)
 

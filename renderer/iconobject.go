@@ -171,17 +171,10 @@ func fileIconName(details *types.Struct) string {
 	return icon
 }
 
-// TODO
-// - блок с иконкой не надо рисовать если нет иконки
-// - finish all layouts
-// - render user svg
-// - render files as inline link
-// - https://linear.app/anytype/issue/GO-5052/add-marker-to-text-block-with-style=title-when-object-layout-is-task
-// - withDefault - should default icon be rendered, false for IconImage
 func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
 	var src string
 	classes := []string{"iconObject"}
-	iconClasses := []string{}
+	var iconClasses []string
 	var isDeleted bool
 	if targetDetails == nil || len(targetDetails.Fields) == 0 {
 		isDeleted = true
@@ -236,11 +229,13 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		iconClasses = append(iconClasses, "iconCheckbox")
 		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/task/%d.svg", i))
 
-		// case model.ObjectType_set:
-		// case model.ObjectType_dashboard:
-		// case model.ObjectType_note:
-		// case model.ObjectType_objectType:
-		// case model.ObjectType_relation:
+	// case model.ObjectType_set:
+
+	// case model.ObjectType_todo:
+	// case model.ObjectType_dashboard:
+	// case model.ObjectType_note:
+	// case model.ObjectType_objectType:
+	// case model.ObjectType_relation:
 	// case model.ObjectType_bookmark:
 	// case model.ObjectType_spaceView:
 	case model.ObjectType_image:

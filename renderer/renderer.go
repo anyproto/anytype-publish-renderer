@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/anyproto/anytype-heart/pkg/lib/localstore/addr"
 	"io"
 	"net/http"
 	"net/url"
@@ -344,6 +345,26 @@ func (r *Renderer) hydrateSpecialBlocks() {
 
 	}
 
+}
+
+func (r *Renderer) getObjectSnapshot(objectId string) *pb.SnapshotWithType {
+	if strings.HasPrefix(objectId, addr.DatePrefix) {
+		return r.getDateSnapshot(objectId)
+	}
+	directories := []string{"objects", "relations", "types", "templates", "filesObjects"}
+	var (
+		snapshot *pb.SnapshotWithType
+		err      error
+	)
+	for _, dir := range directories {
+		path := filepath.Join(dir, objectId+".pb")
+		snapshot, err = r.ReadJsonpbSnapshot(path)
+		if err == nil {
+			return snapshot
+		}
+	}
+	log.Error("failed to get snapshot for object", zap.String("objectId", objectId), zap.Error(err))
+	return nil
 }
 
 func Comment(text string) templ.ComponentFunc {

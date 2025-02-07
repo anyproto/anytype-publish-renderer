@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import raf from 'raf';
 import Prism from 'prismjs';
 import mermaid from 'mermaid';
 import { instance as viz } from '@viz-js/viz';
@@ -232,6 +233,71 @@ function renderPdf () {
 	});
 };
 
+function renderMenu () {
+	const win = $(window);
+	const btn = $('.menuButton');
+
+	btn.off('click').on('click', function () {
+		const el = $(this);
+		const st = win.scrollTop();
+		const { menuId, horizontal } = el.data();
+		const wrap = $(`#menu-${menuId}`);
+		const dimmer = wrap.find('.dimmer');
+		const menu = wrap.find('.menu');
+		const css: any = {};
+
+		wrap.show();
+
+		const { left, top } = el.offset();
+		const ew = el.width();
+		const eh = el.height();
+		const iw = menu.width();
+
+		css.top = top - st + eh + 4;
+
+		switch (horizontal) {
+			case 'left': {
+				css.left = left;
+				break;
+			};
+
+			case 'right': {
+				css.left = left + ew - iw;
+				break;
+			};
+
+			case 'center': {
+				css.left = left + (ew - iw) / 2;
+				break;
+			};
+		};
+
+		menu.css(css);
+		raf(() => {
+			el.addClass('hover');
+			wrap.addClass('show');
+		});
+
+		const hide = () => {
+			el.removeClass('hover');
+			wrap.removeClass('show');
+
+			setTimeout(() => wrap.hide(), 200);
+			win.off('keydown');
+		};
+
+		win.off('keydown').on('keydown', e => {
+			const k = e.key.toLowerCase();
+
+			if (k == 'escape') {
+				hide();
+			};
+		});
+
+		dimmer.off('click').on('click', () => hide());
+	});
+};
+
 window.onMessage = (data) => {
 	const { type, height, blockId, url } = data;
 
@@ -265,6 +331,7 @@ $(document).ready(() => {
 		renderPrism, 
 		renderInlineLatex,
 		renderPdf,
+		renderMenu,
 	];
 
     renderFns.forEach(f => {

@@ -2,74 +2,80 @@ package renderer
 
 import (
 	"fmt"
+	"net/url"
 	"path/filepath"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/a-h/templ"
-	"go.uber.org/zap"
-
 	"github.com/anyproto/anytype-heart/core/domain"
-	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
-	"github.com/anyproto/anytype-heart/pkg/lib/localstore/addr"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
 )
 
 const defaultName = "Untitled"
 
-type RelationRenderParams struct {
-	Id              string
-	BackgroundColor string
-	IsDeleted       string
-	Name            string
-	IsEmpty         string
-	Format          string
-	Value           templ.Component
+type RelationRenderSetting struct {
+	Key          string
+	Featured     bool
+	LimitDisplay bool
+	Classes      []string
 }
 
-func (r *Renderer) MakeRelationRenderParams(b *model.Block) *RelationRenderParams {
+func (r *Renderer) MakeRelationRenderParams(b *model.Block) templ.Component {
 	relationBlock := b.GetRelation()
 	key := relationBlock.GetKey()
-
 	if key == "" {
 		return nil
 	}
-
-	color := b.GetBackgroundColor()
-
-	params := &RelationRenderParams{
-		Id: b.Id,
+	params := &RelationRenderSetting{Key: key}
+	relationComponent := r.buildRelationComponents(params)
+	if relationComponent == nil {
+		return nil
 	}
+	return BlocksWrapper(&BlockWrapperParams{Classes: []string{"sides"}, Components: relationComponent})
+}
 
-	if color != "" {
-		params.BackgroundColor = fmt.Sprintf("bgColor bgColor-%s", color)
-	}
-
-	name, format, found := r.retrieveRelationInfo(key)
-	params.Name = name
-
+func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []templ.Component {
+	name, format, found := r.retrieveRelationInfo(params.Key)
 	if !found {
-		params.IsDeleted = "isDeleted"
-		params.IsEmpty = "isEmpty"
-		return params
+		return nil
 	}
-
-	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[key]
+	var components []templ.Component
+	if !params.Featured {
+		components = append(components, BlocksWrapper(&BlockWrapperParams{
+			Classes:    []string{"info"},
+			Components: []templ.Component{NameTemplate("name", name)},
+		}))
+	}
+	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[params.Key]
+	formatClass := r.getFormatClass(format)
+	params.Classes = append(params.Classes, formatClass)
 	if relationValue == nil {
-		params.IsEmpty = "isEmpty"
-		return params
+		params.Classes = append(params.Classes, "isEmpty")
+		return append(components, CellTemplate(params, NameTemplate("empty", "")))
 	}
-
-	params.Format = r.getFormatClass(format)
-	switch params.Format {
-	case "c-object", "c-file", "c-select":
-		params.Value = ListTemplate(params.Format, r.populateRelationListValue(format, relationValue))
+	switch format {
+	case model.RelationFormat_object, model.RelationFormat_tag, model.RelationFormat_status, model.RelationFormat_file:
+		listTemplate := r.buildListComponent(params, format, relationValue)
+		components = append(components, CellTemplate(params, listTemplate))
 	default:
-		params.Value = WrapToCellTemplate(params.Format, r.populateRelationValue(format, relationValue))
+		components = append(components, CellTemplate(params, r.populateRelationValue(format, relationValue)))
 	}
-	return params
+	return components
+}
+
+func (r *Renderer) buildListComponent(params *RelationRenderSetting, format model.RelationFormat, relationValue *types.Value) templ.Component {
+	components := r.populateRelationListValue(format, relationValue)
+	var listTemplate templ.Component
+	if params.LimitDisplay && (format == model.RelationFormat_object || format == model.RelationFormat_file) && len(components) > 1 {
+		more := fmt.Sprintf("+%s", strconv.FormatInt(int64(len(components)-1), 10))
+		listTemplate = ListTemplate(more, components[0:1])
+	} else {
+		listTemplate = ListTemplate("", components)
+	}
+	return listTemplate
 }
 
 func (r *Renderer) retrieveRelationInfo(key string) (string, model.RelationFormat, bool) {
@@ -111,7 +117,7 @@ func (r *Renderer) populateRelationListValue(format model.RelationFormat, relati
 	case model.RelationFormat_object:
 		return r.generateObjectLinks(relationValue)
 	case model.RelationFormat_file:
-		return r.generateFileIcons(relationValue)
+		return r.generateFileComponent(relationValue)
 	}
 	return nil
 }
@@ -119,17 +125,40 @@ func (r *Renderer) populateRelationListValue(format model.RelationFormat, relati
 func (r *Renderer) populateRelationValue(format model.RelationFormat, relationValue *types.Value) templ.Component {
 	switch format {
 	case model.RelationFormat_shorttext, model.RelationFormat_longtext:
-		return BasicTemplate(relationValue.GetStringValue())
+		return NameTemplate("name", relationValue.GetStringValue())
 	case model.RelationFormat_number:
-		return BasicTemplate(fmt.Sprintf("%g", relationValue.GetNumberValue()))
+		return NameTemplate("name", fmt.Sprintf("%g", relationValue.GetNumberValue()))
 	case model.RelationFormat_phone, model.RelationFormat_email, model.RelationFormat_url:
-		return BasicTemplate(relationValue.GetStringValue())
+		url := getUrlScheme(format, relationValue.GetStringValue()) + relationValue.GetStringValue()
+		return ObjectElement(relationValue.GetStringValue(), templ.SafeURL(url))
 	case model.RelationFormat_date:
-		return BasicTemplate(r.formatDate(relationValue.GetNumberValue()))
+		return NameTemplate("name", r.formatDate(relationValue.GetNumberValue()))
 	case model.RelationFormat_checkbox:
 		return r.generateCheckbox(relationValue.GetBoolValue())
 	}
 	return nil
+}
+
+func getUrlScheme(format model.RelationFormat, value string) string {
+	if value == "" {
+		return ""
+	}
+	if format == model.RelationFormat_url {
+		parsedUrl, err := url.Parse(value)
+		if err != nil {
+			return ""
+		}
+		if parsedUrl.Scheme == "" {
+			return "http://"
+		}
+	}
+	if format == model.RelationFormat_email {
+		return "mailto:"
+	}
+	if format == model.RelationFormat_phone {
+		return "tel:'"
+	}
+	return ""
 }
 
 func (r *Renderer) getFormatClass(format model.RelationFormat) string {
@@ -191,7 +220,7 @@ func (r *Renderer) generateSelectOptions(format model.RelationFormat, relationVa
 		fields := tag.GetSnapshot().GetData().GetDetails().GetFields()
 		name := fields[bundle.RelationKeyName.String()].GetStringValue()
 		color := fields[bundle.RelationKeyRelationOptionColor.String()].GetStringValue()
-		elements = append(elements, OptionElement(name, color, relationType))
+		elements = append(elements, ListElement(OptionElement(name, color, relationType), nil))
 	}
 
 	return elements
@@ -204,27 +233,6 @@ func (r *Renderer) extractRelationValues(relationValue *types.Value) []*types.Va
 	return []*types.Value{relationValue}
 }
 
-func (r *Renderer) getIconFromDetails(details *types.Struct, iconClass string) (icon, updatedIconClass string) {
-	emojiField := details.GetFields()[bundle.RelationKeyIconEmoji.String()]
-	if emojiField != nil && emojiField.GetStringValue() != "" {
-		emojiRune := []rune(emojiField.GetStringValue())[0]
-		icon = r.GetEmojiUrl(emojiRune)
-		return icon, iconClass + " withIcon"
-	}
-
-	imageField := details.GetFields()[bundle.RelationKeyIconImage.String()]
-	if imageField != nil && imageField.GetStringValue() != "" {
-		icon, err := r.getFileUrl(imageField.GetStringValue())
-		if err != nil {
-			log.Error("Failed to get file URL for icon", zap.Error(err))
-			return "", iconClass
-		}
-		return icon, iconClass + " withImage"
-	}
-
-	return "", iconClass
-}
-
 func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Component {
 	var elements []templ.Component
 	for _, value := range r.extractRelationValues(relationValue) {
@@ -235,42 +243,19 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 			continue
 		}
 
-		layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
-
 		spaceId := details.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 		name := details.GetFields()[bundle.RelationKeyName.String()].GetStringValue()
 		if name == "" {
 			name = defaultName
 		}
-		icon, class := r.getIconFromDetails(details, "c20")
-		layoutClass := getLayoutClass(layout)
+		icon := r.getIconFromDetails(details)
 		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
-		elements = append(elements, ObjectsListElement(layoutClass, icon, class, name, templ.URL(link)))
+		elements = append(elements, ListElement(ObjectElement(name, templ.SafeURL(link)), icon))
 	}
 	return elements
 }
 
-func (r *Renderer) getObjectSnapshot(objectId string) *pb.SnapshotWithType {
-	if strings.HasPrefix(objectId, addr.DatePrefix) {
-		return r.getDateSnapshot(objectId)
-	}
-	directories := []string{"objects", "relations", "types", "templates", "filesObjects"}
-	var (
-		snapshot *pb.SnapshotWithType
-		err      error
-	)
-	for _, dir := range directories {
-		path := filepath.Join(dir, objectId+".pb")
-		snapshot, err = r.ReadJsonpbSnapshot(path)
-		if err == nil {
-			return snapshot
-		}
-	}
-	log.Error("failed to get snapshot for object", zap.String("objectId", objectId), zap.Error(err))
-	return nil
-}
-
-func (r *Renderer) generateFileIcons(relationValue *types.Value) []templ.Component {
+func (r *Renderer) generateFileComponent(relationValue *types.Value) []templ.Component {
 	var elements []templ.Component
 	for _, value := range r.extractRelationValues(relationValue) {
 		url, err := r.getFileUrl(value.GetStringValue())
@@ -281,31 +266,39 @@ func (r *Renderer) generateFileIcons(relationValue *types.Value) []templ.Compone
 		if err != nil {
 			continue
 		}
-
-		elements = append(elements, r.createFileIcon(url, fileBlock))
+		icon := r.createFileIcon(fileBlock)
+		elements = append(elements, ListElement(NameTemplate("name", filepath.Base(url)), icon))
 	}
 	return elements
 }
 
-func (r *Renderer) createFileIcon(url string, fileBlock *model.BlockContentFile) templ.Component {
-	filename := filepath.Base(url)
-
-	switch fileBlock.GetType() {
-	case model.BlockContentFile_Audio:
-		return AudioIconTemplate(filename)
-	case model.BlockContentFile_Image:
-		return ImageIconTemplate(url, filename)
-	case model.BlockContentFile_Video:
-		return VideoIconTemplate(url, filename)
-	default:
-		return FileIconTemplate(filename)
+func (r *Renderer) createFileIcon(fileBlock *model.Block) templ.Component {
+	params, err := r.MakeRenderFileParams(fileBlock)
+	if err != nil {
+		return NoneTemplate(err.Error())
 	}
+
+	iconComp := r.FileIconBlock(fileBlock, params)
+	return iconComp
+}
+
+func (r *Renderer) getIconFromDetails(details *types.Struct) templ.Component {
+	props := &IconObjectProps{Size: 20}
+	iconParams := r.MakeRenderIconObjectParams(details, props)
+	return IconObjectTemplate(r, iconParams)
 }
 
 func (r *Renderer) RenderRelations(b *model.Block) templ.Component {
-	params := r.MakeRelationRenderParams(b)
-	if params == nil {
+	component := r.MakeRelationRenderParams(b)
+	if component == nil {
 		return NoneTemplate("")
 	}
-	return RelationTemplate(params)
+	blockParams := makeDefaultBlockParams(b)
+	color := b.GetBackgroundColor()
+	if color != "" {
+		blockParams.Classes = append(blockParams.Classes, fmt.Sprintf("bgColor bgColor-%s", color))
+	}
+	blockParams.Content = component
+
+	return BlockTemplate(r, blockParams)
 }

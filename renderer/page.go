@@ -152,6 +152,14 @@ func (r *Renderer) RenderBlock(blockId string) templ.Component {
 	return NoneTemplate(fmt.Sprintf("not supported: %s, %s", b.Id, reflect.TypeOf(b.Content).String()))
 }
 
+func (r *Renderer) supportLink() templ.SafeURL {
+	supportEmail := "support@anytype.io"
+	subject := "subject=Web Publishing Report"
+	body := fmt.Sprintf("body=PublishFilesPath: %s", r.Config.PublishFilesPath)
+	mailtoUrl := fmt.Sprintf("mailto:%s?%s&%s", supportEmail, subject, body)
+	return templ.SafeURL(mailtoUrl)
+}
+
 func (r *Renderer) joinSpaceLink() templ.SafeURL {
 	return templ.URL(r.UberSp.Meta.InviteLink)
 }

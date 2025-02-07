@@ -29,6 +29,7 @@
 		"pdfjs-dist": "^3.11.174",
 		"prism": "^4.1.2",
 		"prismjs": "^1.29.0",
+		"raf": "^3.4.1",
 		"sass": "^1.83.4",
 		"sass-loader": "^16.0.4",
 		"style-loader": "^4.0.0"
