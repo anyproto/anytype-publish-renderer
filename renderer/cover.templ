@@ -47,6 +47,8 @@ templ CoverDefaultTemplate(p *CoverRenderParams) {
 templ UnsplashReferral(author string, authorUrl templ.SafeURL) {
 	<div class="author label">
 		Photo by
-		<a href={ authorUrl }> { author } </a> on <a href="https://unsplash.com/?utm_source=Anytype&amp;utm_medium=referral">Unsplash</a>
+		<a href={authorUrl} target="_blank">{author}</a> 
+		on 
+		<a href="https://unsplash.com/?utm_source=Anytype&amp;utm_medium=referral" target="_blank">Unsplash</a>
 	</div>
 }
