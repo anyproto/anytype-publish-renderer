@@ -169,8 +169,7 @@ func (r *Renderer) FileIconBlock(b *model.Block, params *FileRenderParams) templ
 	fileClass := getFileClass(b)
 	details := r.findTargetDetails(file.TargetObjectId)
 
-	props := &IconObjectProps{}
-	iconParams := r.MakeRenderIconObjectParams(details, props)
+	iconParams := r.MakeRenderIconObjectParams(details, &IconObjectProps{})
 	iconParams.Classes = append(iconParams.Classes, fileClass)
 	iconComp := IconObjectTemplate(r, iconParams)
 	return iconComp

@@ -44,6 +44,19 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			</style>
         </head>
 		<body>
+			<div class="menus">
+				<div id="menu-more" class="menuWrap">
+					<div class="menu vertical">
+						<div class="content">
+							<a id="reportButton" class="item textColor textColor-red" href={r.supportLink()}>
+								<span class="name">Report</span>
+							</a>
+						</div>
+					</div>
+					<div class="dimmer"></div>
+				</div>
+			</div>
+
 			<main>
 				<div id="root-loader">
 					<div class="inner">
@@ -57,6 +70,8 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 							Join Space
 						</a>
 					}
+
+					<div class="icon more withBackground menuButton" data-menu-id="more" data-horizontal="right"></div>
 				</header>
 
 				<div class="coverWrapper">

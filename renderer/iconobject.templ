@@ -2,7 +2,9 @@ package renderer
 
 
 templ IconObjectTemplate(r *Renderer, p *IconObjectParams) {
-	<div class={ p.Classes }>
-		<img src={ p.Src } class={ p.IconClasses } />
-	</div>
+	if p.Src != "" {
+		<div class={ p.Classes }>
+			<img src={ p.Src } class={ p.IconClasses } />
+		</div>
+	}
 }

@@ -9,5 +9,5 @@
 	img.cover { background-color: transparent; height: auto; }
 
 	.author { @include text-small; color: var(--color-bg-primary); position: absolute; right: 16px; bottom: 16px; z-index: 3; text-shadow: 1px 1px 1px rgba(0,0,0,0.5);  }
-	.author a { color: var(--color-bg-primary); }
+	.author a { color: var(--color-bg-primary); text-decoration: underline; }
 }

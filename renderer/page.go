@@ -5,10 +5,10 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/a-h/templ"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
-
-	"github.com/a-h/templ"
 	"go.uber.org/zap"
 )
 
@@ -19,18 +19,24 @@ type RenderPageParams struct {
 }
 
 func (r *Renderer) hasPageIcon() bool {
-	fields := r.Sp.Snapshot.Data.GetDetails()
-	iconEmoji := pbtypes.GetString(fields, "iconEmoji")
+	details := r.Sp.Snapshot.Data.GetDetails()
+	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	iconEmoji := getRelationField(details, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
+	iconImage := getRelationField(details, bundle.RelationKeyIconImage, r.relationToFileUrl)
+
+	if layout == model.ObjectType_todo {
+		return false
+	}
+
 	if iconEmoji != "" {
 		return true
 	}
 
-	iconImageId := pbtypes.GetString(fields, "iconImage")
-	if iconImageId == "" {
+	if iconImage == "" {
 		return false
 	}
 
-	_, err := r.getFileUrl(iconImageId)
+	_, err := r.getFileUrl(iconImage)
 
 	return err == nil
 
@@ -57,6 +63,8 @@ func (r *Renderer) hasPageCover() bool {
 
 func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
+	layout := getRelationField(fields, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+
 	layoutAlign := pbtypes.GetInt64(fields, "layoutAlign")
 	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", layoutAlign)}
 	name := pbtypes.GetString(fields, "name")
@@ -76,7 +84,7 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 		class = "withCover"
 	}
 
-	classes = append(classes, class)
+	classes = append(classes, class, getLayoutClass(layout))
 
 	descr := description
 	if descr == "" {
@@ -142,6 +150,14 @@ func (r *Renderer) RenderBlock(blockId string) templ.Component {
 		zap.String("type", reflect.TypeOf(b.Content).String()),
 		zap.String("id", b.Id))
 	return NoneTemplate(fmt.Sprintf("not supported: %s, %s", b.Id, reflect.TypeOf(b.Content).String()))
+}
+
+func (r *Renderer) supportLink() templ.SafeURL {
+	supportEmail := "support@anytype.io"
+	subject := "subject=Web Publishing Report"
+	body := fmt.Sprintf("body=PublishFilesPath: %s", r.Config.PublishFilesPath)
+	mailtoUrl := fmt.Sprintf("mailto:%s?%s&%s", supportEmail, subject, body)
+	return templ.SafeURL(mailtoUrl)
 }
 
 func (r *Renderer) joinSpaceLink() templ.SafeURL {

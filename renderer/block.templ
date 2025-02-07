@@ -19,14 +19,15 @@ templ BlockTemplate(r *Renderer, p *BlockParams) {
 		</div>
 	</div>
 }
+
 // wraps multiple components
 templ BlocksWrapper(p *BlockWrapperParams) {
-	<div class={ p.Classes }
-
-		 if p.Styles != nil {
-		 style={ p.Styles }
-		 }
-		>
+	<div 
+		class={ p.Classes }
+		if p.Styles != nil {
+			style={ p.Styles }
+		}
+	>
 		for _, comp := range p.Components {
 			@comp
 		}

@@ -79,6 +79,7 @@
 
 				let processor = 0;
 				let useRootHeight = false;
+				let allowIframeResize = false
 				let cachedHtml = '';
 				let height = 0;
 				let blockId = '';
@@ -98,12 +99,12 @@
 					let js = data.Js;
 					let className = data.ClassName;
 					let insertBeforeLoad = data.InsertBeforeLoad;
-					let allowIframeResize = data.AllowIframeResize;
 					let align = data.Align;
 
 					libs = oe.data.Libs || [];
 					blockId = oe.data.BlockId;
 					processor = oe.data.Processor;
+					allowIframeResize = data.AllowIframeResize;
 					useRootHeight = oe.data.UseRootHeight;
 
 					const envContent = getEnvironmentContent(processor);
@@ -188,6 +189,10 @@
 				win.on('resize', resize);
 
 				function resize () {
+					if (!allowIframeResize) {
+						return;
+					};
+
 					const height = useRootHeight ? root.height() : document.documentElement.scrollHeight;
 					window.parent.postMessage({ type: 'resize', height, blockId }, '*');
 				};
