@@ -15,7 +15,7 @@ import (
 type BookmarkRendererParams struct {
 	Id          string
 	Classes     string
-	SideLeftClasses string
+	InnerClasses string
 	IsEmpty     bool
 	Url         string
 	Favicon     string
@@ -29,10 +29,10 @@ func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkR
 	bookmark := b.GetBookmark()
 	bgColor := b.GetBackgroundColor()
 	classes := []string{"block", "blockBookmark"}
-	sideLeftClasses := []string{"side", "left"}
+	innerClasses := []string{"inner"}
 
 	if bgColor != "" {
-		sideLeftClasses = append(sideLeftClasses, "bgColor", "bgColor-" + bgColor)
+		innerClasses = append(innerClasses, "bgColor", "bgColor-" + bgColor)
 	}
 
 	if bookmark.GetUrl() == "" {
@@ -82,10 +82,14 @@ func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkR
 		return &BookmarkRendererParams{IsEmpty: true}
 	}
 
+	if image != "" {
+		innerClasses = append(innerClasses, "withImage")
+	}
+
 	return &BookmarkRendererParams{
 		Id:          b.Id,
 		Classes:     strings.Join(classes, " "),
-		SideLeftClasses: strings.Join(sideLeftClasses, " "),
+		InnerClasses: strings.Join(innerClasses, " "),
 		Url:         parsedUrl.Host,
 		Favicon:     favicon,
 		Name:        html.UnescapeString(name),
