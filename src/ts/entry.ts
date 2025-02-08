@@ -328,6 +328,24 @@ function renderTable () {
 	});
 };
 
+function renderRow () {
+	const blocks = $('.block.blockLayout.layoutRow');
+
+	blocks.each((i, block) => {
+		block = $(block);
+
+		const children = block.find('> .children > .block');
+		const length = children.length;
+
+		children.each((i, child) => {
+			child = $(child);
+
+			const width = Number(child.data('width')) || 1;
+			child.css({ width: `calc(${width / length * 100}% - ${48 / length}px)` });
+		});
+	});
+};
+
 function renderColumn () {
 	const blocks = $('.block.blockLayout.layoutColumn');
 
@@ -363,10 +381,12 @@ $(document).ready(() => {
 	win.off('resize').on('resize', () => { 
 		renderCover();
 		renderTable();
+		renderRow();
 	});
 
     const renderFns = [ 
 		renderTable,
+		renderRow,
 		renderColumn,
 		renderCover,
 		renderAnalyticsEvents, 

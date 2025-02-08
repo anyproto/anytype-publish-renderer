@@ -1,6 +1,6 @@
 @use "../_mixins" as *;
 
-.blocks { width: 704px; margin: 0px auto; padding: 0px 0px 80px 0px; margin-top: 56px; border: 1px solid red; }
+.blocks { width: 704px; margin: 0px auto; padding: 0px 0px 80px 0px; margin-top: 56px; }
 .blocks {
 	.block { @include text-paragraph; word-break: break-word; margin: 0px 0px 2px 0px; position: relative; }
 	.block {

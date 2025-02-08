@@ -1,7 +1,11 @@
 package renderer
 
+import (
+	"fmt"
+)
+
 templ LayoutTemplate(r *Renderer, p *LayoutRenderParams) {
-	<div id={"block-" + p.Id } class={ "block blockLayout " + p.Classes }>
+	<div id={"block-" + p.Id } class={ "block blockLayout " + p.Classes } data-width={fmt.Sprintf("%.2f", p.Width)}>
         <div class="content">
             // this is for template wrapping, actual block children processed below
 			// { children... }
