@@ -157,7 +157,7 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 			break
 
 		case model.BlockContentLatex_Mermaid:
-			text = fmt.Sprintf(`<pre class="mermaid">%s</pre>`, text)
+			text = fmt.Sprintf(`<div class="mermaidChart">%s</div>`, text)
 
 		case model.BlockContentLatex_Graphviz:
 			break

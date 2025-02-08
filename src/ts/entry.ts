@@ -118,8 +118,8 @@ function renderInlineLatex () {
 };
 
 function renderMermaid () {
-    mermaid.initialize({ 
-		 securityLevel: 'loose',
+	mermaid.initialize({ 
+		securityLevel: 'loose',
 		theme: 'base', 
 		themeVariables: {
 			fontFamily: 'Helvetica, Arial, sans-serif',
@@ -127,6 +127,8 @@ function renderMermaid () {
 		},
 		startOnLoad: true,
 	});
+
+	mermaid.run({ querySelector: `.mermaidChart` });
 };
 
 function renderGraphviz () {
