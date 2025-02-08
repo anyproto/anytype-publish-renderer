@@ -340,8 +340,14 @@ function renderRow () {
 		children.each((i, child) => {
 			child = $(child);
 
-			const width = Number(child.data('width')) || 1;
-			child.css({ width: `calc(${width / length * 100}% - ${48 / length}px)` });
+			const width = (Number(child.data('width')) || 1) / length;
+			const innerBlocks = child.find('> .children > .block');
+
+			child.css({ width: `calc(${width * 100}% - ${48 / length}px)` });
+
+			if (width <= 0.5) {
+				innerBlocks.addClass('isVertical');
+			};
 		});
 	});
 };

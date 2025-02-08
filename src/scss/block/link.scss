@@ -57,30 +57,32 @@
 			.iconObject { position: absolute; left: 16px; top: 15px; background-color: var(--color-shape-highlight-medium); border-radius: 10px; }
 		}
 
-		.linkCard.c48.withIcon.withCover.isVertical {
-			.sides { min-height: 62px; }
-			.side.left { padding: 24px 16px 16px 16px; z-index: 10; }
-			.iconObject { top: -32px; transform: none; }
-		}
-
 		.linkCard.withCover {
 			.sides { align-items: stretch; }
 			.side.left { width: calc(100% - 28%); border-radius: 8px 0px 0px 8px !important; border-right-width: 0px; }
 			.side.right { width: 28%; display: block; border: 1px solid var(--color-shape-secondary); border-left: 0px; }
 		}
+	}
 
-		.linkCard.isVertical { display: block; }
-		.linkCard.isVertical {
+	.block.blockLink.isVertical {
+		.linkCard { display: block; }
+		.linkCard {
 			.sides { flex-direction: column-reverse; }
 			.side.left { width: 100%; border-right-width: 1px; }
 			.side.right { aspect-ratio: 7/3; width: 100%; border-radius: 8px 8px 0px 0px !important; border: 1px solid var(--color-shape-secondary); border-bottom: 0px; }
 		}
 
-		.linkCard.withCover.isVertical {
+		.linkCard.withCover {
 			.side.left { border-radius: 0px 0px 8px 8px !important; }
 		}
 
-		.linkCard.withCover.isVertical.text { padding-top: 0px; }
+		.linkCard.withCover.text { padding-top: 0px; }
+
+		.linkCard.c48.withIcon.withCover {
+			.sides { min-height: 62px; }
+			.side.left { padding: 24px 16px 16px 16px; z-index: 10; }
+			.iconObject { top: -32px; transform: none; }
+		}
 	}
 
 	.block.blockLink.isArchived {
