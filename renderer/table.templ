@@ -3,13 +3,15 @@ package renderer
 
 templ TableTemplate(r *Renderer, p *RenderTableParams) {
 	<div id={"block-" + p.Id} class={p.Classes}>
-		<div class="scrollWrap">
-			<div class="inner">
-				<div id={"table-" + p.Id} class="table">
-					<div class="rows">
-						for _, rowId := range p.Rows.ChildrenIds {
-							@TableRowTemplate(r, rowId, p)
-						}
+		<div class="content">
+			<div class="scrollWrap">
+				<div class="inner">
+					<div id={"table-" + p.Id} class="table">
+						<div class="rows">
+							for _, rowId := range p.Rows.ChildrenIds {
+								@TableRowTemplate(r, rowId, p)
+							}
+						</div>
 					</div>
 				</div>
 			</div>

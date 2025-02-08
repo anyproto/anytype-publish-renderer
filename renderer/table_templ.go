@@ -60,14 +60,14 @@ func TableTemplate(r *Renderer, p *RenderTableParams) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"scrollWrap\"><div class=\"inner\"><div id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"content\"><div class=\"scrollWrap\"><div class=\"inner\"><div id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs("table-" + p.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/table.templ`, Line: 8, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/table.templ`, Line: 9, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -83,7 +83,7 @@ func TableTemplate(r *Renderer, p *RenderTableParams) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,7 +124,7 @@ func TableRowCellTemplate(r *Renderer, p *RenderTableRowCellParams) templ.Compon
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs("cell-" + p.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/table.templ`, Line: 21, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/table.templ`, Line: 23, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -221,7 +221,7 @@ func TableRowTemplate(r *Renderer, rowId string, p *RenderTableParams) templ.Com
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs("row-" + rowId)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/table.templ`, Line: 32, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/table.templ`, Line: 34, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -250,7 +250,7 @@ func TableRowTemplate(r *Renderer, rowId string, p *RenderTableParams) templ.Com
 				"grid-template-columns": p.ColumnSizes,
 			})
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/table.templ`, Line: 37, Col: 4}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/table.templ`, Line: 39, Col: 4}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {

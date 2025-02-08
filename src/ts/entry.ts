@@ -298,6 +298,49 @@ function renderMenu () {
 	});
 };
 
+function renderTable () {
+	const blocks = $('.block.blockTable');
+
+	blocks.each((i, block) => {
+		block = $(block);
+
+		const wrapper = $('.blocks');
+		const scrollWrap = block.find('.scrollWrap');
+		const table = block.find('.table');	
+		const parent = block.parents('.block');
+		const wrapperWidth = wrapper.width();
+
+		let width = table.width();
+		let maxWidth = 0;
+
+		if (!parent.length) {
+			maxWidth = $(window).width() -  92;
+			width = Math.max(wrapperWidth, Math.min(maxWidth, width));
+			block.css({
+				width: (width >= wrapperWidth) ? width : 'auto',
+				marginLeft: (width >= wrapperWidth) ? Math.min(0, (wrapperWidth - width) / 2) : '',
+			});
+		} else {
+			maxWidth = parent.width();
+		};
+
+		scrollWrap.toggleClass('withScroll', width >= maxWidth);
+	});
+};
+
+function renderColumn () {
+	const blocks = $('.block.blockLayout.layoutColumn');
+
+	blocks.each((i, block) => {
+		block = $(block);
+
+		const children = block.find('> .children > .block');
+
+		children.first().addClass('first');
+		children.last().addClass('last');
+	});
+};
+
 window.onMessage = (data) => {
 	const { type, height, blockId, url } = data;
 
@@ -319,9 +362,12 @@ $(document).ready(() => {
 
 	win.off('resize').on('resize', () => { 
 		renderCover();
+		renderTable();
 	});
 
     const renderFns = [ 
+		renderTable,
+		renderColumn,
 		renderCover,
 		renderAnalyticsEvents, 
 		renderToggles, 
