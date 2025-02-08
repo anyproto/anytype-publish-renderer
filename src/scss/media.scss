@@ -10,5 +10,8 @@
 
 	.block.blockLayout.layoutRow {
 		> .children { flex-direction: column; gap: 16px; }
+		> .children {
+			> .block.blockLayout.layoutColumn { width: 100% !important; }
+		}
 	}
 }
