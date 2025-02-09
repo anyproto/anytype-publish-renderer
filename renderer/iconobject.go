@@ -279,6 +279,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		isDeleted = true
 	}
 
+
 	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 	iconEmoji := getRelationField(targetDetails, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(targetDetails, bundle.RelationKeyIconImage, r.relationToFileUrl)
@@ -325,7 +326,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			if name == "" {
 				name = "Untitled"
 			}
-			props := makeUserSvgProps(128, name)
+			props := makeUserSvgProps(int(props.Size), name)
 			svg := makeSvgString(props)
 			src = EncodeSVGToDataURL(svg)
 		}
@@ -339,7 +340,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
 		checkIconNum := 0
 		if done {
-			checkIconNum = 2
+			checkIconNum = 1
 		}
 		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/object/checkbox%d.svg", checkIconNum))
 		iconClasses = append(iconClasses, "iconCheckbox")
