@@ -100,7 +100,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 			link = fmt.Sprintf(linkTemplate, mark.Param, spaceId)
 		}
 
-		return `<markupmention class="` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><a href=` + link + ` <span class="name">` + s + `</span></a></markupmention>`
+		return `<a href=` + link + ` target="_blank" class="markupmention ` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><span class="name">` + s + `</span></a>`
 
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]

@@ -160,7 +160,7 @@ func TestMakeRenderText(t *testing.T) {
 		builder := strings.Builder{}
 		err := actual.InnerFlex[0].Render(context.Background(), &builder)
 		assert.NoError(t, err)
-		expectedHtml := `<div class="text"><markupmention class="withImage"><span class="smile"><div class="iconObject withDefault c20"><img src="/img/icon/default/page.svg" class="iconCommon c18"></div></span><img src="./static/img/space.svg" class="space" /><a href=anytype://object?objectId=anytypeId&spaceId=spaceId <span class="name">test</span></a></markupmention></div>`
+		expectedHtml := `<div class="text"><a href=anytype://object?objectId=anytypeId&spaceId=spaceId target="_blank" class="markupmention withImage"><span class="smile"><div class="iconObject withDefault c20"><img src="/img/icon/default/page.svg" class="iconCommon c18"></div></span><img src="./static/img/space.svg" class="space" /><span class="name">test</span></a></div>`
 		assert.Equal(t, expectedHtml, builder.String())
 	})
 }
