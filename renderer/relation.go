@@ -59,6 +59,9 @@ func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []temp
 	switch format {
 	case model.RelationFormat_object, model.RelationFormat_tag, model.RelationFormat_status, model.RelationFormat_file:
 		listTemplate := r.buildListComponent(params, format, relationValue)
+		if listTemplate == nil {
+			return components
+		}
 		components = append(components, CellTemplate(params, listTemplate))
 	default:
 		components = append(components, CellTemplate(params, r.populateRelationValue(format, relationValue)))
@@ -68,6 +71,9 @@ func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []temp
 
 func (r *Renderer) buildListComponent(params *RelationRenderSetting, format model.RelationFormat, relationValue *types.Value) templ.Component {
 	components := r.populateRelationListValue(format, relationValue)
+	if len(components) == 0 {
+		return nil
+	}
 	var listTemplate templ.Component
 	if params.LimitDisplay && (format == model.RelationFormat_object || format == model.RelationFormat_file) && len(components) > 1 {
 		more := fmt.Sprintf("+%s", strconv.FormatInt(int64(len(components)-1), 10))
