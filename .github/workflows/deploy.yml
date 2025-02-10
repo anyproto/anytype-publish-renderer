@@ -88,5 +88,5 @@ jobs:
 
       - name: Upload static on AWS S3
         run: |
-          s3cmd sync --recursive ./static/ s3://$S3_BUCKET/static/
-          s3cmd info s3://$S3_BUCKET/static/
+          s3cmd sync --region=$AWS_REGION --recursive ./static/ s3://$S3_BUCKET/static/
+          s3cmd info --region=$AWS_REGION s3://$S3_BUCKET/static/
