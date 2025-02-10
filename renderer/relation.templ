@@ -17,14 +17,14 @@ templ CellTemplate(params *RelationRenderSetting, component templ.Component) {
 
 templ ListTemplate(more string, components []templ.Component) {
     <div class="wrap">
-            <div class="over">
-                for _, component := range components {
-                    @component
-                }
-                if more != "" {
-                   <div class="more"> { more } </div>
-                }
-            </div>
+		<div class="over">
+			for _, component := range components {
+				@component
+			}
+			if more != "" {
+				<div class="more"> { more } </div>
+			}
+		</div>
     </div>
 }
 

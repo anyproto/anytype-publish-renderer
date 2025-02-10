@@ -79,7 +79,7 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 			isIframe = true
 			allowIframeResize := allowIframeResize(processor)
 			allowScript := false
-			sandbox = append(sandbox, "allow-scripts", "allow-same-origin")
+			sandbox = append(sandbox, "allow-scripts", "allow-same-origin", "allow-popups")
 
 			if allowPresentation(processor) {
 				sandbox = append(sandbox, "allow-presentation")

@@ -18,7 +18,7 @@ func (r *Renderer) makeRootRenderParams(b *model.Block) (params *RootRenderParam
 		width = fields.Fields["width"].GetNumberValue()
 	}
 
-	min := fmt.Sprintf("%dpx", 704);
+	min := "60%";
 	w := fmt.Sprintf("%f", width);
 
 	str := "max(" + min + ", min(calc(100% - 96px), calc(" + min + " + (100% - " + min + " - 96px) * " + w + ")))";
