@@ -81,8 +81,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 	case model.BlockContentTextMark_Mention:
 		details := r.findTargetDetails(mark.Param)
 
-		iconHtml := ""
-		class := ""
+		var iconHtml, class, link string
 
 		if details != nil && len(details.Fields) != 0 {
 			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
@@ -97,9 +96,11 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 			if iconHtml != "" {
 				class = "withImage"
 			}
+			spaceId := getRelationField(details, bundle.RelationKeySpaceId, relationToString)
+			link = fmt.Sprintf(linkTemplate, mark.Param, spaceId)
 		}
 
-		return `<markupmention class="` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><span class="name">` + s + `</span></markupmention>`
+		return `<a href=` + link + ` target="_blank" class="markupmention ` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><span class="name">` + s + `</span></a>`
 
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
@@ -111,6 +112,14 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		} else {
 			return emojiHtml
 		}
+	case model.BlockContentTextMark_Object:
+		details := r.findTargetDetails(mark.Param)
+		if details == nil || len(details.Fields) == 0 {
+			return "<markupobject>" + s + "</markupobject>"
+		}
+		spaceId := getRelationField(details, bundle.RelationKeySpaceId, relationToString)
+		link := fmt.Sprintf(linkTemplate, mark.Param, spaceId)
+		return fmt.Sprintf(`<a href="%s" class="markuplink" target="_blank">`, link) + s + "</a>"
 	}
 
 	return "<markupobject>" + s + "</markupobject>"
@@ -267,14 +276,14 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		additionalTemplate := NoneTemplate("")
 
 		if isTodoLayout(layout) {
-			iconDetails := &types.Struct{ 
+			iconDetails := &types.Struct{
 				Fields: map[string]*types.Value{
-					bundle.RelationKeyDone.String(): pbtypes.Bool(done), 
+					bundle.RelationKeyDone.String():   pbtypes.Bool(done),
 					bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
 				},
 			}
 
-			params := r.MakeRenderIconObjectParams(iconDetails, &IconObjectProps{ Size: 30 })
+			params := r.MakeRenderIconObjectParams(iconDetails, &IconObjectProps{Size: 30})
 			iconTemplate := IconObjectTemplate(r, params)
 			additionalTemplate = AdditionalIconTemplate(iconTemplate)
 		}

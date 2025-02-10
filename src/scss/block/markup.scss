@@ -23,26 +23,26 @@ markupemoji {
 }
 .markuplink.disabled, markupobject.disabled { border-width: 0px; }
 
-markupmention { display: inline; user-select: all !important; position: relative; cursor: default; }
-markupmention * { user-select: text !important; }
-markupmention {
+.markupmention { display: inline; user-select: all !important; position: relative; cursor: default; }
+.markupmention * { user-select: text !important; }
+.markupmention {
 	.smile { position: relative; z-index: 1; }
 	.smile img { margin-top: 2px !important; }
 	.space { width: 6px; height: 20px; vertical-align: middle; display: none; }
 	.name { display: inline; white-space: normal; position: relative; border-bottom: 0.075em solid; border-color: inherit; }
 }
-markupmention.disabled {
+.markupmention.disabled {
 	.name { border-width: 0px; }
 }
-markupmention.withImage {
+.markupmention.withImage {
 	.smile { display: inline; }
 	.space { display: inline; }
 }
-markupmention.withImage.c24 name markupBgcolor:first-child { margin-left: -22px; padding-left: 22px; }
-markupmention.withImage.c26 name markupBgcolor:first-child { margin-left: -22px; padding-left: 22px; }
-markupmention.withImage.c28 name markupBgcolor:first-child { margin-left: -27px; padding-left: 27px; }
-markupmention.withImage.c32 name markupBgcolor:first-child { margin-left: -34px; padding-left: 34px; }
-markupmention:hover {
+.markupmention.withImage.c24 name markupBgcolor:first-child { margin-left: -22px; padding-left: 22px; }
+.markupmention.withImage.c26 name markupBgcolor:first-child { margin-left: -22px; padding-left: 22px; }
+.markupmention.withImage.c28 name markupBgcolor:first-child { margin-left: -27px; padding-left: 27px; }
+.markupmention.withImage.c32 name markupBgcolor:first-child { margin-left: -34px; padding-left: 34px; }
+.markupmention:hover {
 	.name::before { border-color: var(--color-text-primary); }
 }
 
