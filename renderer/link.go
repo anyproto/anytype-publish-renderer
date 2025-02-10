@@ -64,14 +64,18 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 
 	size, iconSize := getLinkIconSize(b)
 
-	params := r.MakeRenderIconObjectParams(targetDetails, &IconObjectProps{
-		Size:     int32(size),
-		IconSize: int32(iconSize),
-	})
-	iconTemplate := IconObjectTemplate(r, params)
+	iconTemplate := NoneTemplate("")
 
-	if iconTemplate != nil {
-		cardClasses = append(cardClasses, "withIcon", fmt.Sprintf("c%d", size))
+	if size != 0 {
+		params := r.MakeRenderIconObjectParams(targetDetails, &IconObjectProps{
+			Size:     int32(size),
+			IconSize: int32(iconSize),
+		})
+		iconTemplate = IconObjectTemplate(r, params)
+
+		if iconTemplate != nil {
+			cardClasses = append(cardClasses, "withIcon", fmt.Sprintf("c%d", size))
+		}
 	}
 
 	if coverTemplate != nil {
@@ -165,6 +169,10 @@ func getLinkIconSize(b *model.Block) (int, int) {
 	link := b.GetLink()
 	cardStyle := link.GetCardStyle()
 	iconSize := link.GetIconSize()
+
+	if iconSize == model.BlockContentLink_SizeNone {
+		return 0, 0
+	}
 
 	newSize := 20
 	newIconSize := 20
