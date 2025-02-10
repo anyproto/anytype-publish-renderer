@@ -58,8 +58,7 @@ jobs:
 
       - name: Compress static files
         run: |
-          for file in static/*.{js,css}; do
-            [ -f "$file" ] || continue
+          find static/ -type f \( -name "*.js" -o -name "*.css" \) | while read -r file; do
             gzip -k -9 "$file"
             brotli -k -q 11 "$file"
           done
@@ -84,7 +83,7 @@ jobs:
         with:
           access_key: ${{ env.AWS_KEY_ID }}
           secret_key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          region: ${{ env.AWS_REGION }}
+          region: '${{ env.AWS_REGION }}'
           provider: aws
 
       - name: Upload static on AWS S3
