@@ -135,4 +135,41 @@ func TestMakeFeaturedRelationsComponent(t *testing.T) {
 		// then
 		assert.NotNil(t, result)
 	})
+	t.Run("empty list relation", func(t *testing.T) {
+		// given
+		relationKey := "tag-relation"
+		r := &Renderer{UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+
+		r.Sp = &pb.SnapshotWithType{
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{
+				Fields: map[string]*types.Value{
+					bundle.RelationKeyFeaturedRelations.String(): pbtypes.StringList([]string{relationKey}),
+					relationKey: pbtypes.StringList([]string{}),
+				},
+			}}},
+		}
+
+		sn := &pb.SnapshotWithType{
+			SbType: model.SmartBlockType_STRelation,
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("tag-relation").URL()),
+						bundle.RelationKeyName.String():           pbtypes.String("Tag Relation"),
+						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_tag)),
+					},
+				},
+			}},
+		}
+		marshaler := jsonpb.Marshaler{}
+		json, err := marshaler.MarshalToString(sn)
+		assert.NoError(t, err)
+		r.UberSp.PbFiles[filepath.Join("relations", "tag-relation.pb")] = json
+
+		// when
+		result := r.MakeFeaturedRelationsComponent()
+
+		// then
+		assert.Nil(t, result)
+	})
 }

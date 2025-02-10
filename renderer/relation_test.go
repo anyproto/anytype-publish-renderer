@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"context"
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
@@ -8,6 +9,7 @@ import (
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/types"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -523,5 +525,57 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 
 		// then
 		assert.NotNil(t, params)
+	})
+	t.Run("empty list relation", func(t *testing.T) {
+		// given
+		relationKey := "tag-relation"
+		r := &Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+
+		block := &model.Block{
+			Id: "tag-value",
+			Content: &model.BlockContentOfRelation{
+				Relation: &model.BlockContentRelation{
+					Key: relationKey,
+				},
+			},
+		}
+
+		r.Sp = &pb.SnapshotWithType{
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						relationKey: pbtypes.StringList([]string{"tag1", "tag2"}),
+					},
+				},
+			},
+			},
+		}
+
+		sn := &pb.SnapshotWithType{
+			SbType: model.SmartBlockType_STRelation,
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("tag-relation").URL()),
+						bundle.RelationKeyName.String():           pbtypes.String("Tag Relation"),
+						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_tag)),
+					},
+				},
+			}},
+		}
+		marshaler := jsonpb.Marshaler{}
+		json, err := marshaler.MarshalToString(sn)
+		assert.NoError(t, err)
+		r.UberSp.PbFiles[filepath.Join("relations", "tag-relation.pb")] = json
+
+		// when
+		params := r.MakeRelationRenderParams(block)
+
+		// then
+		assert.NotNil(t, params)
+		builder := strings.Builder{}
+		err = params.Render(context.Background(), &builder)
+		assert.NoError(t, err)
+		assert.Equal(t, `<div class="sides"><div class="info"><div class="name">Tag Relation</div></div></div>`, builder.String())
 	})
 }
