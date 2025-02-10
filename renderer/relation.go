@@ -130,7 +130,7 @@ func (r *Renderer) populateRelationValue(format model.RelationFormat, relationVa
 		return NameTemplate("name", fmt.Sprintf("%g", relationValue.GetNumberValue()))
 	case model.RelationFormat_phone, model.RelationFormat_email, model.RelationFormat_url:
 		url := getUrlScheme(format, relationValue.GetStringValue()) + relationValue.GetStringValue()
-		return ObjectElement(relationValue.GetStringValue(), templ.SafeURL(url))
+		return ObjectElement(relationValue.GetStringValue(), templ.URL(url))
 	case model.RelationFormat_date:
 		return NameTemplate("name", r.formatDate(relationValue.GetNumberValue()))
 	case model.RelationFormat_checkbox:

@@ -11,7 +11,7 @@ func TestMakeRenderCoverParams(t *testing.T) {
 		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
 		expected := &CoverRenderParams{
 			Id:      "bafyreic35rt6o6jbpfoibui4oskwo2dqurapsyuub4k7o42uatcteucan4",
-			Classes: "type1",
+			Classes: "type1 bafyreic35rt6o6jbpfoibui4oskwo2dqurapsyuub4k7o42uatcteucan4",
 			Src:     "../test_snapshots/Anytype.WebPublish.20241217.112212.67/files/640px-anatomy_of_a_sunset-2.webp",
 		}
 
@@ -27,7 +27,7 @@ func TestMakeRenderCoverParams(t *testing.T) {
 		r := getTestRenderer("test-solid-color-cover")
 		expected := &CoverRenderParams{
 			Id:        "red",
-			Classes:   "red",
+			Classes:   "type2 red",
 			CoverType: CoverType_Color,
 		}
 
@@ -43,7 +43,7 @@ func TestMakeRenderCoverParams(t *testing.T) {
 		r := getTestRenderer("test-gradient-cover")
 		expected := &CoverRenderParams{
 			Id:        "blue",
-			Classes:   "blue",
+			Classes:   "type3 blue",
 			CoverType: CoverType_Gradient,
 		}
 
@@ -53,7 +53,5 @@ func TestMakeRenderCoverParams(t *testing.T) {
 			assert.Equal(t, expected.Classes, actual.Classes)
 			assert.Equal(t, expected.CoverType, actual.CoverType)
 		}
-
 	})
-
 }

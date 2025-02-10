@@ -45,11 +45,13 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 				},
 			},
 			expected: &BookmarkRendererParams{
-				Id:          "block1",
-				Url:         "example.com",
-				Name:        "name1",
-				Description: "description1",
-				SafeUrl:     templ.SafeURL("https://example.com"),
+				Id:           "block1",
+				Url:          "example.com",
+				Name:         "name1",
+				Description:  "description1",
+				SafeUrl:      templ.SafeURL("https://example.com"),
+				InnerClasses: "inner",
+				Classes:      "block blockBookmark",
 			},
 		},
 		{
