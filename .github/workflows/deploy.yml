@@ -1,0 +1,50 @@
+on:
+  workflow_dispatch:
+
+name: Deploy static on AWS S3 | Stage
+
+jobs:
+  deploy-static:
+    runs-on: ubuntu-latest
+    env:
+      GOPRIVATE: github.com/anyproto
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.23
+      - name: git config
+        run: git config --global url.https://${{ secrets.ANYTYPE_PAT }}@github.com/.insteadOf https://github.com/
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup GO env
+        run: |
+          echo GOPATH=$(go env GOPATH) >> $GITHUB_ENV
+          echo GOBIN=$(go env GOPATH)/bin >> $GITHUB_ENV
+          echo $(go env GOPATH)/bin >> $GITHUB_PATH
+      - name: Setup license repository
+        uses: actions/checkout@master
+        with:
+          repository: anyproto/open
+          ref: refs/heads/main
+          path: ./open
+      - name: Go build
+        run: |
+          npm i
+          make build
+      - name: Debug
+        run: |
+          tree static/
+      - name: Setup s3cmd
+        uses: s3-actions/s3cmd@v1.9.0
+        with:
+          access_key: ${{ secrets.AWS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          region: 'eu-central-1'
+          provider: aws
+      - name: Upload static on AWS S3
+        run: |
+          s3cmd sync --recursive ./static/ s3://anytype-stage1-publishserver/static/
+          s3cmd info s3://anytype-stage1-publishserver/static/
