@@ -39,7 +39,7 @@ func (r *Renderer) RenderPageIconImage() templ.Component {
 		return NoneTemplate("")
 	}
 
-	if iconEmoji != "" && iconImage != "" {
+	if iconEmoji == "" || iconImage == "" {
 		return NoneTemplate("")
 	}
 
@@ -47,6 +47,7 @@ func (r *Renderer) RenderPageIconImage() templ.Component {
 		NoDefault: true,
 		Size:      pageIconInitSize(layout),
 	})
+
 	if params.Src == "" {
 		return NoneTemplate("")
 	}
