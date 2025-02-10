@@ -144,21 +144,6 @@ func readUberSnapshot(path string) (uberSnapshot PublishingUberSnapshot, err err
 	return
 
 }
-func debugJsonSnapshot(snapshot pb.SnapshotWithType) error {
-	var snapshotJson []byte
-	snapshotJson, err := json.Marshal(snapshot)
-	if err != nil {
-		log.Error("failed to render snapshot.json", zap.Error(err))
-		return err
-	}
-
-	err = os.WriteFile("./snapshot.json", snapshotJson, 0644)
-	if err != nil {
-		log.Error("failed to write snapshot.json", zap.Error(err))
-		return err
-	}
-	return nil
-}
 
 func (r *Renderer) maybeAddDebugCss() {
 	if isDebugCss := os.Getenv("ANYTYPE_PUBLISH_CSS_DEBUG"); isDebugCss != "" {
@@ -199,8 +184,6 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	for _, block := range blocks {
 		blocksById[block.Id] = block
 	}
-
-	// debugJsonSnapshot(snapshot)
 
 	r = &Renderer{
 		Sp:            &snapshot,
@@ -353,11 +336,10 @@ func (r *Renderer) hydrateSpecialBlocks() {
 }
 
 func Comment(text string) templ.ComponentFunc {
-
-	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
+	return func(ctx context.Context, w io.Writer) error {
 		io.WriteString(w, "<!--comment:\n")
 		io.WriteString(w, text)
 		io.WriteString(w, "\n-->\n")
 		return nil
-	})
+	}
 }

@@ -1,0 +1,9 @@
+package renderer
+
+templ BasicTemplate(class string, value string) {
+    <div class={ class }> { value } </div>
+}
+
+templ ImageWithSourceTemplate(imageSrc, class string) {
+    <img src={ imageSrc } class={ class } />
+}

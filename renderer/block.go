@@ -58,6 +58,7 @@ type BlockParams struct {
 	Content     templ.Component
 	Additional  templ.Component
 	ChildrenIds []string
+	Width       string
 }
 
 type BlockWrapperParams struct {

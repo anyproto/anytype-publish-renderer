@@ -4,20 +4,6 @@ import (
 	"fmt"
 )
 
-templ TableOfContentTemplate(p *TableOfContentRenderParams) {
-	<div id={"block-" + p.Id} class={"block blockTableOfContents " + p.BackgroundColor}>
-		<div class="content">
-			<div class="wrap">
-				if !p.IsEmpty {
-					for _, item := range p.Items {
-						@item
-					}
-				}
-			</div>
-		</div>
-	</div>
-}
-
 templ HeadingTemplate(id string, name string, depth int) {
     <div 
 		class="item" 

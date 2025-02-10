@@ -9,6 +9,8 @@ import (
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 )
 
+const DefaultColumnWidth = 140
+
 type RenderTableParams struct {
 	Classes string
 	Id      string
@@ -26,10 +28,7 @@ type RenderTableRowCellParams struct {
 	TextComp templ.Component
 }
 
-const DEFAULT_COLUMN_WIDTH = 140
-
-func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTableParams) {
-
+func (r *Renderer) MakeRenderTableParams(b *model.Block) *BlockParams {
 	var columnSizes []string
 	columns := r.BlocksById[b.ChildrenIds[0]]
 
@@ -38,32 +37,37 @@ func (r *Renderer) MakeRenderTableParams(b *model.Block) (params *RenderTablePar
 		fields := col.GetFields()
 		width := pbtypes.GetInt64(fields, "width")
 		if width == 0 {
-			width = DEFAULT_COLUMN_WIDTH
+			width = DefaultColumnWidth
 		}
 		columnSizes = append(columnSizes, fmt.Sprintf("%dpx", width))
 	}
 
 	rows := r.BlocksById[b.ChildrenIds[1]]
 
-	classes := []string{"block", "blockTable"}
+	blockParams := makeDefaultBlockParams(b)
 	if b.BackgroundColor != "" {
-		classes = append(classes, fmt.Sprintf("bgColor bgColor-%s", b.BackgroundColor))
+		blockParams.Classes = append(blockParams.Classes, fmt.Sprintf("bgColor bgColor-%s", b.BackgroundColor))
 	}
-
-	params = &RenderTableParams{
-		Classes:     strings.Join(classes, " "),
-		Id:          b.Id,
+	tableTemplate := TableTemplate(r, &RenderTableParams{
 		Rows:        rows,
 		Columns:     columns,
 		ColumnSizes: strings.Join(columnSizes, " "),
-	}
-
-	return
+	})
+	blockParams.Content = BlocksWrapper(&BlockWrapperParams{
+		Classes: []string{"scrollWrap"},
+		Components: []templ.Component{
+			BlocksWrapper(&BlockWrapperParams{
+				Classes:    []string{"inner"},
+				Components: []templ.Component{tableTemplate},
+			}),
+		},
+	})
+	return blockParams
 }
 
 func (r *Renderer) RenderTable(b *model.Block) templ.Component {
 	params := r.MakeRenderTableParams(b)
-	return TableTemplate(r, params)
+	return BlockTemplate(r, params)
 }
 
 func (r *Renderer) MakeRenderTableRowCellParams(b *model.Block) (params *RenderTableRowCellParams) {
