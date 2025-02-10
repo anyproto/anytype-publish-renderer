@@ -16,12 +16,12 @@ func TestRenderer_MakeRootRenderParams(t *testing.T) {
 		width := 100
 		expected := &RootRenderParams{
 			Style: `
-<style> 
-.blocks {
-	width: 10000%
-}
-</style> 
-`,
+		<style> 
+			.blocks {
+				width: max(60%, min(calc(100% - 96px), calc(60% + (100% - 60% - 96px) * 100.000000)));
+			}
+		</style> 
+	`,
 		}
 
 		// when
@@ -40,7 +40,13 @@ func TestRenderer_MakeRootRenderParams(t *testing.T) {
 		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
 		id := "blockId"
 		expected := &RootRenderParams{
-			Style: "",
+			Style: `
+		<style> 
+			.blocks {
+				width: max(60%, min(calc(100% - 96px), calc(60% + (100% - 60% - 96px) * 0.000000)));
+			}
+		</style> 
+	`,
 		}
 
 		// when

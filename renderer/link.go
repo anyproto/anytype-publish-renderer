@@ -50,12 +50,15 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 	layoutClass := getLayoutClass(layout)
 	archiveClass := getArchiveClass(targetDetails)
 	objectTypeName, coverTemplate := r.getAdditionalParams(b, targetDetails)
+	cardClasses := []string{"linkCard", layoutClass}
+	if coverTemplate != nil {
+		cardClasses = append(cardClasses, "withCover")
+	}
 	spaceId := targetDetails.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 	link := fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
 	classes := []string{linkTypeClass, archiveClass}
 	contentClasses := []string{"content"}
 	sidesClasses := []string{"sides"}
-	cardClasses := []string{"linkCard", layoutClass}
 
 	if bgColor != "" {
 		sidesClasses = append(sidesClasses, "withBgColor")
@@ -102,7 +105,7 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 		Name:           name,
 		Description:    description,
 		Type:           objectTypeName,
-		Url:            templ.URL(link),
+		Url:            templ.SafeURL(link),
 		CoverTemplate:  coverTemplate,
 		IconTemplate:   iconTemplate,
 	}

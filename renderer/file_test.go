@@ -14,11 +14,13 @@ func TestMakeRenderFileParams(t *testing.T) {
 
 		expected := &FileMediaRenderParams{
 			Id:      id,
-			Classes: "align0",
+			Classes: []string{"align0"},
 			Src:     "../test_snapshots/Anytype.WebPublish.20241217.112212.67/files/img_5296.jpeg",
+			Width:   "100",
 		}
 
-		actual, err := r.MakeRenderFileImageParams(imageBlock)
+		fileParams, err := r.MakeRenderFileParams(imageBlock)
+		actual := fileParams.ToFileMediaRenderParams("100", []string{"align0"})
 		if assert.NoError(t, err) {
 			assert.Equal(t, expected.Id, actual.Id)
 			assert.Equal(t, expected.Classes, actual.Classes)
