@@ -88,6 +88,16 @@ jobs:
       - name: Deploy static site to S3 bucket
         run: aws s3 sync static/ s3://$S3_BUCKET/static/ --delete --region $AWS_REGION
 
+      - name: Set content-encoding for js.gz files
+        run: |
+          aws s3 ls s3://$S3_BUCKET/static/ --recursive | awk '{print $4}' | grep '\.js\.gz$' | while read file; do
+            aws s3 cp "s3://$S3_BUCKET/$file" "s3://$S3_BUCKET/$file" \
+              --content-type "application/javascript" \
+              --content-encoding gzip \
+              --metadata-directive REPLACE \
+              --region $AWS_REGION
+          done
+
       - name: Verify uploaded files
         run: |
           aws s3 ls s3://$S3_BUCKET/static/ --region $AWS_REGION
