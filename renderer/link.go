@@ -50,33 +50,22 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 	layoutClass := getLayoutClass(layout)
 	archiveClass := getArchiveClass(targetDetails)
 	objectTypeName, coverTemplate := r.getAdditionalParams(b, targetDetails)
+	cardClasses := []string{"linkCard", layoutClass}
+	if coverTemplate != nil {
+		cardClasses = append(cardClasses, "withCover")
+	}
 	spaceId := targetDetails.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 	link := fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
 	classes := []string{linkTypeClass, archiveClass}
 	contentClasses := []string{"content"}
 	sidesClasses := []string{"sides"}
-	cardClasses := []string{"linkCard", layoutClass}
 
 	if bgColor != "" {
 		sidesClasses = append(sidesClasses, "withBgColor")
 		contentClasses = append(contentClasses, "bgColor", "bgColor-"+bgColor)
 	}
 
-	size, iconSize := getLinkIconSize(b)
-
-	params := r.MakeRenderIconObjectParams(targetDetails, &IconObjectProps{
-		Size:     int32(size),
-		IconSize: int32(iconSize),
-	})
-	iconTemplate := IconObjectTemplate(r, params)
-
-	if iconTemplate != nil {
-		cardClasses = append(cardClasses, "withIcon", fmt.Sprintf("c%d", size))
-	}
-
-	if coverTemplate != nil {
-		cardClasses = append(cardClasses, "withCover")
-	}
+	iconTemplate, cardClasses := r.getIconTemplate(b, targetDetails, cardClasses)
 
 	n := 1
 	if description != "" {
@@ -98,10 +87,26 @@ func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
 		Name:           name,
 		Description:    description,
 		Type:           objectTypeName,
-		Url:            templ.URL(link),
+		Url:            templ.SafeURL(link),
 		CoverTemplate:  coverTemplate,
 		IconTemplate:   iconTemplate,
 	}
+}
+
+func (r *Renderer) getIconTemplate(b *model.Block, targetDetails *types.Struct, cardClasses []string) (templ.Component, []string) {
+	var iconTemplate templ.Component
+	if b.GetLink().GetIconSize() != model.BlockContentLink_SizeNone {
+		size, iconSize := getLinkIconSize(b)
+		params := r.MakeRenderIconObjectParams(targetDetails, &IconObjectProps{
+			Size:     int32(size),
+			IconSize: int32(iconSize),
+		})
+		iconTemplate = IconObjectTemplate(r, params)
+		if iconTemplate != nil {
+			cardClasses = append(cardClasses, "withIcon", fmt.Sprintf("c%d", size))
+		}
+	}
+	return iconTemplate, cardClasses
 }
 
 func getDescription(b *model.Block, details *types.Struct) string {
