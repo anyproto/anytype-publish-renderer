@@ -57,7 +57,7 @@ jobs:
         with:
           access_key: ${{ secrets.PROD_AWS_KEY_ID }}
           secret_key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-          region: 'eu-central-1'
+          region: 'eu-central-2'
           provider: aws
       - name: Upload static on AWS S3
         run: |
