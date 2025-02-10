@@ -1,4 +1,4 @@
-name: Deploy static on AWS S3 | Stage
+name: Deploy static on AWS S3
 
 on:
   workflow_dispatch:
