@@ -29,7 +29,7 @@
 			html.align1 .twitter-tweet, body.align1 .instagram-media { justify-content: center; }
 			html.align2 .twitter-tweet, body.align2 .instagram-media { justify-content: flex-end; }
 
-			html.isChart canvas { background: #fff; }
+			html.isChart canvas { background: #fff; width: 100% !important; height: 100% !important; }
 			html.isKroki #root img { max-width: 100%; background: #fff; }
 		</style>
 	</head>
@@ -101,11 +101,11 @@
 					let insertBeforeLoad = data.InsertBeforeLoad;
 					let align = data.Align;
 
-					libs = oe.data.Libs || [];
-					blockId = oe.data.BlockId;
-					processor = oe.data.Processor;
+					libs = data.Libs || [];
+					blockId = data.BlockId;
+					processor = data.Processor;
 					allowIframeResize = data.AllowIframeResize;
-					useRootHeight = oe.data.UseRootHeight;
+					useRootHeight = data.UseRootHeight;
 
 					const envContent = getEnvironmentContent(processor);
 
@@ -118,7 +118,7 @@
 					};
 
 					scripts.html('');
-					htmlEl.attr({ class: '' });
+					htmlEl.attr({ class: `align${align}` });
 
 					if (param.theme) {
 						htmlEl.addClass(param.theme);
@@ -126,12 +126,9 @@
 					if (className) {
 						htmlEl.addClass(className);
 					};
-					if (allowIframeResize) {
-						htmlEl.addClass('allowIframeResize');
-					};
-					htmlEl.addClass(`align${align}`);
 
 					if (allowIframeResize) {
+						htmlEl.addClass('allowIframeResize');
 						setInterval(resize, 300);
 					};
 
