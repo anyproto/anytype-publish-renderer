@@ -14,4 +14,11 @@
 			> .block.blockLayout.layoutColumn { width: 100% !important; }
 		}
 	}
+
+	.footer {
+		.button {
+			.icon { margin: 0px; }
+			.text { display: none; }
+		}
+	}
 }

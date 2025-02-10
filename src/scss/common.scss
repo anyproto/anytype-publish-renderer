@@ -75,7 +75,7 @@ main { max-width: 1600px; margin: 0px auto; }
 }
 
 .footer {
-	.button { background: var(--color-shape-tertiary); }
+	.button { @include text-small; background: rgba(0,0,0,0.03); }
 	.button {
 		.icon { width: 14px; height: 14px; background-image: url('~img/icon/logo.svg');	}
 	}
