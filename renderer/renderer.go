@@ -275,19 +275,19 @@ func (r *Renderer) ReadJsonpbSnapshot(path string) (*pb.SnapshotWithType, error)
 func (r *Renderer) unwrapLayouts(blocks []*model.Block) []*model.Block {
 	ret := make([]*model.Block, 0)
 	for _, b := range blocks {
-		switch b.Content.(type) {
-		case *model.BlockContentOfLayout:
-			break
-		default:
+		layout := b.GetLayout()
+
+		if layout == nil || layout.GetStyle() != model.BlockContentLayout_Div {
 			ret = append(ret, b)
+			continue
 		}
+
 		chBlocks := make([]*model.Block, len(b.ChildrenIds))
 		for i, chId := range b.ChildrenIds {
 			chBlocks[i] = r.BlocksById[chId]
 		}
-		unwrapped := r.unwrapLayouts(chBlocks)
-		ret = append(ret, unwrapped...)
 
+		ret = append(ret, chBlocks...)
 	}
 
 	return ret
@@ -295,17 +295,23 @@ func (r *Renderer) unwrapLayouts(blocks []*model.Block) []*model.Block {
 
 func (r *Renderer) hydrateNumberBlocksInner(blocks []*model.Block) {
 	unwrapped := r.unwrapLayouts(blocks)
-	prevNumber := 1
+	prevNumber := 0
+
 	for _, b := range unwrapped {
 		if t := b.GetText(); t != nil {
 			if t.GetStyle() == model.BlockContentText_Numbered {
 				if _, ok := r.BlockNumbers[b.Id]; !ok {
-					r.BlockNumbers[b.Id] = prevNumber
 					prevNumber++
+					r.BlockNumbers[b.Id] = prevNumber
 				}
 			} else {
-				prevNumber = 1
+				prevNumber = 0
 			}
+		}
+
+		layout := b.GetLayout()
+		if layout != nil || layout.GetStyle() == model.BlockContentLayout_Div {
+			continue
 		}
 
 		if len(b.ChildrenIds) > 0 {
