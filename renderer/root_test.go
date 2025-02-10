@@ -18,7 +18,7 @@ func TestRenderer_MakeRootRenderParams(t *testing.T) {
 			Style: `
 		<style> 
 			.blocks {
-				width: max(704px, min(calc(100% - 96px), calc(704px + (100% - 704px - 96px) * 100.000000)));
+				width: max(60%, min(calc(100% - 96px), calc(60% + (100% - 60% - 96px) * 100.000000)));
 			}
 		</style> 
 	`,
@@ -43,7 +43,7 @@ func TestRenderer_MakeRootRenderParams(t *testing.T) {
 			Style: `
 		<style> 
 			.blocks {
-				width: max(704px, min(calc(100% - 96px), calc(704px + (100% - 704px - 96px) * 0.000000)));
+				width: max(60%, min(calc(100% - 96px), calc(60% + (100% - 60% - 96px) * 0.000000)));
 			}
 		</style> 
 	`,
