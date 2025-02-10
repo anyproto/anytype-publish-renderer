@@ -75,18 +75,48 @@
 	.iconImage { width: 100%; height: 100%; left: 0px; top: 0px; margin: 0px; }
 }
 
+.iconObject.c14,
+.iconObject.c16,
+.iconObject.c18,
+.iconObject.c20 {
+	border-radius: 2px;
+}
+
+.iconObject.c22,
+.iconObject.c24,
+.iconObject.c25 {
+	border-radius: 3px;
+}
+
+.iconObject.c28,
+.iconObject.c30,
+.iconObject.c32,
+.iconObject.c36 {
+	border-radius: 4px;
+}
+
+.iconObject.c40,
+.iconObject.c42 {
+	border-radius: 5px;
+}
+
+.iconObject.c44,
+.iconObject.c48 {
+	border-radius: 6px;
+}
+
 .iconObject.c56,
 .iconObject.c64,
 .iconObject.c80 {
-	border-radius: 14px;
+	border-radius: 8px;
 }
 
 .iconObject.c96,
 .iconObject.c108,
 .iconObject.c112,
-.iconObject.c128
+.iconObject.c128,
 .iconObject.c160 {
-	border-radius: 20px;
+	border-radius: 12px;
 }
 
 .iconObject.isFile,
