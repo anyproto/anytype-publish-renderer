@@ -5,24 +5,24 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
     <html lang="en" class={ r.Config.HtmlClasses }>
         <head>
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-			<meta property="PublishFilesPath" content={ r.Config.PublishFilesPath }/>
+			<meta property="PublishFilesPath" content={ r.Config.PublishFilesPath } />
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-			<meta property="og:title" content={p.Name}>
-			<meta property="og:type" content="website">
-			<meta property="og:url" content="https://www.example.com">
-			<meta property="og:image" content="https://www.example.com/image.jpg">
-			<meta property="og:description" content={p.Description}>
-			<meta property="og:site_name" content="Your Website Name">
-			<meta property="og:locale" content="en_US">
+			<meta property="og:title" content={p.Name} />
+			<meta property="og:type" content="website" />
+			<meta property="og:url" content="" />
+			<meta property="og:image" content="" />
+			<meta property="og:description" content={p.Description} />
+			<meta property="og:site_name" content="Anytype" />
+			<meta property="og:locale" content="en_US" />
 
-			<meta name="twitter:card" content="summary_large_image">
-			<meta name="twitter:title" content={p.Name}>
-			<meta name="twitter:description" content={p.Description}>
-			<meta name="twitter:image" content="https://www.example.com/image.jpg">
-			<meta name="twitter:url" content="https://www.example.com">
-			<meta name="twitter:site" content="@YourTwitterHandle">
-			<meta name="twitter:creator" content="@CreatorTwitterHandle">
+			<meta name="twitter:card" content="summary_large_image" />
+			<meta name="twitter:title" content={p.Name} />
+			<meta name="twitter:description" content={p.Description} />
+			<meta name="twitter:image" content="" />
+			<meta name="twitter:url" content="" />
+			<meta name="twitter:site" content="" />
+			<meta name="twitter:creator" content="" />
 
 			<title>{p.Name}</title>
 
