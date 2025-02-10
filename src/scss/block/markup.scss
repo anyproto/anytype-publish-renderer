@@ -8,6 +8,9 @@
 .smile .loaderWrapper { display: inline-block; }
 
 markupcode { display: inline; font-family: 'Plex'; border-radius: 4px; background: var(--color-shape-secondary); padding: 1px 4px; }
+markupbgcolor {
+	markupcode { background: inherit; }
+}
 
 markupemoji { display: inline; user-select: all; }
 markupemoji * { user-select: all; }
