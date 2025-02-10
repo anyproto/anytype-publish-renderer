@@ -89,4 +89,4 @@ jobs:
       - name: Upload static on AWS S3
         run: |
           s3cmd sync --recursive ./static/ s3://$S3_BUCKET/static/
-          s3cmd info s3://anytype-stage1-publishserver/static/
+          s3cmd info s3://$S3_BUCKET/static/
