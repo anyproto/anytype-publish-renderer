@@ -1,24 +1,166 @@
 package renderer
 
 import (
+	"context"
+	"github.com/anyproto/anytype-heart/pb"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
+	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/gogo/protobuf/types"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMakeRenderText(t *testing.T) {
-	r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
-	id := "66c58b2a7e4bcd764b24c205"
-	textBlock := r.BlocksById[id]
+	t.Run("success", func(t *testing.T) {
+		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
+		id := "66c58b2a7e4bcd764b24c205"
+		textBlock := r.BlocksById[id]
 
-	expected := &TextRenderParams{
-		Id:          id,
-		Classes:     "block blockText textParagraph align0",
-		ChildrenIds: nil,
-	}
+		expected := &TextRenderParams{
+			Id:          id,
+			Classes:     "block blockText textParagraph align0",
+			ChildrenIds: nil,
+		}
 
-	actual := r.MakeRenderTextParams(textBlock)
-	assert.Equal(t, expected.Id, actual.Id)
-	assert.Equal(t, expected.Classes, actual.Classes)
-	assert.EqualValues(t, expected.ChildrenIds, actual.ChildrenIds)
+		actual := r.MakeRenderTextParams(textBlock)
+		assert.Equal(t, expected.Id, actual.Id)
+		assert.Equal(t, expected.Classes, actual.Classes)
+		assert.EqualValues(t, expected.ChildrenIds, actual.ChildrenIds)
+	})
+	t.Run("anytype object link in markdown", func(t *testing.T) {
+		// given
+		r := Renderer{}
+		expected := &TextRenderParams{
+			Classes:     "block blockText textParagraph align0",
+			ChildrenIds: nil,
+		}
+		pbFiles := map[string]*pb.SnapshotWithType{
+			filepath.Join("objects", "anytypeId.pb"): {
+				SbType: model.SmartBlockType_Page,
+				Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+					Details: &types.Struct{Fields: map[string]*types.Value{
+						bundle.RelationKeyId.String():      pbtypes.String("anytypeId"),
+						bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
+					}},
+				}},
+			},
+		}
+		r.CachedPbFiles = pbFiles
+
+		// when
+		actual := r.MakeRenderTextParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
+			Text:  "test",
+			Style: 0,
+			Marks: &model.BlockContentTextMarks{
+				Marks: []*model.BlockContentTextMark{
+					{
+						Range: &model.Range{
+							From: 0,
+							To:   4,
+						},
+						Type:  model.BlockContentTextMark_Object,
+						Param: "anytypeId",
+					},
+				},
+			},
+		}}})
+
+		// then
+		assert.Equal(t, expected.Id, actual.Id)
+		assert.Equal(t, expected.Classes, actual.Classes)
+		assert.Len(t, actual.InnerFlex, 1)
+		builder := strings.Builder{}
+		err := actual.InnerFlex[0].Render(context.Background(), &builder)
+		assert.NoError(t, err)
+		expectedHtml := `<div class="text"><a href="anytype://object?objectId=anytypeId&spaceId=spaceId" class="markuplink" target="_blank">test</a></div>`
+		assert.Equal(t, expectedHtml, builder.String())
+	})
+	t.Run("object is missing", func(t *testing.T) {
+		// given
+		r := Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+		expected := &TextRenderParams{
+			Classes:     "block blockText textParagraph align0",
+			ChildrenIds: nil,
+		}
+
+		// when
+		actual := r.MakeRenderTextParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
+			Text:  "test",
+			Style: 0,
+			Marks: &model.BlockContentTextMarks{
+				Marks: []*model.BlockContentTextMark{
+					{
+						Range: &model.Range{
+							From: 0,
+							To:   4,
+						},
+						Type:  model.BlockContentTextMark_Object,
+						Param: "anytypeId",
+					},
+				},
+			},
+		}}})
+
+		// then
+		assert.Equal(t, expected.Id, actual.Id)
+		assert.Equal(t, expected.Classes, actual.Classes)
+		assert.Len(t, actual.InnerFlex, 1)
+		builder := strings.Builder{}
+		err := actual.InnerFlex[0].Render(context.Background(), &builder)
+		assert.NoError(t, err)
+		expectedHtml := `<div class="text"><markupobject>test</markupobject></div>`
+		assert.Equal(t, expectedHtml, builder.String())
+	})
+	t.Run("anytype object mention in markdown", func(t *testing.T) {
+		// given
+		r := Renderer{}
+		expected := &TextRenderParams{
+			Classes:     "block blockText textParagraph align0",
+			ChildrenIds: nil,
+		}
+		pbFiles := map[string]*pb.SnapshotWithType{
+			filepath.Join("objects", "anytypeId.pb"): {
+				SbType: model.SmartBlockType_Page,
+				Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+					Details: &types.Struct{Fields: map[string]*types.Value{
+						bundle.RelationKeyId.String():      pbtypes.String("anytypeId"),
+						bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
+					}},
+				}},
+			},
+		}
+		r.CachedPbFiles = pbFiles
+
+		// when
+		actual := r.MakeRenderTextParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
+			Text:  "test",
+			Style: 0,
+			Marks: &model.BlockContentTextMarks{
+				Marks: []*model.BlockContentTextMark{
+					{
+						Range: &model.Range{
+							From: 0,
+							To:   4,
+						},
+						Type:  model.BlockContentTextMark_Mention,
+						Param: "anytypeId",
+					},
+				},
+			},
+		}}})
+
+		// then
+		assert.Equal(t, expected.Id, actual.Id)
+		assert.Equal(t, expected.Classes, actual.Classes)
+		assert.Len(t, actual.InnerFlex, 1)
+		builder := strings.Builder{}
+		err := actual.InnerFlex[0].Render(context.Background(), &builder)
+		assert.NoError(t, err)
+		expectedHtml := `<div class="text"><markupmention class="withImage"><span class="smile"><div class="iconObject withDefault c20"><img src="/img/icon/default/page.svg" class="iconCommon c18"></div></span><img src="./static/img/space.svg" class="space" /><a href=anytype://object?objectId=anytypeId&spaceId=spaceId <span class="name">test</span></a></markupmention></div>`
+		assert.Equal(t, expectedHtml, builder.String())
+	})
 }
