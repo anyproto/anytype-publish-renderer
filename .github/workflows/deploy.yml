@@ -1,13 +1,19 @@
 on:
   workflow_dispatch:
+    inputs:
+      stand:
+        description: 'Deploy static on AWS S3 (stage1/prod)'
+        required: true
+        default: 'stage1'
 
-name: Deploy static on AWS S3 | Stage
+name: Deploy static on AWS S3
 
 jobs:
   deploy-static:
     runs-on: ubuntu-latest
     env:
       GOPRIVATE: github.com/anyproto
+      STAND: ${{ github.event.inputs.stand }}
     steps:
       - name: Install Go
         uses: actions/setup-go@v5
@@ -37,14 +43,24 @@ jobs:
       - name: Debug
         run: |
           tree static/
-      - name: Setup s3cmd
+      - name: Setup s3cmd (stage)
+        if: github.event.inputs.stand == 'stage1'
         uses: s3-actions/s3cmd@v1.9.0
         with:
-          access_key: ${{ secrets.AWS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          access_key: ${{ secrets.STAGE_AWS_KEY_ID }}
+          secret_key: ${{ secrets.STAGE_AWS_SECRET_ACCESS_KEY }}
+          region: 'eu-central-1'
+          provider: aws
+      - name: Setup s3cmd (prod)
+        if: github.event.inputs.stand == 'prod'
+        uses: s3-actions/s3cmd@v1.9.0
+        with:
+          access_key: ${{ secrets.PROD_AWS_KEY_ID }}
+          secret_key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           region: 'eu-central-1'
           provider: aws
       - name: Upload static on AWS S3
         run: |
-          s3cmd sync --recursive ./static/ s3://anytype-stage1-publishserver/static/
-          s3cmd info s3://anytype-stage1-publishserver/static/
+          BUCKET_NAME="anytype-${{ env.STAND }}-publishserver"
+          s3cmd sync --recursive ./static/ s3://$BUCKET_NAME/static/
+          s3cmd info s3://$BUCKET_NAME/static/
