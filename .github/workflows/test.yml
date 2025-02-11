@@ -45,7 +45,7 @@ jobs:
           make check-fmt
       - name: lint
         run: |
-          make check-fmt
+          make lint
       - name: Go test
         run: |
           make test
