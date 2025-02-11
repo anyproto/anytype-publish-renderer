@@ -9,7 +9,7 @@ templ BlockTemplate(r *Renderer, p *BlockParams) {
         }
         >
 		if p.Additional != nil {
-			<div className="additional">
+			<div class={ "additional", p.AdditionalClasses }>
 				@p.Additional
 			</div>
 		}

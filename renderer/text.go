@@ -221,10 +221,8 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 		textComp = TextCodeTemplate(text, lang)
 	}
 
-	var outerFlex []templ.Component
 	var innerFlex []templ.Component
 	switch style {
-
 	case model.BlockContentText_Toggle:
 		externalComp := ToggleMarkerTemplate(utils.GetColor(color))
 		innerFlex = append(innerFlex, externalComp, textComp)
@@ -271,8 +269,8 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 
 		innerFlex = append(innerFlex, additionalTemplate, textComp)
 	case model.BlockContentText_Quote:
-		externalComp := AdditionalQuoteTemplate(color)
-		outerFlex = append(outerFlex, externalComp)
+		blockParams.Additional = AdditionalQuoteTemplate(color)
+		blockParams.AdditionalClasses = append(blockParams.AdditionalClasses, "textColor-"+color)
 		innerFlex = append(innerFlex, textComp)
 	case model.BlockContentText_Checkbox:
 		var checkboxComp templ.Component
@@ -290,9 +288,6 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 	blockParams.Classes = append(blockParams.Classes, classes...)
 	if len(innerFlex) != 0 {
 		blockParams.Content = BlocksWrapper(&BlockWrapperParams{Classes: []string{"flex"}, Components: innerFlex})
-	}
-	if len(outerFlex) != 0 {
-		blockParams.Additional = BlocksWrapper(&BlockWrapperParams{Components: outerFlex})
 	}
 	blockParams.ContentClasses = append(blockParams.ContentClasses, contentClasses...)
 	return blockParams

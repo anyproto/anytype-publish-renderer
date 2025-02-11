@@ -13,6 +13,6 @@ templ HeadingTemplate(id string, name string, depth int) {
 			}
 	 	}
 	>
-		<a href={ templ.URL("#block-" + id) }>{ name }</a>
+		<a href={ templ.URL("#" + id) }>{ name }</a>
 	</div>
 }
