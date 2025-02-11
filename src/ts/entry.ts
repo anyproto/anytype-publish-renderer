@@ -347,7 +347,7 @@ function renderRow () {
 
 			child.css({ width: `calc(${width * 100}% - ${48 / length}px)` });
 
-			if (width <= 0.5) {
+			if (child.width() < 0.5) {
 				innerBlocks.addClass('isVertical');
 			};
 		});
