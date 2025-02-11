@@ -64,9 +64,9 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 					</div>
 				</div>
 
-				<header class="header">
-					if r.joinSpaceLink() != "" {
-						<a href={r.joinSpaceLink()} target="_blank" class="button black c28 fathom" data-event="PublishJoinSpaceClick">
+				<header class={p.HeaderClasses}>
+					if p.SpaceLink != "" {
+						<a href={p.SpaceLink} target="_blank" class="button black c28 fathom" data-event="PublishJoinSpaceClick">
 							Join Space
 						</a>
 					}

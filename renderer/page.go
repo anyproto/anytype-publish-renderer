@@ -14,8 +14,10 @@ import (
 
 type RenderPageParams struct {
 	Classes     string
+	HeaderClasses string
 	Name        string
 	Description string
+	SpaceLink   templ.SafeURL
 }
 
 func (r *Renderer) hasPageIcon() bool {
@@ -66,9 +68,11 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 
 	layoutAlign := pbtypes.GetInt64(fields, "layoutAlign")
 	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", layoutAlign)}
+	headerClasses := []string{"header"}
 	name := pbtypes.GetString(fields, "name")
 	description := pbtypes.GetString(fields, "description")
 	snippet := pbtypes.GetString(fields, "snippet")
+	spaceLink := r.joinSpaceLink()
 
 	hasPageIcon := r.hasPageIcon()
 	hasPageCover := r.hasPageCover()
@@ -90,10 +94,16 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 		descr = snippet
 	}
 
+	if spaceLink != "" {
+		headerClasses = append(headerClasses, "withJoinSpace")
+	}
+
 	return &RenderPageParams{
 		Classes:     strings.Join(classes, " "),
+		HeaderClasses: strings.Join(headerClasses, " "),
 		Name:        name,
 		Description: descr,
+		SpaceLink:   spaceLink,
 	}
 }
 

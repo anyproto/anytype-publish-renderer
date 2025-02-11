@@ -8,9 +8,9 @@ SNAPSHOTS_DIR:=./test_snapshots
 # SNAPSHOT_PATH:=./test_snapshots/Anytype.WebPublish.20241217.112212.67
 # SNAPSHOT_PATH:=./test_snapshots/test-three-column
 # SNAPSHOT_PATH:=./test_snapshots/test-angle-brackets
-# SNAPSHOT_PATH:=./test_snapshots/test-me
+SNAPSHOT_PATH:=./test_snapshots/test-me
 # SNAPSHOT_PATH:=https://anytype-prod-publishserver.s3.eu-central-2.amazonaws.com/67aa2b841b625f4939f38013
- SNAPSHOT_PATH:=https://anytype-prod-publishserver.s3.eu-central-2.amazonaws.com/67ab5e6a9f3954baeb0645d2
+# SNAPSHOT_PATH:=https://anytype-prod-publishserver.s3.eu-central-2.amazonaws.com/67ab78a0c755e143dabb9891
 
 EXEC:=./bin/anytype-publish-renderer
 TEMPL_VER:=$(shell cat go.mod | grep templ | cut -d' ' -f2)
