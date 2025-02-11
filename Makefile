@@ -25,6 +25,7 @@ deps:
 	echo $(TEMPL_VER)
 	go install github.com/a-h/templ/cmd/templ@$(TEMPL_VER)
 	go install honnef.co/go/tools/cmd/staticcheck@latest
+	go install golang.org/x/tools/cmd/goimports@latest
 
 GO_FILES_CMD = find . -type f -name '*.go' -not -name '*_templ.go'
 
