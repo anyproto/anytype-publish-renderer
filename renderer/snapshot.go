@@ -1,14 +1,15 @@
 package renderer
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/localstore/addr"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
-	"path/filepath"
-	"strings"
 )
 
 func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
@@ -20,7 +21,7 @@ func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
 }
 
 type relType interface {
-	string | bool | model.ObjectTypeLayout | model.RelationFormat
+	string | bool | int64 | model.ObjectTypeLayout | model.RelationFormat
 }
 
 type relTransformer[V relType] func(*types.Value) V
@@ -75,6 +76,15 @@ func relationToBool(boolField *types.Value) bool {
 	var null bool
 	if boolField != nil {
 		return boolField.GetBoolValue()
+	}
+
+	return null
+}
+
+func relationToInt64(field *types.Value) int64 {
+	var null int64
+	if field != nil {
+		return int64(field.GetNumberValue())
 	}
 
 	return null

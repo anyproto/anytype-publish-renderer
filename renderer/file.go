@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/a-h/templ"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/anyproto/anytype-publish-renderer/utils"
@@ -141,14 +142,16 @@ func (r *Renderer) MakeRenderFileParams(b *model.Block) (params *FileRenderParam
 		return
 	}
 
-	name := file.Name
-	size := prettyByteSize(file.Size_)
+	details := r.findTargetDetails(file.TargetObjectId)
+	size := getRelationField(details, bundle.RelationKeySizeInBytes, relationToInt64)
+	name := getRelationField(details, bundle.RelationKeyName, relationToString)
+	sizeStr := prettyByteSize(size)
 
 	params = &FileRenderParams{
 		Id:   b.Id,
 		Src:  templ.URL(src),
 		Name: name,
-		Size: size,
+		Size: sizeStr,
 	}
 
 	return
