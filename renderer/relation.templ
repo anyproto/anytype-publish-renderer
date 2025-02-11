@@ -51,10 +51,16 @@ templ OptionElement(value, color, relationType string) {
     </div>
 }
 
-templ ActiveCheckBoxTemplate() {
+templ ActiveCheckBoxTemplate(name string, isFeatured bool) {
     <div class="icon checkbox active"> </div>
+    if isFeatured {
+        <div class="label">{ name }</div>
+    }
 }
 
-templ DisabledCheckBoxTemplate() {
+templ DisabledCheckBoxTemplate(name string, isFeatured bool) {
     <div class="icon checkbox"> </div>
+    if isFeatured {
+        <div class="label">{ name }</div>
+    }
 }
