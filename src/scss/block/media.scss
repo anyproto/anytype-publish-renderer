@@ -10,8 +10,9 @@
 			> .media,
 			> audio,
 			> canvas,
-			> video { width: 100%; display: block; }
+			> video { max-width: 100%; display: block; }
 
+			audio { width: 100%;  }
 			> iframe { width: 100%; aspect-ratio: 3/4; display: block; }
 		}
 	}
