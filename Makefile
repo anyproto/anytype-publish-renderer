@@ -20,6 +20,10 @@ setup-go:
 	@echo 'Setting up go modules...'
 	@go mod download
 
+fmt:
+	@echo 'Formatting with goimports...'
+	@goimports -w -l `find . -type f -name '*.go' -not -name '*_templ.go'`
+
 deps:
 	echo $(TEMPL_VER)
 	go install github.com/a-h/templ/cmd/templ@$(TEMPL_VER)

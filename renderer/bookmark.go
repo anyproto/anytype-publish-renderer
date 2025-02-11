@@ -13,16 +13,16 @@ import (
 )
 
 type BookmarkRendererParams struct {
-	Id          string
-	Classes     string
+	Id           string
+	Classes      string
 	InnerClasses string
-	IsEmpty     bool
-	Url         string
-	Favicon     string
-	Name        string
-	Description string
-	Image       string
-	SafeUrl     templ.SafeURL
+	IsEmpty      bool
+	Url          string
+	Favicon      string
+	Name         string
+	Description  string
+	Image        string
+	SafeUrl      templ.SafeURL
 }
 
 func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkRendererParams) {
@@ -32,7 +32,7 @@ func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkR
 	innerClasses := []string{"inner"}
 
 	if bgColor != "" {
-		innerClasses = append(innerClasses, "bgColor", "bgColor-" + bgColor)
+		innerClasses = append(innerClasses, "bgColor", "bgColor-"+bgColor)
 	}
 
 	if bookmark.GetUrl() == "" {
@@ -87,15 +87,15 @@ func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkR
 	}
 
 	return &BookmarkRendererParams{
-		Id:          b.Id,
-		Classes:     strings.Join(classes, " "),
+		Id:           b.Id,
+		Classes:      strings.Join(classes, " "),
 		InnerClasses: strings.Join(innerClasses, " "),
-		Url:         parsedUrl.Host,
-		Favicon:     favicon,
-		Name:        html.UnescapeString(name),
-		Description: html.UnescapeString(description),
-		Image:       image,
-		SafeUrl:     templ.URL(bookmark.GetUrl()),
+		Url:          parsedUrl.Host,
+		Favicon:      favicon,
+		Name:         html.UnescapeString(name),
+		Description:  html.UnescapeString(description),
+		Image:        image,
+		SafeUrl:      templ.URL(bookmark.GetUrl()),
 	}
 }
 

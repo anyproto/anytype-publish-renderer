@@ -1,14 +1,15 @@
 package renderer
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/localstore/addr"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
-	"path/filepath"
-	"strings"
 )
 
 func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
