@@ -1,11 +1,12 @@
 package renderer
 
 import (
+	"testing"
+	"time"
+
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/localstore/addr"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 func TestGetDateSnapshot(t *testing.T) {

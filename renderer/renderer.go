@@ -144,6 +144,8 @@ func readUberSnapshot(path string) (uberSnapshot PublishingUberSnapshot, err err
 	return
 
 }
+
+//lint:ignore U1000 sometimes we want to use this for debugging
 func debugJsonSnapshot(snapshot pb.SnapshotWithType) error {
 	var snapshotJson []byte
 	snapshotJson, err := json.Marshal(snapshot)

@@ -9,7 +9,7 @@ on:
 name: test
 
 jobs:
-  unit-test:
+  test:
     runs-on: ubuntu-latest
     env:
       GOPRIVATE: github.com/anyproto
@@ -37,6 +37,7 @@ jobs:
           path: ./open
       - name: Go build
         run: |
+          make deps
           npm i
           make build
       - name: Go test
