@@ -138,12 +138,12 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"><span class=\"name\">Report</span></a></div></div><div class=\"dimmer\"></div></div></div><main><div id=\"root-loader\"><div class=\"inner\"><div class=\"logo anim from\"></div></div></div><header class=\"header\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"><span class=\"name\">Report</span></a></div></div><div class=\"dimmer\"></div></div></div><main><div id=\"root-loader\"><div class=\"inner\"><div class=\"logo anim from\"></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if r.joinSpaceLink() != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<header class=\"header\"><a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -152,12 +152,12 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" target=\"_blank\" class=\"button black c28 fathom\" data-event=\"PublishJoinSpaceClick\">Join Space</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" target=\"_blank\" class=\"button black c28 fathom\" data-event=\"PublishJoinSpaceClick\">Join Space</a><div class=\"icon more withBackground menuButton\" data-menu-id=\"more\" data-horizontal=\"right\"></div></header>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"icon more withBackground menuButton\" data-menu-id=\"more\" data-horizontal=\"right\"></div></header><div class=\"coverWrapper\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"coverWrapper\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -216,7 +216,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(r.GetStaticFolderUrl("/js/loader.js"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 101, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 100, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {

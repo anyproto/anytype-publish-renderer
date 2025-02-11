@@ -64,15 +64,14 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 					</div>
 				</div>
 
-				<header class="header">
-					if r.joinSpaceLink() != "" {
+				if r.joinSpaceLink() != "" {
+					<header class="header">
 						<a href={r.joinSpaceLink()} target="_blank" class="button black c28 fathom" data-event="PublishJoinSpaceClick">
 							Join Space
 						</a>
-					}
-
-					<div class="icon more withBackground menuButton" data-menu-id="more" data-horizontal="right"></div>
-				</header>
+						<div class="icon more withBackground menuButton" data-menu-id="more" data-horizontal="right"></div>
+					</header>
+				}
 
 				<div class="coverWrapper">
 					@r.RenderPageCover()
