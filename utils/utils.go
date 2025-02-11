@@ -22,9 +22,6 @@ var Colors = map[string]string{
 	"lime":    "#5dd400",
 }
 
-func fooo(component templ.Component) {
-}
-
 func TemplToString(component templ.Component) (string, error) {
 	var sb strings.Builder
 	err := component.Render(context.Background(), &sb)
