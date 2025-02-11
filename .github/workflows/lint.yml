@@ -9,7 +9,7 @@ on:
 name: lint
 
 jobs:
-  unit-test:
+  lint:
     runs-on: ubuntu-latest
     env:
       GOPRIVATE: github.com/anyproto
