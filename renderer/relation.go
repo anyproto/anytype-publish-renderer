@@ -259,13 +259,12 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 			continue
 		}
 
-		spaceId := details.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
-		name := details.GetFields()[bundle.RelationKeyName.String()].GetStringValue()
+		name := getRelationField(details, bundle.RelationKeyName, relationToString)
 		if name == "" {
 			name = defaultName
 		}
 		icon := r.getIconFromDetails(details)
-		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
+		link := r.getLinkByLayout(details, objectId)
 		elements = append(elements, ListElement(ObjectElement(name, templ.SafeURL(link)), icon))
 	}
 	return elements
@@ -283,7 +282,7 @@ func (r *Renderer) generateFileComponent(relationValue *types.Value) []templ.Com
 			continue
 		}
 		icon := r.createFileIcon(fileBlock)
-		elements = append(elements, ListElement(NameTemplate("name", filepath.Base(url)), icon))
+		elements = append(elements, ListElement(ObjectElement(filepath.Base(url), templ.URL(url)), icon))
 	}
 	return elements
 }
