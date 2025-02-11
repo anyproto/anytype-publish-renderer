@@ -1,0 +1,42 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+name: lint
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    env:
+      GOPRIVATE: github.com/anyproto
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.23
+      - name: git config
+        run: git config --global url.https://${{ secrets.ANYTYPE_PAT }}@github.com/.insteadOf https://github.com/
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup GO env
+        run: |
+          echo GOPATH=$(go env GOPATH) >> $GITHUB_ENV
+          echo GOBIN=$(go env GOPATH)/bin >> $GITHUB_ENV
+          echo $(go env GOPATH)/bin >> $GITHUB_PATH
+      - name: check-fmt
+        run: |
+          make deps-goimport
+          make check-fmt
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          skip-cache: true
+          version: latest
+          only-new-issues: true
+          args: --timeout 25m --verbose
