@@ -1,5 +1,10 @@
 # anytype-publish-renderer
 
+- `make fmt` formats the code
+- `make lints` does linter checks
+
+this also wired to commit hooks
+
 ## to test with local publish:
 
 1. set the env var to e.g. renderer/test_snapshots/test-me

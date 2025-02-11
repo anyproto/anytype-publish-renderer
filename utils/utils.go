@@ -9,7 +9,7 @@ import (
 )
 
 var Colors = map[string]string{
-	     "default": "#252525",
+	"default": "#252525",
 	"grey":    "#b6b6b6",
 	"yellow":  "#ecd91b",
 	"orange":  "#ffb522",
