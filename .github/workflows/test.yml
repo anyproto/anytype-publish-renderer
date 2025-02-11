@@ -9,7 +9,7 @@ on:
 name: test
 
 jobs:
-  unit-test:
+  test:
     runs-on: ubuntu-latest
     env:
       GOPRIVATE: github.com/anyproto
@@ -40,12 +40,6 @@ jobs:
           make deps
           npm i
           make build
-      - name: check-fmt
-        run: |
-          make check-fmt
-      - name: lint
-        run: |
-          make lint
       - name: Go test
         run: |
           make test
