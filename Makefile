@@ -10,6 +10,7 @@ SNAPSHOTS_DIR:=./test_snapshots
 # SNAPSHOT_PATH:=./test_snapshots/test-angle-brackets
 SNAPSHOT_PATH:=./test_snapshots/test-me
 # SNAPSHOT_PATH:=https://anytype-prod-publishserver.s3.eu-central-2.amazonaws.com/67aa2b841b625f4939f38013
+# SNAPSHOT_PATH:=https://anytype-prod-publishserver.s3.eu-central-2.amazonaws.com/67ab3c9beb2f8cfcf2af9f28
 
 EXEC:=./bin/anytype-publish-renderer
 TEMPL_VER:=$(shell cat go.mod | grep templ | cut -d' ' -f2)

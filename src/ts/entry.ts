@@ -331,7 +331,9 @@ function renderTable () {
 };
 
 function renderRow () {
+	const wrapper = $('.blocks');
 	const blocks = $('.block.blockLayout.layoutRow');
+	const mw = wrapper.width() / 2;
 
 	blocks.each((i, block) => {
 		block = $(block);
@@ -342,14 +344,15 @@ function renderRow () {
 		children.each((i, child) => {
 			child = $(child);
 
-			const width = (Number(child.data('width')) || 1) / length;
+			const width = (Number(child.data('width')) || 1 / length) * 100;
 			const innerBlocks = child.find('> .children > .block');
+			const offset = i > 0 ? `${48}px` : '0px';
 
-			child.css({ width: `calc(${width * 100}% - ${48 / length}px)` });
+			child.css({ width: `calc(${width}% - ${offset})` });
 
-			if (width <= 0.5) {
-				innerBlocks.addClass('isVertical');
-			};
+			raf(() => {
+				innerBlocks.toggleClass('isVertical', child.width() < mw);
+			});
 		});
 	});
 };
@@ -408,13 +411,13 @@ $(document).ready(() => {
 		renderMenu,
 	];
 
-    renderFns.forEach(f => {
-        setTimeout(_ => {
-            try {
-                f();
-            } catch (e) {
-                console.error(`error executing render function "${f.name}":`, e, f);
-            };
-        });
-    });
+	renderFns.forEach(f => {
+		setTimeout(_ => {
+			try {
+				f();
+			} catch (e) {
+				console.error(`error executing render function "${f.name}":`, e, f);
+			};
+		});
+	});
 });

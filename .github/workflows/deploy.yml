@@ -1,7 +1,16 @@
+name: Deploy static on AWS S3
+
 on:
   workflow_dispatch:
-
-name: Deploy static on AWS S3 | Stage
+    inputs:
+      role:
+        description: "Select deployment role"
+        required: true
+        default: "stage1"
+        type: choice
+        options:
+          - prod
+          - stage1
 
 jobs:
   deploy-static:
@@ -13,38 +22,82 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: 1.23
+
       - name: git config
         run: git config --global url.https://${{ secrets.ANYTYPE_PAT }}@github.com/.insteadOf https://github.com/
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Setup GO env
         run: |
           echo GOPATH=$(go env GOPATH) >> $GITHUB_ENV
           echo GOBIN=$(go env GOPATH)/bin >> $GITHUB_ENV
           echo $(go env GOPATH)/bin >> $GITHUB_PATH
+
       - name: Setup license repository
         uses: actions/checkout@master
         with:
           repository: anyproto/open
           ref: refs/heads/main
           path: ./open
+
       - name: Go build
         run: |
           npm i
           make build
+
       - name: Debug
         run: |
           tree static/
-      - name: Setup s3cmd
-        uses: s3-actions/s3cmd@v1.9.0
-        with:
-          access_key: ${{ secrets.AWS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          region: 'eu-central-1'
-          provider: aws
-      - name: Upload static on AWS S3
+
+      - name: Install Brotli
+        run: sudo apt-get update && sudo apt-get install -y brotli
+
+      - name: Compress static files
         run: |
-          s3cmd sync --recursive ./static/ s3://anytype-stage1-publishserver/static/
-          s3cmd info s3://anytype-stage1-publishserver/static/
+          find static/ -type f \( -name "*.js" -o -name "*.css" \) | while read -r file; do
+            gzip -k -9 "$file"
+            brotli -k -q 11 "$file"
+          done
+
+      - name: Set S3 settings based on role
+        id: set_bucket
+        run: |
+          if [[ "${{ github.event.inputs.role }}" == "prod" ]]; then
+            echo "S3_BUCKET=anytype-prod-publishserver" >> $GITHUB_ENV
+            echo "AWS_KEY_ID=${{ secrets.PROD_AWS_KEY_ID }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+            echo "AWS_REGION=eu-central-2" >> $GITHUB_ENV
+          else
+            echo "S3_BUCKET=anytype-stage1-publishserver" >> $GITHUB_ENV
+            echo "AWS_KEY_ID=${{ secrets.STAGE_AWS_KEY_ID }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGE_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+            echo "AWS_REGION=eu-central-1" >> $GITHUB_ENV
+          fi
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ env.AWS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy static site to S3 bucket
+        run: aws s3 sync static/ s3://$S3_BUCKET/static/ --delete --region $AWS_REGION
+
+      - name: Set content-encoding for js.gz files
+        run: |
+          aws s3 ls s3://$S3_BUCKET/static/ --recursive | awk '{print $4}' | grep '\.js\.gz$' | while read file; do
+            aws s3 cp "s3://$S3_BUCKET/$file" "s3://$S3_BUCKET/$file" \
+              --content-type "application/javascript" \
+              --content-encoding gzip \
+              --metadata-directive REPLACE \
+              --region $AWS_REGION
+          done
+
+      - name: Verify uploaded files
+        run: |
+          aws s3 ls s3://$S3_BUCKET/static/ --region $AWS_REGION
