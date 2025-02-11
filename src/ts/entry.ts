@@ -346,9 +346,8 @@ function renderRow () {
 
 			const width = (Number(child.data('width')) || 1 / length) * 100;
 			const innerBlocks = child.find('> .children > .block');
-			const offset = i > 0 ? `${48}px` : '0px';
-
-			child.css({ width: `calc(${width}% - ${offset})` });
+			
+			child.css({ width: `${width}%` });
 
 			raf(() => {
 				innerBlocks.toggleClass('isVertical', child.width() < mw);
