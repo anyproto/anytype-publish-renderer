@@ -95,7 +95,7 @@ type UserSvgProps struct {
 	Letter     string
 }
 
-func FirstAlnumChar(s string, defaultLetter string) string {
+func firstAlnumChar(s string, defaultLetter string) string {
 	for _, r := range s {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
 			return string(unicode.ToUpper(r))
@@ -105,8 +105,8 @@ func FirstAlnumChar(s string, defaultLetter string) string {
 	return defaultLetter
 }
 
-// EncodeSVGToDataURL converts an SVG string to a Base64 data URL
-func EncodeSVGToDataURL(svg string) string {
+// encodeSVGToDataURL converts an SVG string to a Base64 data URL
+func encodeSVGToDataURL(svg string) string {
 	// Base64 encode the SVG string directly
 	base64SVG := base64.StdEncoding.EncodeToString([]byte(svg))
 
@@ -131,7 +131,7 @@ func makeUserSvgProps(size int, username string) *UserSvgProps {
 	fontSizeStr := fmt.Sprintf("%dpx", fontSize)
 
 	// "U" stands for "Untitled"
-	letter := FirstAlnumChar(username, "U")
+	letter := firstAlnumChar(username, "U")
 
 	return &UserSvgProps{
 		Size:       sizeStr,
@@ -275,10 +275,9 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 	classes := []string{"iconObject"}
 	var iconClasses []string
 	var isDeleted bool
-	if targetDetails == nil || len(targetDetails.Fields) == 0 {
+	if targetDetails == nil || len(targetDetails.Fields) == 0 || getRelationField(targetDetails, bundle.RelationKeyIsDeleted, relationToBool) {
 		isDeleted = true
 	}
-
 
 	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 	iconEmoji := getRelationField(targetDetails, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
@@ -328,7 +327,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			}
 			props := makeUserSvgProps(int(props.Size), name)
 			svg := makeSvgString(props)
-			src = EncodeSVGToDataURL(svg)
+			src = encodeSVGToDataURL(svg)
 		}
 
 	case model.ObjectType_date:

@@ -10,7 +10,7 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 )
 
-func (r *Renderer) MakeFeaturedRelationsComponent() templ.Component {
+func (r *Renderer) makeFeaturedRelationsComponent() templ.Component {
 	details := r.Sp.GetSnapshot().GetData().GetDetails()
 
 	if details == nil || len(details.GetFields()) == 0 {
@@ -68,7 +68,7 @@ func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
 	if color != "" {
 		blockParams.Classes = append(blockParams.Classes, fmt.Sprintf("bgColor bgColor-%s", color))
 	}
-	params := r.MakeFeaturedRelationsComponent()
+	params := r.makeFeaturedRelationsComponent()
 	if params == nil {
 		return NoneTemplate("")
 	}

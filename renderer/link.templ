@@ -1,45 +1,30 @@
 package renderer
 
-templ LinkTempl(p *LinkRenderParams) {
-    <div id={"block-" + p.Id } class={ "block blockLink " + p.Classes }>
-        <div class={ p.ContentClasses }>
-			if p.IsDeleted {
-				<div class="deleted">
-					<div id="" draggable="false" class="icon ghost"></div>
-					<div class="name">Non-existent object</div>
-				</div>
-			} else {
-				<a href={ p.Url } class={ p.CardClasses }>
-					<div class={ p.SidesClasses }>
-						<div class="side left">
-							<div class="cardName">
-								@p.IconTemplate
-
-								<div class="name">{ p.Name }</div>
-
-								if p.IsArchived != "" {
-									<div class="tagItem isMultiSelect archive">Deleted</div>
-								}
-							</div>
-
-							<div class="relationItem cardDescription">
-								<div class="description"> { p.Description } </div>
-							</div>
-
-							if p.Type != "" {
-								<div class="relationItem cardType">
-									<div class="item"> { p.Type } </div>
-								</div>
-							}
-						</div>
-						if p.CoverTemplate != nil {
-							<div class="side right">
-								@p.CoverTemplate
-							</div>
-						}
-					</div>
-				</a>
-			}
+templ LinkTemplate(p *LinkRenderParams) {
+    <a href={ p.Url } class={ p.CardClasses }>
+        <div class={ p.SidesClasses }>
+	        for _, component := range p.Components {
+	            @component
+	        }
         </div>
+    </a>
+}
+
+templ DeletedLinkTemplate(icon templ.Component) {
+    <div class="deleted">
+         if icon != nil {
+            @icon
+         }
+        <div class="name">Non-existent object</div>
+    </div>
+}
+
+templ ArchivedLinkTemplate() {
+    <div class="tagItem isMultiSelect archive">Deleted</div>
+}
+
+templ LinkItemTemplate(cardClass, itemClass, value string) {
+    <div class={ "relationItem", cardClass }>
+        <div class={ itemClass }> { value } </div>
     </div>
 }

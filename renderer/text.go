@@ -1,12 +1,10 @@
 package renderer
 
 import (
-	"cmp"
 	"fmt"
 	"html"
 	"regexp"
 	"slices"
-	"strconv"
 	"strings"
 	"unicode/utf16"
 
@@ -19,19 +17,6 @@ import (
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
 )
-
-type TextRenderParams struct {
-	Classes        string
-	ContentClasses string
-	Id             string
-	InnerFlex      []templ.Component
-	OuterFlex      []templ.Component
-	ChildrenIds    []string
-}
-
-func cmpMarks(a, b *model.BlockContentTextMark) int {
-	return cmp.Compare(a.Range.From, b.Range.From)
-}
 
 func emojiParam(t model.BlockContentTextStyle) int32 {
 	switch t {
@@ -96,8 +81,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 			if iconHtml != "" {
 				class = "withImage"
 			}
-			spaceId := getRelationField(details, bundle.RelationKeySpaceId, relationToString)
-			link = fmt.Sprintf(linkTemplate, mark.Param, spaceId)
+			link = makeAnytypeLink(details, mark.Param)
 		}
 
 		return `<a href=` + link + ` target="_blank" class="markupmention ` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><span class="name">` + s + `</span></a>`
@@ -117,8 +101,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		if details == nil || len(details.Fields) == 0 {
 			return "<markupobject>" + s + "</markupobject>"
 		}
-		spaceId := getRelationField(details, bundle.RelationKeySpaceId, relationToString)
-		link := fmt.Sprintf(linkTemplate, mark.Param, spaceId)
+		link := makeAnytypeLink(details, mark.Param)
 		return fmt.Sprintf(`<a href="%s" class="markuplink" target="_blank">`, link) + s + "</a>"
 	}
 
@@ -201,19 +184,17 @@ func replaceNewlineBr(text string) string {
 	return text
 }
 
-func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParams) {
+func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 	blockText := b.GetText()
 	style := blockText.GetStyle()
 	bgColor := b.GetBackgroundColor()
 	color := blockText.GetColor()
 	iconEmoji := blockText.GetIconEmoji()
 	iconImage := blockText.GetIconImage()
-	classes := []string{"block", "blockText"}
-	contentClasses := []string{"content"}
+	var contentClasses []string
+	classes := []string{"text" + style.String()}
 
-	classes = append(classes, "text"+style.String())
-	classes = append(classes, "align"+strconv.Itoa(int(b.GetAlign())))
-
+	blockParams := makeDefaultBlockParams(b)
 	if bgColor != "" {
 		if (style == model.BlockContentText_Callout) ||
 			(style == model.BlockContentText_Quote) {
@@ -306,18 +287,18 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		innerFlex = append(innerFlex, textComp)
 	}
 
-	params = &TextRenderParams{
-		Id:             b.Id,
-		Classes:        strings.Join(classes, " "),
-		ContentClasses: strings.Join(contentClasses, " "),
-		ChildrenIds:    b.ChildrenIds,
-		OuterFlex:      outerFlex,
-		InnerFlex:      innerFlex,
+	blockParams.Classes = append(blockParams.Classes, classes...)
+	if len(innerFlex) != 0 {
+		blockParams.Content = BlocksWrapper(&BlockWrapperParams{Classes: []string{"flex"}, Components: innerFlex})
 	}
-	return
+	if len(outerFlex) != 0 {
+		blockParams.Additional = BlocksWrapper(&BlockWrapperParams{Components: outerFlex})
+	}
+	blockParams.ContentClasses = append(blockParams.ContentClasses, contentClasses...)
+	return blockParams
 
 }
 func (r *Renderer) RenderText(b *model.Block) templ.Component {
-	params := r.MakeRenderTextParams(b)
-	return TextTemplate(r, params)
+	params := r.makeTextBlockParams(b)
+	return BlockTemplate(r, params)
 }

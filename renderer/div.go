@@ -5,10 +5,9 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 )
 
-func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *BlockParams) {
+func (r *Renderer) makeRenderDivParams(b *model.Block) (params *BlockParams) {
 	var divClass string
 	var comp templ.Component
-
 
 	switch b.GetDiv().Style {
 	case model.BlockContentDiv_Line:
@@ -26,13 +25,13 @@ func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *BlockParams) {
 	params.Content = comp
 
 	if bgColor != "" {
-		params.Classes = append(params.Classes, "bgColor", "bgColor-" + bgColor)
+		params.Classes = append(params.Classes, "bgColor", "bgColor-"+bgColor)
 	}
 
 	return
 }
 
 func (r *Renderer) RenderDiv(b *model.Block) templ.Component {
-	params := r.MakeRenderDivParams(b)
+	params := r.makeRenderDivParams(b)
 	return BlockTemplate(r, params)
 }

@@ -9,9 +9,15 @@ import (
 )
 
 func (r *Renderer) RenderLayout(b *model.Block) templ.Component {
+	blockParams := r.makeLayoutBlockParams(b)
+	return BlockTemplate(r, blockParams)
+}
+
+func (r *Renderer) makeLayoutBlockParams(b *model.Block) *BlockParams {
 	blockParams := makeDefaultBlockParams(b)
 	fields := b.GetFields()
 	width := fmt.Sprintf("%.2f", pbtypes.GetFloat64(fields, "width"))
 	blockParams.Width = width
-	return BlockTemplate(r, blockParams)
+	blockParams.Classes = append(blockParams.Classes, "layout"+b.GetLayout().GetStyle().String())
+	return blockParams
 }

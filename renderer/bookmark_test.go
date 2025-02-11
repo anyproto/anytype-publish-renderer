@@ -1,24 +1,27 @@
 package renderer
 
 import (
-	"github.com/anyproto/anytype-heart/pb"
-	"github.com/anyproto/anytype-heart/util/pbtypes"
-	"github.com/gogo/protobuf/types"
+	"context"
 	"path/filepath"
+	"strings"
 	"testing"
 
-	"github.com/a-h/templ"
+	"github.com/gogo/protobuf/types"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-	"github.com/stretchr/testify/assert"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
 )
 
 func TestMakeBookmarkRendererParams(t *testing.T) {
 	tests := []struct {
-		name     string
-		block    *model.Block
-		pbFiles  map[string]*pb.SnapshotWithType
-		expected *BookmarkRendererParams
+		name         string
+		block        *model.Block
+		pbFiles      map[string]*pb.SnapshotWithType
+		expected     *BlockParams
+		expectedHtml string
 	}{
 		{
 			name: "valid bookmark",
@@ -44,15 +47,11 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 					}},
 				},
 			},
-			expected: &BookmarkRendererParams{
-				Id:           "block1",
-				Url:          "example.com",
-				Name:         "name1",
-				Description:  "description1",
-				SafeUrl:      templ.SafeURL("https://example.com"),
-				InnerClasses: "inner",
-				Classes:      "block blockBookmark",
+			expected: &BlockParams{
+				Id:      "block1",
+				Classes: []string{"block", "align0", "blockBookmark"},
 			},
+			expectedHtml: `<a href="https://example.com" target="_blank" class="inner"><div class="side left"><div class="link">example.com</div><div class="name">name1</div><div class="descr">description1</div></div><div class="side right"></div></a>`,
 		},
 		{
 			name: "missing details",
@@ -71,9 +70,20 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{}},
 				},
 			},
-			expected: &BookmarkRendererParams{
-				IsEmpty: true,
+			expected: nil,
+		},
+		{
+			name: "missing bookmark",
+			block: &model.Block{
+				Id: "block2",
+				Content: &model.BlockContentOfBookmark{
+					Bookmark: &model.BlockContentBookmark{
+						Url:            "https://example.com",
+						TargetObjectId: "object12",
+					},
+				},
 			},
+			expected: nil,
 		},
 		{
 			name: "invalid URL",
@@ -99,18 +109,35 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 					}},
 				},
 			},
-			expected: &BookmarkRendererParams{
-				IsEmpty: true,
+			expected: nil,
+		},
+		{
+			name: "empty URL",
+			block: &model.Block{
+				Id: "block3",
+				Content: &model.BlockContentOfBookmark{
+					Bookmark: &model.BlockContentBookmark{},
+				},
 			},
+			expected: nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
+			r := &Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 			r.CachedPbFiles = tt.pbFiles
-			result := r.MakeBookmarkRendererParams(tt.block)
-			assert.Equal(t, tt.expected, result)
+			result := r.makeBookmarkBlockParams(tt.block)
+			if tt.expected == nil {
+				assert.Nil(t, result)
+			} else {
+				assert.Equal(t, tt.expected.Classes, result.Classes)
+				assert.Equal(t, tt.expected.Id, result.Id)
+				builder := strings.Builder{}
+				err := result.Content.Render(context.Background(), &builder)
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedHtml, builder.String())
+			}
 		})
 	}
 }

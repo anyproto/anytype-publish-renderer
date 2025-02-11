@@ -12,7 +12,7 @@ type childBlock struct {
 	isChild bool
 }
 
-func (r *Renderer) MakeTableOfContentRenderParams(block *model.Block) *BlockParams {
+func (r *Renderer) makeTableOfContentBlockParams(block *model.Block) *BlockParams {
 	blockParams := makeDefaultBlockParams(block)
 
 	color := block.GetBackgroundColor()
@@ -84,7 +84,7 @@ func (r *Renderer) getHeadingName(b *model.Block) string {
 }
 
 func (r *Renderer) RenderTableOfContent(block *model.Block) templ.Component {
-	params := r.MakeTableOfContentRenderParams(block)
+	params := r.makeTableOfContentBlockParams(block)
 	return BlockTemplate(r, params)
 }
 

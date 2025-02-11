@@ -24,7 +24,7 @@ type RelationRenderSetting struct {
 	Classes      []string
 }
 
-func (r *Renderer) MakeRelationRenderParams(b *model.Block) templ.Component {
+func (r *Renderer) makeRelationTemplate(b *model.Block) templ.Component {
 	relationBlock := b.GetRelation()
 	key := relationBlock.GetKey()
 	if key == "" {
@@ -250,13 +250,12 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 			continue
 		}
 
-		spaceId := details.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
 		name := details.GetFields()[bundle.RelationKeyName.String()].GetStringValue()
 		if name == "" {
 			name = defaultName
 		}
 		icon := r.getIconFromDetails(details)
-		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
+		link := makeAnytypeLink(details, objectId)
 		elements = append(elements, ListElement(ObjectElement(name, templ.SafeURL(link)), icon))
 	}
 	return elements
@@ -296,7 +295,7 @@ func (r *Renderer) getIconFromDetails(details *types.Struct) templ.Component {
 }
 
 func (r *Renderer) RenderRelations(b *model.Block) templ.Component {
-	component := r.MakeRelationRenderParams(b)
+	component := r.makeRelationTemplate(b)
 	if component == nil {
 		return NoneTemplate("")
 	}

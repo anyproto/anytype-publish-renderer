@@ -11,7 +11,7 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 )
 
-func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) *BlockParams {
+func (r *Renderer) makeBookmarkBlockParams(b *model.Block) *BlockParams {
 	bookmark := b.GetBookmark()
 	if bookmark.GetUrl() == "" {
 		return nil
@@ -83,7 +83,7 @@ func (r *Renderer) getSideRightComponent(details *types.Struct, innerClasses []s
 }
 
 func (r *Renderer) RenderBookmark(b *model.Block) templ.Component {
-	params := r.MakeBookmarkRendererParams(b)
+	params := r.makeBookmarkBlockParams(b)
 	if params == nil {
 		return NoneTemplate("")
 	}

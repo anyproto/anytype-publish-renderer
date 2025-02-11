@@ -20,13 +20,13 @@ func TestMakeRenderText(t *testing.T) {
 		id := "66c58b2a7e4bcd764b24c205"
 		textBlock := r.BlocksById[id]
 
-		expected := &TextRenderParams{
+		expected := &BlockParams{
 			Id:          id,
-			Classes:     "block blockText textParagraph align0",
+			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
 			ChildrenIds: nil,
 		}
 
-		actual := r.MakeRenderTextParams(textBlock)
+		actual := r.makeTextBlockParams(textBlock)
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.EqualValues(t, expected.ChildrenIds, actual.ChildrenIds)
@@ -34,8 +34,8 @@ func TestMakeRenderText(t *testing.T) {
 	t.Run("anytype object link in markdown", func(t *testing.T) {
 		// given
 		r := Renderer{}
-		expected := &TextRenderParams{
-			Classes:     "block blockText textParagraph align0",
+		expected := &BlockParams{
+			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
 			ChildrenIds: nil,
 		}
 		pbFiles := map[string]*pb.SnapshotWithType{
@@ -52,7 +52,7 @@ func TestMakeRenderText(t *testing.T) {
 		r.CachedPbFiles = pbFiles
 
 		// when
-		actual := r.MakeRenderTextParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
+		actual := r.makeTextBlockParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
 			Text:  "test",
 			Style: 0,
 			Marks: &model.BlockContentTextMarks{
@@ -72,23 +72,23 @@ func TestMakeRenderText(t *testing.T) {
 		// then
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
-		assert.Len(t, actual.InnerFlex, 1)
+		assert.NotNil(t, actual.Content)
 		builder := strings.Builder{}
-		err := actual.InnerFlex[0].Render(context.Background(), &builder)
+		err := actual.Content.Render(context.Background(), &builder)
 		assert.NoError(t, err)
-		expectedHtml := `<div class="text"><a href="anytype://object?objectId=anytypeId&spaceId=spaceId" class="markuplink" target="_blank">test</a></div>`
+		expectedHtml := `<div class="flex"><div class="text"><a href="anytype://object?objectId=anytypeId&spaceId=spaceId" class="markuplink" target="_blank">test</a></div></div>`
 		assert.Equal(t, expectedHtml, builder.String())
 	})
 	t.Run("object is missing", func(t *testing.T) {
 		// given
 		r := Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
-		expected := &TextRenderParams{
-			Classes:     "block blockText textParagraph align0",
+		expected := &BlockParams{
+			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
 			ChildrenIds: nil,
 		}
 
 		// when
-		actual := r.MakeRenderTextParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
+		actual := r.makeTextBlockParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
 			Text:  "test",
 			Style: 0,
 			Marks: &model.BlockContentTextMarks{
@@ -108,18 +108,18 @@ func TestMakeRenderText(t *testing.T) {
 		// then
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
-		assert.Len(t, actual.InnerFlex, 1)
+		assert.NotNil(t, actual.Content)
 		builder := strings.Builder{}
-		err := actual.InnerFlex[0].Render(context.Background(), &builder)
+		err := actual.Content.Render(context.Background(), &builder)
 		assert.NoError(t, err)
-		expectedHtml := `<div class="text"><markupobject>test</markupobject></div>`
+		expectedHtml := `<div class="flex"><div class="text"><markupobject>test</markupobject></div></div>`
 		assert.Equal(t, expectedHtml, builder.String())
 	})
 	t.Run("anytype object mention in markdown", func(t *testing.T) {
 		// given
 		r := Renderer{}
-		expected := &TextRenderParams{
-			Classes:     "block blockText textParagraph align0",
+		expected := &BlockParams{
+			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
 			ChildrenIds: nil,
 		}
 		pbFiles := map[string]*pb.SnapshotWithType{
@@ -136,7 +136,7 @@ func TestMakeRenderText(t *testing.T) {
 		r.CachedPbFiles = pbFiles
 
 		// when
-		actual := r.MakeRenderTextParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
+		actual := r.makeTextBlockParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
 			Text:  "test",
 			Style: 0,
 			Marks: &model.BlockContentTextMarks{
@@ -156,11 +156,11 @@ func TestMakeRenderText(t *testing.T) {
 		// then
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
-		assert.Len(t, actual.InnerFlex, 1)
+		assert.NotNil(t, actual.Content, 1)
 		builder := strings.Builder{}
-		err := actual.InnerFlex[0].Render(context.Background(), &builder)
+		err := actual.Content.Render(context.Background(), &builder)
 		assert.NoError(t, err)
-		expectedHtml := `<div class="text"><a href=anytype://object?objectId=anytypeId&spaceId=spaceId target="_blank" class="markupmention withImage"><span class="smile"><div class="iconObject withDefault c20"><img src="/img/icon/default/page.svg" class="iconCommon c18"></div></span><img src="./static/img/space.svg" class="space" /><span class="name">test</span></a></div>`
+		expectedHtml := `<div class="flex"><div class="text"><a href=anytype://object?objectId=anytypeId&spaceId=spaceId target="_blank" class="markupmention withImage"><span class="smile"><div class="iconObject withDefault c20"><img src="/img/icon/default/page.svg" class="iconCommon c18"></div></span><img src="./static/img/space.svg" class="space" /><span class="name">test</span></a></div></div>`
 		assert.Equal(t, expectedHtml, builder.String())
 	})
 }

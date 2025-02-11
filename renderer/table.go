@@ -28,7 +28,7 @@ type RenderTableRowCellParams struct {
 	TextComp templ.Component
 }
 
-func (r *Renderer) MakeRenderTableParams(b *model.Block) *BlockParams {
+func (r *Renderer) makeTableBlockParams(b *model.Block) *BlockParams {
 	var columnSizes []string
 	columns := r.BlocksById[b.ChildrenIds[0]]
 
@@ -62,11 +62,12 @@ func (r *Renderer) MakeRenderTableParams(b *model.Block) *BlockParams {
 			}),
 		},
 	})
+	blockParams.ChildrenIds = nil
 	return blockParams
 }
 
 func (r *Renderer) RenderTable(b *model.Block) templ.Component {
-	params := r.MakeRenderTableParams(b)
+	params := r.makeTableBlockParams(b)
 	return BlockTemplate(r, params)
 }
 

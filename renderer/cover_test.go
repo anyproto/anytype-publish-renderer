@@ -15,7 +15,7 @@ func TestMakeRenderCoverParams(t *testing.T) {
 			Src:     "../test_snapshots/Anytype.WebPublish.20241217.112212.67/files/640px-anatomy_of_a_sunset-2.webp",
 		}
 
-		actual, err := r.MakeRenderPageCoverParams()
+		actual, err := r.makeRenderPageCoverParams()
 		if assert.NoError(t, err) {
 			assert.Equal(t, expected.Id, actual.Id)
 			assert.Equal(t, expected.Classes, actual.Classes)
@@ -31,7 +31,7 @@ func TestMakeRenderCoverParams(t *testing.T) {
 			CoverType: CoverType_Color,
 		}
 
-		actual, err := r.MakeRenderPageCoverParams()
+		actual, err := r.makeRenderPageCoverParams()
 		if assert.NoError(t, err) {
 			assert.Equal(t, expected.Id, actual.Id)
 			assert.Equal(t, expected.Classes, actual.Classes)
@@ -47,7 +47,7 @@ func TestMakeRenderCoverParams(t *testing.T) {
 			CoverType: CoverType_Gradient,
 		}
 
-		actual, err := r.MakeRenderPageCoverParams()
+		actual, err := r.makeRenderPageCoverParams()
 		if assert.NoError(t, err) {
 			assert.Equal(t, expected.Id, actual.Id)
 			assert.Equal(t, expected.Classes, actual.Classes)
