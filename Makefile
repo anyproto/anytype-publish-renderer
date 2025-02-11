@@ -20,13 +20,28 @@ setup-go:
 	@echo 'Setting up go modules...'
 	@go mod download
 
-fmt:
-	@echo 'Formatting with goimports...'
-	@goimports -w -l `find . -type f -name '*.go' -not -name '*_templ.go'`
-
 deps:
 	echo $(TEMPL_VER)
 	go install github.com/a-h/templ/cmd/templ@$(TEMPL_VER)
+	go install honnef.co/go/tools/cmd/staticcheck@latest
+
+GO_FILES_CMD = find . -type f -name '*.go' -not -name '*_templ.go'
+
+check-fmt:
+	@GO_FILES=$$($(GO_FILES_CMD)); \
+	GOIMPORTS_OUTPUT=$$(goimports -d -l $$GO_FILES); \
+	if [ -n "$$GOIMPORTS_OUTPUT" ]; then \
+		echo "The following files have improperly ordered imports. Please run 'make fmt' to fix them:"; \
+		echo "$$GOIMPORTS_OUTPUT"; \
+		exit 1; \
+	fi
+
+fmt:
+	@GO_FILES=$$($(GO_FILES_CMD)); \
+	goimports -w -l $$GO_FILES
+
+lint:
+	@staticcheck ./...
 
 build-templ:
 	templ generate -lazy

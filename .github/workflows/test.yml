@@ -39,6 +39,16 @@ jobs:
         run: |
           npm i
           make build
+      - name: check-fmt
+        run: |
+          make check-fmt
+      - name: lint
+        run: |
+          make check-fmt
+      - uses: dominikh/staticcheck-action@v1
+        with:
+          install-go: false
+          version: "latest"
       - name: Go test
         run: |
           make test
