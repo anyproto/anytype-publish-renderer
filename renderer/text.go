@@ -1,7 +1,6 @@
 package renderer
 
 import (
-	"cmp"
 	"fmt"
 	"html"
 	"regexp"
@@ -27,10 +26,6 @@ type TextRenderParams struct {
 	InnerFlex      []templ.Component
 	OuterFlex      []templ.Component
 	ChildrenIds    []string
-}
-
-func cmpMarks(a, b *model.BlockContentTextMark) int {
-	return cmp.Compare(a.Range.From, b.Range.From)
 }
 
 func emojiParam(t model.BlockContentTextStyle) int32 {

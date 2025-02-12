@@ -1,9 +1,10 @@
 package renderer
 
 import (
-	"github.com/gogo/protobuf/types"
 	"strings"
 	"time"
+
+	"github.com/gogo/protobuf/types"
 
 	"go.uber.org/zap"
 

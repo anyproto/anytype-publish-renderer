@@ -36,17 +36,17 @@ func (r *Renderer) MakeTableOfContentRenderParams(block *model.Block) *TableOfCo
 	return params
 }
 
-func (r *Renderer) getList () []templ.Component {
+func (r *Renderer) getList() []templ.Component {
 	blocks := r.traverseBlocks(r.BlocksById, r.Root.GetId(), false)
 	list := []templ.Component{}
-	styles := []model.BlockContentTextStyle{ model.BlockContentText_Header1, model.BlockContentText_Header2, model.BlockContentText_Header3 }
+	styles := []model.BlockContentTextStyle{model.BlockContentText_Header1, model.BlockContentText_Header2, model.BlockContentText_Header3}
 
 	hasH1 := false
 	hasH2 := false
 
 	for _, bl := range blocks {
 		text := bl.GetText()
-		
+
 		if text == nil {
 			continue
 		}
@@ -113,10 +113,10 @@ func (r *Renderer) traverseBlocks(blockMap map[string]*model.Block, blockID stri
 }
 
 func contains(arr []model.BlockContentTextStyle, target any) bool {
-    for _, v := range arr {
-        if v == target {
-            return true
-        }
-    }
-    return false
+	for _, v := range arr {
+		if v == target {
+			return true
+		}
+	}
+	return false
 }
