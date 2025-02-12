@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"net/url"
 	"path/filepath"
 	"strconv"
@@ -18,6 +19,7 @@ const defaultName = "Untitled"
 
 type RelationRenderSetting struct {
 	Key          string
+	Name         string
 	Featured     bool
 	LimitDisplay bool
 	Classes      []string
@@ -64,7 +66,12 @@ func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []temp
 		}
 		components = append(components, CellTemplate(params, listTemplate))
 	default:
-		components = append(components, CellTemplate(params, r.populateRelationValue(format, relationValue)))
+		params.Name = name
+		var component = r.populateRelationValue(params, format, relationValue)
+		if component == nil {
+			return components
+		}
+		components = append(components, CellTemplate(params, component))
 	}
 	return components
 }
@@ -128,7 +135,10 @@ func (r *Renderer) populateRelationListValue(format model.RelationFormat, relati
 	return nil
 }
 
-func (r *Renderer) populateRelationValue(format model.RelationFormat, relationValue *types.Value) templ.Component {
+func (r *Renderer) populateRelationValue(params *RelationRenderSetting, format model.RelationFormat, relationValue *types.Value) templ.Component {
+	if format != model.RelationFormat_checkbox && pbtypes.IsEmptyValue(relationValue) {
+		return nil
+	}
 	switch format {
 	case model.RelationFormat_shorttext, model.RelationFormat_longtext:
 		return NameTemplate("name", relationValue.GetStringValue())
@@ -140,7 +150,7 @@ func (r *Renderer) populateRelationValue(format model.RelationFormat, relationVa
 	case model.RelationFormat_date:
 		return NameTemplate("name", r.formatDate(relationValue.GetNumberValue()))
 	case model.RelationFormat_checkbox:
-		return r.generateCheckbox(relationValue.GetBoolValue())
+		return r.generateCheckbox(params, relationValue.GetBoolValue())
 	}
 	return nil
 }
@@ -203,11 +213,11 @@ func (r *Renderer) formatDate(timestamp float64) string {
 	return time.Unix(int64(timestamp), 0).Format("02 Jan 2006")
 }
 
-func (r *Renderer) generateCheckbox(checked bool) templ.Component {
+func (r *Renderer) generateCheckbox(params *RelationRenderSetting, checked bool) templ.Component {
 	if checked {
-		return ActiveCheckBoxTemplate()
+		return ActiveCheckBoxTemplate(params.Name, params.Featured)
 	}
-	return DisabledCheckBoxTemplate()
+	return DisabledCheckBoxTemplate(params.Name, params.Featured)
 }
 
 func (r *Renderer) generateSelectOptions(format model.RelationFormat, relationValue *types.Value) []templ.Component {
@@ -249,13 +259,12 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 			continue
 		}
 
-		spaceId := details.GetFields()[bundle.RelationKeySpaceId.String()].GetStringValue()
-		name := details.GetFields()[bundle.RelationKeyName.String()].GetStringValue()
+		name := getRelationField(details, bundle.RelationKeyName, relationToString)
 		if name == "" {
 			name = defaultName
 		}
 		icon := r.getIconFromDetails(details)
-		link := fmt.Sprintf(linkTemplate, objectId, spaceId)
+		link := r.getLinkByLayout(details, objectId)
 		elements = append(elements, ListElement(ObjectElement(name, templ.SafeURL(link)), icon))
 	}
 	return elements
@@ -273,7 +282,7 @@ func (r *Renderer) generateFileComponent(relationValue *types.Value) []templ.Com
 			continue
 		}
 		icon := r.createFileIcon(fileBlock)
-		elements = append(elements, ListElement(NameTemplate("name", filepath.Base(url)), icon))
+		elements = append(elements, ListElement(ObjectElement(filepath.Base(url), templ.URL(url)), icon))
 	}
 	return elements
 }

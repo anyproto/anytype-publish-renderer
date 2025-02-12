@@ -7,15 +7,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/jsonpb"
+	"github.com/gogo/protobuf/types"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
-	"github.com/anyproto/anytype-heart/util/pbtypes"
-	"github.com/gogo/protobuf/jsonpb"
-	"github.com/gogo/protobuf/types"
-
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-	"github.com/stretchr/testify/assert"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
 )
 
 func TestMakeRelationRenderParams_ShortText(t *testing.T) {
@@ -578,5 +578,57 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		err = params.Render(context.Background(), &builder)
 		assert.NoError(t, err)
 		assert.Equal(t, `<div class="sides"><div class="info"><div class="name">Tag Relation</div></div></div>`, builder.String())
+	})
+	t.Run("empty relation", func(t *testing.T) {
+		// given
+		relationKey := "text-relation"
+		r := &Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+
+		block := &model.Block{
+			Id: "text-value",
+			Content: &model.BlockContentOfRelation{
+				Relation: &model.BlockContentRelation{
+					Key: relationKey,
+				},
+			},
+		}
+
+		r.Sp = &pb.SnapshotWithType{
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						relationKey: pbtypes.String(""),
+					},
+				},
+			},
+			},
+		}
+
+		sn := &pb.SnapshotWithType{
+			SbType: model.SmartBlockType_STRelation,
+			Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+				Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("text-relation").URL()),
+						bundle.RelationKeyName.String():           pbtypes.String("Text Relation"),
+						bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_shorttext)),
+					},
+				},
+			}},
+		}
+		marshaler := jsonpb.Marshaler{}
+		json, err := marshaler.MarshalToString(sn)
+		assert.NoError(t, err)
+		r.UberSp.PbFiles[filepath.Join("relations", "text-relation.pb")] = json
+
+		// when
+		params := r.MakeRelationRenderParams(block)
+
+		// then
+		assert.NotNil(t, params)
+		builder := strings.Builder{}
+		err = params.Render(context.Background(), &builder)
+		assert.NoError(t, err)
+		assert.Equal(t, `<div class="sides"><div class="info"><div class="name">Text Relation</div></div></div>`, builder.String())
 	})
 }
