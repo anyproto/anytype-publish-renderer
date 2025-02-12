@@ -17,6 +17,10 @@ func isTodoLayout(layout model.ObjectTypeLayout) bool {
 	return layout == model.ObjectType_todo
 }
 
+func isBookmarkLayout(layout model.ObjectTypeLayout) bool {
+	return layout == model.ObjectType_bookmark
+}
+
 func isHumanLayout(layout model.ObjectTypeLayout) bool {
 	return layout == model.ObjectType_profile || layout == model.ObjectType_participant
 }
@@ -35,7 +39,7 @@ func (r *Renderer) RenderPageIconImage() templ.Component {
 	iconEmoji := getRelationField(details, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(details, bundle.RelationKeyIconImage, r.relationToFileUrl)
 
-	if isTodoLayout(layout) {
+	if isTodoLayout(layout) || isBookmarkLayout(layout) {
 		return NoneTemplate("")
 	}
 
