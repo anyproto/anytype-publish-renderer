@@ -13,11 +13,11 @@ import (
 )
 
 type RenderPageParams struct {
-	Classes     string
+	Classes       string
 	HeaderClasses string
-	Name        string
-	Description string
-	SpaceLink   templ.SafeURL
+	Name          string
+	Description   string
+	SpaceLink     templ.SafeURL
 }
 
 func (r *Renderer) hasPageIcon() bool {
@@ -99,11 +99,11 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	}
 
 	return &RenderPageParams{
-		Classes:     strings.Join(classes, " "),
+		Classes:       strings.Join(classes, " "),
 		HeaderClasses: strings.Join(headerClasses, " "),
-		Name:        name,
-		Description: descr,
-		SpaceLink:   spaceLink,
+		Name:          name,
+		Description:   descr,
+		SpaceLink:     spaceLink,
 	}
 }
 

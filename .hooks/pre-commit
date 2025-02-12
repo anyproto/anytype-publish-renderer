@@ -1,3 +1,2 @@
 #!/usr/bin/env sh
-make check-fmt
-make lint
+make check-fmt && make lint
