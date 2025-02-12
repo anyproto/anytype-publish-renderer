@@ -371,9 +371,10 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		}
 	case model.ObjectType_bookmark:
 		// TODO: should show image preview when we will have cropped images in snapshot
-		iconClasses = append(iconClasses, "iconFile")
-		iconName := "image"
-		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/file/%s.svg", iconName))
+		defaultIcon = "bookmark"
+		classes = append(classes, "withDefault")
+		iconClasses = append(iconClasses, "iconCommon")
+		src = r.getDefaultIconPath(defaultIcon)
 	case model.ObjectType_image:
 		// TODO: should show image preview when we will have cropped images in snapshot
 		fallthrough
