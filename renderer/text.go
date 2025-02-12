@@ -256,6 +256,10 @@ func (r *Renderer) MakeRenderTextParams(b *model.Block) (params *TextRenderParam
 		externalComp := BulletMarkerTemplate(color)
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Callout:
+		if iconEmoji == "" && iconImage == "" {
+			iconEmoji = "💡"
+		}
+
 		details := &types.Struct{
 			Fields: map[string]*types.Value{
 				bundle.RelationKeyIconEmoji.String(): pbtypes.String(iconEmoji),
