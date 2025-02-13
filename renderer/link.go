@@ -219,3 +219,19 @@ func (r *Renderer) RenderLink(b *model.Block) templ.Component {
 	params := r.makeLinkBlockParams(b)
 	return BlockTemplate(r, params)
 }
+
+func (r *Renderer) getLinkByLayout(details *types.Struct, targetObjectId string) string {
+	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	switch layout {
+	case model.ObjectType_file, model.ObjectType_image, model.ObjectType_pdf, model.ObjectType_audio, model.ObjectType_video:
+		src, err := r.getFileUrl(targetObjectId)
+		if err != nil {
+			log.Error("failed to get file url", zap.Error(err))
+			return ""
+		}
+		return src
+	default:
+		spaceId := getRelationField(details, bundle.RelationKeySpaceId, relationToString)
+		return fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
+	}
+}

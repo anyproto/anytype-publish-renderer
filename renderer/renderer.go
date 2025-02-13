@@ -145,6 +145,23 @@ func readUberSnapshot(path string) (uberSnapshot PublishingUberSnapshot, err err
 
 }
 
+//lint:ignore U1000 sometimes we want to use this for debugging
+func debugJsonSnapshot(snapshot pb.SnapshotWithType) error {
+	var snapshotJson []byte
+	snapshotJson, err := json.Marshal(snapshot)
+	if err != nil {
+		log.Error("failed to render snapshot.json", zap.Error(err))
+		return err
+	}
+
+	err = os.WriteFile("./snapshot.json", snapshotJson, 0644)
+	if err != nil {
+		log.Error("failed to write snapshot.json", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
 func (r *Renderer) maybeAddDebugCss() {
 	if isDebugCss := os.Getenv("ANYTYPE_PUBLISH_CSS_DEBUG"); isDebugCss != "" {
 		r.Config.HtmlClasses = append(r.Config.HtmlClasses, "debug")

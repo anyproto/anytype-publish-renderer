@@ -23,17 +23,17 @@ type EmbedIframeData struct {
 	Processor         model.BlockContentLatexProcessor
 	ClassName         string
 	BlockId           string
-	Js 			 	  string
-	Html 			  string
+	Js                string
+	Html              string
 }
 
 type EmbedRenderParams struct {
-	Id        string
-	Classes   string
-	Content   string
-	Data      EmbedIframeData
-	IsIframe  bool
-	Sandbox   string
+	Id       string
+	Classes  string
+	Content  string
+	Data     EmbedIframeData
+	IsIframe bool
+	Sandbox  string
 }
 
 type JsSVGString struct {
@@ -71,105 +71,105 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 	sandbox := []string{}
 
 	if bgColor != "" {
-		classes = append(classes, "bgColor", "bgColor-" + bgColor)
+		classes = append(classes, "bgColor", "bgColor-"+bgColor)
 	}
 
 	switch processor {
-		default:
-			isIframe = true
-			allowIframeResize := allowIframeResize(processor)
-			allowScript := false
-			sandbox = append(sandbox, "allow-scripts", "allow-same-origin", "allow-popups")
+	default:
+		isIframe = true
+		allowIframeResize := allowIframeResize(processor)
+		allowScript := false
+		sandbox = append(sandbox, "allow-scripts", "allow-same-origin", "allow-popups")
 
-			if allowPresentation(processor) {
-				sandbox = append(sandbox, "allow-presentation")
+		if allowPresentation(processor) {
+			sandbox = append(sandbox, "allow-presentation")
+		}
+
+		if allowPopup(processor) {
+			sandbox = append(sandbox, "allow-popups")
+		}
+
+		data.AllowIframeResize = allowIframeResize
+		data.InsertBeforeLoad = insertBeforeLoad(processor)
+		data.UseRootHeight = useRootHeight(processor)
+		data.Align = align
+		data.Processor = processor
+		data.ClassName = embedClass
+		data.BlockId = id
+
+		// Fix Bilibili schemeless URLs and autoplay
+		if processor == model.BlockContentLatex_Bilibili {
+			reSrc := regexp.MustCompile(`src="(//player[^"]+)"`)
+			text = reSrc.ReplaceAllString(text, `src="https:$1"`)
+
+			reAutoplay := regexp.MustCompile(`autoplay=`)
+			if !reAutoplay.MatchString(text) {
+				reInsertAutoplay := regexp.MustCompile(`(src="[^"]+)`)
+				text = reInsertAutoplay.ReplaceAllString(text, `$1&autoplay=0`)
 			}
+		}
 
-			if allowPopup(processor) {
-				sandbox = append(sandbox, "allow-popups")
+		// Convert Kroki code into an SVG URL
+		if processor == model.BlockContentLatex_Kroki && !strings.HasPrefix(text, "https://kroki.io") {
+			compressed, err := compressAndEncode(text)
+
+			if err == nil {
+				typeId := pbtypes.GetString(b.GetFields(), "type")
+				text = fmt.Sprintf("https://kroki.io/%s/svg/%s", typeId, compressed)
 			}
+		}
 
-			data.AllowIframeResize = allowIframeResize
-			data.InsertBeforeLoad = insertBeforeLoad(processor)
-			data.UseRootHeight = useRootHeight(processor)
-			data.Align = align
-			data.Processor = processor
-			data.ClassName = embedClass	
-			data.BlockId = id
+		// Process embedded content
+		if allowEmbedUrl(processor) && !regexp.MustCompile(`<iframe|script`).MatchString(text) {
+			text = getHtml(processor, getParsedUrl(text))
+		}
 
-			// Fix Bilibili schemeless URLs and autoplay
-			if processor == model.BlockContentLatex_Bilibili {
-				reSrc := regexp.MustCompile(`src="(//player[^"]+)"`)
-				text = reSrc.ReplaceAllString(text, `src="https:$1"`)
-
-				reAutoplay := regexp.MustCompile(`autoplay=`)
-				if !reAutoplay.MatchString(text) {
-					reInsertAutoplay := regexp.MustCompile(`(src="[^"]+)`)
-					text = reInsertAutoplay.ReplaceAllString(text, `$1&autoplay=0`)
-				}
+		// Sketchfab embed handling
+		if processor == model.BlockContentLatex_Sketchfab && regexp.MustCompile(`<iframe|script`).MatchString(text) {
+			iframeMatch := regexp.MustCompile(`<iframe.*?</iframe>`).FindString(text)
+			if iframeMatch != "" {
+				text = iframeMatch
 			}
+		}
 
-			// Convert Kroki code into an SVG URL
-			if processor == model.BlockContentLatex_Kroki && !strings.HasPrefix(text, "https://kroki.io") {
-				compressed, err := compressAndEncode(text)
+		// Check if script tags should be allowed
+		if processor == model.BlockContentLatex_GithubGist {
+			allowScript = true
+		}
 
-				if err == nil {
-					typeId := pbtypes.GetString(b.GetFields(), "type")
-					text = fmt.Sprintf("https://kroki.io/%s/svg/%s", typeId, compressed)
-				}
-			}
+		// Telegram embed handling
+		if processor == model.BlockContentLatex_Telegram {
+			allowScript = true
+		}
 
-			// Process embedded content
-			if allowEmbedUrl(processor) && !regexp.MustCompile(`<iframe|script`).MatchString(text) {
-				text = getHtml(processor, getParsedUrl(text))
-			}
+		if !allowScript {
+			text = regexp.MustCompile(`<script`).ReplaceAllString(text, "&lt;script")
+		}
 
-			// Sketchfab embed handling
-			if processor == model.BlockContentLatex_Sketchfab && regexp.MustCompile(`<iframe|script`).MatchString(text) {
-				iframeMatch := regexp.MustCompile(`<iframe.*?</iframe>`).FindString(text)
-				if iframeMatch != "" {
-					text = iframeMatch
-				}
-			}
+		// Update sanitization parameters
+		if allowJs(processor) {
+			data.Js = text
+		} else {
+			data.Html = text
+		}
 
-			// Check if script tags should be allowed
-			if processor == model.BlockContentLatex_GithubGist {
-				allowScript = true
-			}
+	case model.BlockContentLatex_Latex:
+		break
 
-			// Telegram embed handling
-			if processor == model.BlockContentLatex_Telegram {
-				allowScript = true
-			}
+	case model.BlockContentLatex_Mermaid:
+		text = fmt.Sprintf(`<div class="mermaidChart">%s</div>`, text)
 
-			if !allowScript {
-				text = regexp.MustCompile(`<script`).ReplaceAllString(text, "&lt;script")
-			}
-
-			// Update sanitization parameters
-			if allowJs(processor) {
-				data.Js = text
-			} else {
-				data.Html = text
-			}
-
-		case model.BlockContentLatex_Latex:
-			break
-
-		case model.BlockContentLatex_Mermaid:
-			text = fmt.Sprintf(`<div class="mermaidChart">%s</div>`, text)
-
-		case model.BlockContentLatex_Graphviz:
-			break
+	case model.BlockContentLatex_Graphviz:
+		break
 	}
 
 	return &EmbedRenderParams{
-		Id:      b.Id,
-		Classes: strings.Join(classes, " "),
-		Content: text,
-		Data:    data,
+		Id:       b.Id,
+		Classes:  strings.Join(classes, " "),
+		Content:  text,
+		Data:     data,
 		IsIframe: isIframe,
-		Sandbox: strings.Join(sandbox, " "),
+		Sandbox:  strings.Join(sandbox, " "),
 	}
 }
 
@@ -299,7 +299,6 @@ func extractSketchfabId(inputUrl string) string {
 	}
 	return nameParts[len(nameParts)-1]
 }
-
 
 func getHtml(processor model.BlockContentLatexProcessor, content string) string {
 	fnName := fmt.Sprintf("Get%sHtml", processor.String())

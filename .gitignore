@@ -4,3 +4,4 @@
 node_modules/
 static/js/build/
 static/js/loader.js
+test_snapshots

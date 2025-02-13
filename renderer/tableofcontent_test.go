@@ -2,11 +2,11 @@ package renderer
 
 import (
 	"context"
+	"testing"
+
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/stretchr/testify/assert"
-	"strings"
-	"testing"
 )
 
 func TestMakeTableOfContentRenderParams(t *testing.T) {

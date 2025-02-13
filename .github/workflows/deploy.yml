@@ -1,4 +1,4 @@
-name: Deploy static on AWS S3 | Stage
+name: Deploy static on AWS S3
 
 on:
   workflow_dispatch:
@@ -58,8 +58,7 @@ jobs:
 
       - name: Compress static files
         run: |
-          for file in static/*.{js,css}; do
-            [ -f "$file" ] || continue
+          find static/ -type f \( -name "*.js" -o -name "*.css" \) | while read -r file; do
             gzip -k -9 "$file"
             brotli -k -q 11 "$file"
           done
@@ -79,15 +78,26 @@ jobs:
             echo "AWS_REGION=eu-central-1" >> $GITHUB_ENV
           fi
 
-      - name: Setup s3cmd
-        uses: s3-actions/s3cmd@v1.9.0
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          access_key: ${{ env.AWS_KEY_ID }}
-          secret_key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          region: ${{ env.AWS_REGION }}
-          provider: aws
+          aws-access-key-id: ${{ env.AWS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Upload static on AWS S3
+      - name: Deploy static site to S3 bucket
+        run: aws s3 sync static/ s3://$S3_BUCKET/static/ --delete --region $AWS_REGION
+
+      - name: Set content-encoding for js.gz files
         run: |
-          s3cmd sync --recursive ./static/ s3://$S3_BUCKET/static/
-          s3cmd info s3://anytype-stage1-publishserver/static/
+          aws s3 ls s3://$S3_BUCKET/static/ --recursive | awk '{print $4}' | grep '\.js\.gz$' | while read file; do
+            aws s3 cp "s3://$S3_BUCKET/$file" "s3://$S3_BUCKET/$file" \
+              --content-type "application/javascript" \
+              --content-encoding gzip \
+              --metadata-directive REPLACE \
+              --region $AWS_REGION
+          done
+
+      - name: Verify uploaded files
+        run: |
+          aws s3 ls s3://$S3_BUCKET/static/ --region $AWS_REGION

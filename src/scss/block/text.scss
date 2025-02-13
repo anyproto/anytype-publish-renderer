@@ -46,8 +46,8 @@
 		}
 	}
 }
-.block.blockText.bgColor {
-	> .content { padding-left: 2px; padding-right: 2px; }
+.block.blockText {
+	> .content.bgColor { padding-left: 8px; padding-right: 8px; }
 }
 
 /* Title */

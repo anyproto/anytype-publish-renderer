@@ -1,10 +1,12 @@
 package renderer
 
 import (
-	"context"
 	"path/filepath"
-	"strings"
 	"testing"
+
+	"github.com/anyproto/anytype-heart/pb"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/gogo/protobuf/types"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/stretchr/testify/assert"
