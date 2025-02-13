@@ -46,7 +46,7 @@ func (r *Renderer) getDetailsFromBlock(bookmark *model.BlockContentBookmark) *ty
 }
 
 func (r *Renderer) getBookmarkBlockParams(b *model.Block, details *types.Struct) *BlockParams {
-	bookmarkUrl := getRelationField(details, bundle.RelationKeySource, relationToString)
+	bookmarkUrl := r.getBookmarkUrl(b, details)
 	if bookmarkUrl == "" {
 		return nil
 	}
@@ -67,6 +67,14 @@ func (r *Renderer) getBookmarkBlockParams(b *model.Block, details *types.Struct)
 	blockParams := makeDefaultBlockParams(b)
 	blockParams.Content = BookmarkLinkTemplate(templ.URL(bookmarkUrl), innerClasses, []templ.Component{sideLeft, sideRightComponents})
 	return blockParams
+}
+
+func (r *Renderer) getBookmarkUrl(b *model.Block, details *types.Struct) string {
+	bookmarkUrl := getRelationField(details, bundle.RelationKeySource, relationToString)
+	if bookmarkUrl == "" {
+		return b.GetBookmark().GetUrl()
+	}
+	return bookmarkUrl
 }
 
 func (r *Renderer) getSideLeftComponent(details *types.Struct, parsedUrl *url.URL) templ.Component {
