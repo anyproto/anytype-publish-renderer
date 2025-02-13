@@ -155,7 +155,11 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 					}},
 				},
 			},
-			expected: nil,
+			expected: &BlockParams{
+				Id:      "block3",
+				Classes: []string{"block", "align0", "blockBookmark"},
+			},
+			expectedHtml: `<a href="https://example.com" target="_blank" class="inner"><div class="side left"><div class="link">example.com</div><div class="name"></div><div class="descr"></div></div><div class="side right"></div></a>`,
 		},
 	}
 
