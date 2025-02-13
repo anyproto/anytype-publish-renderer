@@ -17,7 +17,7 @@ func (r *Renderer) makeTableOfContentBlockParams(block *model.Block) *BlockParam
 
 	color := block.GetBackgroundColor()
 	if color != "" {
-		blockParams.Classes = append(blockParams.Classes, fmt.Sprintf("bgColor bgColor-%s", color))
+		blockParams.ContentClasses = append(blockParams.ContentClasses, fmt.Sprintf("bgColor bgColor-%s", color))
 	}
 
 	blockParams.Content = BlocksWrapper(&BlockWrapperParams{Classes: []string{"wrap"}, Components: r.getList()})

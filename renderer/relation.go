@@ -266,7 +266,7 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 			name = defaultName
 		}
 		icon := r.getIconFromDetails(details)
-		link := makeAnytypeLink(details, objectId)
+		link := r.makeAnytypeLink(details, objectId)
 		elements = append(elements, ListElement(ObjectElement(name, templ.SafeURL(link)), icon))
 	}
 	return elements

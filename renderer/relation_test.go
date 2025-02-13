@@ -622,7 +622,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("relations", "text-relation.pb")] = json
 
 		// when
-		params := r.MakeRelationRenderParams(block)
+		params := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, params)

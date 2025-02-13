@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/anyproto/anytype-heart/pb"
@@ -36,7 +37,8 @@ func TestMakeTableOfContentRenderParams(t *testing.T) {
 		params := renderer.makeTableOfContentBlockParams(block)
 
 		// then
-		assert.Equal(t, []string{"block", "align0", "blockTableOfContents", "bgColor bgColor-red"}, params.Classes)
+		assert.Equal(t, []string{"block", "align0", "blockTableOfContents"}, params.Classes)
+		assert.Equal(t, []string{"bgColor bgColor-red"}, params.ContentClasses)
 	})
 
 	t.Run("with headers", func(t *testing.T) {

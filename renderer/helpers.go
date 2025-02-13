@@ -21,7 +21,7 @@ func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
 }
 
 type relType interface {
-	string | bool | model.ObjectTypeLayout | model.RelationFormat
+	string | bool | int64 | model.ObjectTypeLayout | model.RelationFormat
 }
 
 type relTransformer[V relType] func(*types.Value) V
@@ -77,6 +77,14 @@ func relationToRelationFormat(format *types.Value) model.RelationFormat {
 	return model.RelationFormat_longtext
 }
 
+func relationToInt64(field *types.Value) int64 {
+	var null int64
+	if field != nil {
+		return int64(field.GetNumberValue())
+	}
+	return null
+}
+
 func getRelationField[V relType](targetDetails *types.Struct, relationKey domain.RelationKey, tr relTransformer[V]) V {
 	var null V
 	if f, ok := targetDetails.GetFields()[relationKey.String()]; ok {
@@ -86,10 +94,20 @@ func getRelationField[V relType](targetDetails *types.Struct, relationKey domain
 	return null
 }
 
-func makeAnytypeLink(targetDetails *types.Struct, targetObjectId string) string {
-	spaceId := getRelationField(targetDetails, bundle.RelationKeySpaceId, relationToString)
-	link := fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
-	return link
+func (r *Renderer) makeAnytypeLink(targetDetails *types.Struct, targetObjectId string) string {
+	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	switch layout {
+	case model.ObjectType_file, model.ObjectType_image, model.ObjectType_pdf, model.ObjectType_audio, model.ObjectType_video:
+		src, err := r.getFileUrl(targetObjectId)
+		if err != nil {
+			log.Error("failed to get file url", zap.Error(err))
+			return ""
+		}
+		return src
+	default:
+		spaceId := getRelationField(targetDetails, bundle.RelationKeySpaceId, relationToString)
+		return fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
+	}
 }
 
 func getLayoutClass(layout model.ObjectTypeLayout) string {

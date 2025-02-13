@@ -81,7 +81,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 			if iconHtml != "" {
 				class = "withImage"
 			}
-			link = makeAnytypeLink(details, mark.Param)
+			link = r.makeAnytypeLink(details, mark.Param)
 		}
 
 		return `<a href=` + link + ` target="_blank" class="markupmention ` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><span class="name">` + s + `</span></a>`
@@ -101,7 +101,7 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		if details == nil || len(details.Fields) == 0 {
 			return "<markupobject>" + s + "</markupobject>"
 		}
-		link := makeAnytypeLink(details, mark.Param)
+		link := r.makeAnytypeLink(details, mark.Param)
 		return fmt.Sprintf(`<a href="%s" class="markuplink" target="_blank">`, link) + s + "</a>"
 	}
 

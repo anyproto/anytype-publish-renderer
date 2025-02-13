@@ -67,7 +67,7 @@ func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
 	blockParams := makeDefaultBlockParams(block)
 	color := block.GetBackgroundColor()
 	if color != "" {
-		blockParams.Classes = append(blockParams.Classes, fmt.Sprintf("bgColor bgColor-%s", color))
+		blockParams.ContentClasses = append(blockParams.ContentClasses, fmt.Sprintf("bgColor bgColor-%s", color))
 	}
 	params := r.makeFeaturedRelationsComponent()
 	if params == nil {

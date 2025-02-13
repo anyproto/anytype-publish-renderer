@@ -13,13 +13,6 @@ import (
 
 func (r *Renderer) makeBookmarkBlockParams(b *model.Block) *BlockParams {
 	bookmark := b.GetBookmark()
-	bgColor := b.GetBackgroundColor()
-	classes := []string{"block", "blockBookmark"}
-	innerClasses := []string{"inner"}
-
-	if bgColor != "" {
-		innerClasses = append(innerClasses, "bgColor", "bgColor-"+bgColor)
-	}
 
 	if bookmark.GetUrl() == "" {
 		return nil
