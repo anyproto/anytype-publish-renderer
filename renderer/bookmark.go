@@ -9,35 +9,52 @@ import (
 
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
 )
 
 func (r *Renderer) makeBookmarkBlockParams(b *model.Block) *BlockParams {
 	bookmark := b.GetBookmark()
 
-	if bookmark.GetUrl() == "" {
-		return nil
-	}
+	details := r.getBookmarkDetails(bookmark)
+	return r.getBookmarkBlockParams(b, details)
+}
 
+func (r *Renderer) getBookmarkDetails(bookmark *model.BlockContentBookmark) *types.Struct {
 	targetObjectId := bookmark.GetTargetObjectId()
 	targetBookmark := r.getObjectSnapshot(targetObjectId)
 	if targetBookmark == nil {
-		return nil
+		// fallback to old logic with block
+		return r.getDetailsFromBlock(bookmark)
 	}
 
 	details := targetBookmark.GetSnapshot().GetData().GetDetails()
 	if details == nil || len(details.GetFields()) == 0 {
+		// fallback to old logic with block
+		return r.getDetailsFromBlock(bookmark)
+	}
+	return details
+}
+
+func (r *Renderer) getDetailsFromBlock(bookmark *model.BlockContentBookmark) *types.Struct {
+	return &types.Struct{Fields: map[string]*types.Value{
+		bundle.RelationKeyIconImage.String():   pbtypes.String(bookmark.GetFaviconHash()),
+		bundle.RelationKeyPicture.String():     pbtypes.String(bookmark.GetImageHash()),
+		bundle.RelationKeyDescription.String(): pbtypes.String(bookmark.GetDescription()),
+		bundle.RelationKeyName.String():        pbtypes.String(bookmark.GetTitle()),
+		bundle.RelationKeySource.String():      pbtypes.String(bookmark.GetUrl()),
+	}}
+}
+
+func (r *Renderer) getBookmarkBlockParams(b *model.Block, details *types.Struct) *BlockParams {
+	bookmarkUrl := getRelationField(details, bundle.RelationKeySource, relationToString)
+	if bookmarkUrl == "" {
 		return nil
 	}
-
-	parsedUrl, err := url.Parse(bookmark.GetUrl())
+	parsedUrl, err := url.Parse(bookmarkUrl)
 	if err != nil {
 		log.Error("failed to parse bookmark url", zap.Error(err))
 		return nil
 	}
-	return r.getBookmarkBlockParams(b, details, parsedUrl)
-}
-
-func (r *Renderer) getBookmarkBlockParams(b *model.Block, details *types.Struct, parsedUrl *url.URL) *BlockParams {
 	bgColor := b.GetBackgroundColor()
 	innerClasses := []string{"inner"}
 
@@ -48,7 +65,7 @@ func (r *Renderer) getBookmarkBlockParams(b *model.Block, details *types.Struct,
 	sideLeft := r.getSideLeftComponent(details, parsedUrl)
 	sideRightComponents, innerClasses := r.getSideRightComponent(details, innerClasses)
 	blockParams := makeDefaultBlockParams(b)
-	blockParams.Content = BookmarkLinkTemplate(templ.URL(b.GetBookmark().GetUrl()), innerClasses, []templ.Component{sideLeft, sideRightComponents})
+	blockParams.Content = BookmarkLinkTemplate(templ.URL(bookmarkUrl), innerClasses, []templ.Component{sideLeft, sideRightComponents})
 	return blockParams
 }
 
