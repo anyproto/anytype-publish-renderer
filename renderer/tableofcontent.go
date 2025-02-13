@@ -7,42 +7,29 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 )
 
-type TableOfContentRenderParams struct {
-	Id              string
-	BackgroundColor string
-	Items           []templ.Component
-	IsEmpty         bool
-}
-
 type childBlock struct {
 	*model.Block
 	isChild bool
 }
 
-func (r *Renderer) MakeTableOfContentRenderParams(block *model.Block) *TableOfContentRenderParams {
-	blockId := block.GetId()
-	params := &TableOfContentRenderParams{
-		Id: blockId,
-	}
+func (r *Renderer) makeTableOfContentBlockParams(block *model.Block) *BlockParams {
+	blockParams := makeDefaultBlockParams(block)
+
 	color := block.GetBackgroundColor()
 	if color != "" {
-		params.BackgroundColor = fmt.Sprintf("bgColor bgColor-%s", color)
+		blockParams.ContentClasses = append(blockParams.ContentClasses, fmt.Sprintf("bgColor bgColor-%s", color))
 	}
 
-	params.Items = r.getList()
-	if len(params.Items) == 0 {
-		params.IsEmpty = true
-	}
-	return params
+	blockParams.Content = BlocksWrapper(&BlockWrapperParams{Classes: []string{"wrap"}, Components: r.getList()})
+	return blockParams
 }
 
 func (r *Renderer) getList() []templ.Component {
 	blocks := r.traverseBlocks(r.BlocksById, r.Root.GetId(), false)
-	list := []templ.Component{}
+	var list []templ.Component
 	styles := []model.BlockContentTextStyle{model.BlockContentText_Header1, model.BlockContentText_Header2, model.BlockContentText_Header3}
 
-	hasH1 := false
-	hasH2 := false
+	var hasH1, hasH2 bool
 
 	for _, bl := range blocks {
 		text := bl.GetText()
@@ -97,8 +84,8 @@ func (r *Renderer) getHeadingName(b *model.Block) string {
 }
 
 func (r *Renderer) RenderTableOfContent(block *model.Block) templ.Component {
-	params := r.MakeTableOfContentRenderParams(block)
-	return TableOfContentTemplate(params)
+	params := r.makeTableOfContentBlockParams(block)
+	return BlockTemplate(r, params)
 }
 
 func (r *Renderer) traverseBlocks(blockMap map[string]*model.Block, blockID string, isChild bool) []*childBlock {

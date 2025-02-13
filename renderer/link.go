@@ -2,112 +2,140 @@ package renderer
 
 import (
 	"fmt"
-	"path/filepath"
-
 	"strings"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/types"
-	"go.uber.org/zap"
 )
 
-const linkTemplate = "anytype://object?objectId=%s&spaceId=%s"
-
 type LinkRenderParams struct {
-	Id             string
-	Classes        string
-	ContentClasses string
-	SidesClasses   string
-	CardClasses    string
-	IsDeleted      bool
-	IsArchived     string
-	Name           string
-	Description    string
-	Type           string
-	IconTemplate   templ.Component
-	CoverTemplate  templ.Component
-	Url            templ.SafeURL
+	Id           string
+	SidesClasses string
+	CardClasses  string
+	Url          templ.SafeURL
+	Components   []templ.Component
 }
 
-func (r *Renderer) MakeLinkRenderParams(b *model.Block) *LinkRenderParams {
+func (r *Renderer) makeLinkBlockParams(b *model.Block) *BlockParams {
+	blockParams, sidesClasses := r.fillContentClasses(b)
 	targetObjectId := b.GetLink().GetTargetBlockId()
 	targetDetails := r.findTargetDetails(targetObjectId)
-	if targetDetails == nil || len(targetDetails.Fields) == 0 {
-		return &LinkRenderParams{IsDeleted: true}
+	if targetDetails == nil || len(targetDetails.Fields) == 0 || getRelationField(targetDetails, bundle.RelationKeyIsDeleted, relationToBool) {
+		var icon templ.Component
+		icon, blockParams.Classes = r.getIconTemplate(targetDetails, 20, 20, blockParams.Classes)
+		blockParams.Content = DeletedLinkTemplate(icon)
+		return blockParams
 	}
+	archiveClass := r.fillArchiveClass(targetDetails, b.GetLink().GetCardStyle(), blockParams)
+	cardClasses := r.fillLayoutClass(targetDetails)
 
-	linkTypeClass := strings.ToLower(b.GetLink().GetCardStyle().String())
+	name := getNameValue(targetDetails, bundle.RelationKeyName.String(), defaultName)
 	description := getDescription(b, targetDetails)
-	if isDeleted(targetDetails) {
-		return &LinkRenderParams{IsDeleted: true}
-	}
 
-	bgColor := b.GetBackgroundColor()
-	name := getFieldValue(targetDetails, bundle.RelationKeyName.String(), defaultName)
-	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
-	layoutClass := getLayoutClass(layout)
-	archiveClass := getArchiveClass(targetDetails)
+	iconTemplate, cardClasses := r.getIconComponent(b, targetDetails, cardClasses)
+
 	objectTypeName, coverTemplate := r.getAdditionalParams(b, targetDetails)
-	cardClasses := []string{"linkCard", layoutClass}
-	if coverTemplate != nil {
-		cardClasses = append(cardClasses, "withCover")
-	}
-	link := r.getLinkByLayout(targetDetails, targetObjectId)
-	classes := []string{linkTypeClass, archiveClass}
-	contentClasses := []string{"content"}
-	sidesClasses := []string{"sides"}
+	linkComponents, cardClasses := r.getLinkComponent(coverTemplate, iconTemplate, cardClasses, name, description, objectTypeName, archiveClass)
 
+	lp := &LinkRenderParams{
+		Id:           b.GetId(),
+		SidesClasses: strings.Join(sidesClasses, " "),
+		CardClasses:  strings.Join(cardClasses, " "),
+		Url:          templ.SafeURL(r.makeAnytypeLink(targetDetails, targetObjectId)),
+		Components:   linkComponents,
+	}
+	blockParams.Content = LinkTemplate(lp)
+	return blockParams
+}
+
+func (r *Renderer) fillContentClasses(b *model.Block) (*BlockParams, []string) {
+	blockParams := makeDefaultBlockParams(b)
+	bgColor := b.GetBackgroundColor()
+	sidesClasses := []string{"sides"}
 	if bgColor != "" {
 		sidesClasses = append(sidesClasses, "withBgColor")
-		contentClasses = append(contentClasses, "bgColor", "bgColor-"+bgColor)
+		blockParams.ContentClasses = append(blockParams.ContentClasses, "bgColor", "bgColor-"+bgColor)
 	}
+	return blockParams, sidesClasses
+}
 
+func (r *Renderer) fillArchiveClass(targetDetails *types.Struct, style model.BlockContentLinkCardStyle, blockParams *BlockParams) string {
+	blockParams.Classes = append(blockParams.Classes, strings.ToLower(style.String()))
+	archiveClass := getArchiveClass(targetDetails)
+	if archiveClass != "" {
+		blockParams.Classes = append(blockParams.Classes, archiveClass)
+	}
+	return archiveClass
+}
+
+func (r *Renderer) fillLayoutClass(targetDetails *types.Struct) []string {
+	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	layoutClass := getLayoutClass(layout)
+	cardClasses := []string{"linkCard", layoutClass}
+	return cardClasses
+}
+
+func (r *Renderer) getIconComponent(b *model.Block, targetDetails *types.Struct, cardClasses []string) (templ.Component, []string) {
 	size, iconSize := getLinkIconSize(b)
 
 	iconTemplate := NoneTemplate("")
 
 	if size != 0 {
-		params := r.MakeRenderIconObjectParams(targetDetails, &IconObjectProps{
-			Size:     int32(size),
-			IconSize: int32(iconSize),
-		})
-		iconTemplate = IconObjectTemplate(r, params)
-
-		if iconTemplate != nil {
-			cardClasses = append(cardClasses, "withIcon", fmt.Sprintf("c%d", size))
-		}
+		return r.getIconTemplate(targetDetails, size, iconSize, cardClasses)
 	}
+	return iconTemplate, cardClasses
+}
 
+func (r *Renderer) getIconTemplate(targetDetails *types.Struct, size, iconSize int, cardClasses []string) (templ.Component, []string) {
+	params := r.MakeRenderIconObjectParams(targetDetails, &IconObjectProps{
+		Size:     int32(size),
+		IconSize: int32(iconSize),
+	})
+	iconTemplate := IconObjectTemplate(r, params)
+
+	if iconTemplate != nil {
+		cardClasses = append(cardClasses, "withIcon", fmt.Sprintf("c%d", size))
+	}
+	return iconTemplate, cardClasses
+}
+
+func (r *Renderer) getLinkComponent(coverTemplate, iconTemplate templ.Component, cardClasses []string, name, description, objectTypeName, archiveClass string) ([]templ.Component, []string) {
+	var cardComponents, sideLeftComponents, sideRightComponents []templ.Component
 	if coverTemplate != nil {
 		cardClasses = append(cardClasses, "withCover")
+		sideRightComponents = append(sideRightComponents, BlocksWrapper(&BlockWrapperParams{
+			Classes:    []string{"side right"},
+			Components: []templ.Component{coverTemplate},
+		}))
 	}
-
+	cardComponents = append(cardComponents, iconTemplate, BasicTemplate("name", name))
+	if archiveClass != "" {
+		cardComponents = append(cardComponents, ArchivedLinkTemplate())
+	}
+	sideLeftComponents = append(sideLeftComponents, BlocksWrapper(&BlockWrapperParams{
+		Classes:    []string{"cardName"},
+		Components: cardComponents,
+	}))
 	n := 1
 	if description != "" {
 		n++
+		sideLeftComponents = append(sideLeftComponents, LinkItemTemplate("cardDescription", "description", description))
 	}
 	if objectTypeName != "" {
 		n++
+		sideLeftComponents = append(sideLeftComponents, LinkItemTemplate("cardType", "item", objectTypeName))
 	}
-
 	cardClasses = append(cardClasses, fmt.Sprintf("c%d", n))
-
-	return &LinkRenderParams{
-		Id:             b.GetId(),
-		Classes:        strings.Join(classes, " "),
-		ContentClasses: strings.Join(contentClasses, " "),
-		SidesClasses:   strings.Join(sidesClasses, " "),
-		CardClasses:    strings.Join(cardClasses, " "),
-		IsArchived:     archiveClass,
-		Name:           name,
-		Description:    description,
-		Type:           objectTypeName,
-		Url:            templ.SafeURL(link),
-		CoverTemplate:  coverTemplate,
-		IconTemplate:   iconTemplate,
+	linkComponents := []templ.Component{
+		BlocksWrapper(&BlockWrapperParams{
+			Classes:    []string{"side left"},
+			Components: sideLeftComponents,
+		}),
 	}
+	linkComponents = append(linkComponents, sideRightComponents...)
+	return linkComponents, cardClasses
 }
 
 func getDescription(b *model.Block, details *types.Struct) string {
@@ -129,12 +157,7 @@ func getDescription(b *model.Block, details *types.Struct) string {
 	return ""
 }
 
-func isDeleted(details *types.Struct) bool {
-	deletedValue := details.GetFields()[bundle.RelationKeyIsDeleted.String()]
-	return deletedValue != nil && deletedValue.GetBoolValue()
-}
-
-func getFieldValue(details *types.Struct, key, defaultValue string) string {
+func getNameValue(details *types.Struct, key, defaultValue string) string {
 	value := details.GetFields()[key]
 	if value == nil || value.GetStringValue() == "" {
 		return defaultValue
@@ -148,23 +171,6 @@ func getArchiveClass(details *types.Struct) string {
 		return "isArchived"
 	}
 	return ""
-}
-
-func getLayoutClass(layout model.ObjectTypeLayout) string {
-	switch layout {
-	case model.ObjectType_participant:
-		return "isParticipant"
-	case model.ObjectType_profile:
-		return "isHuman"
-	case model.ObjectType_todo:
-		return "isTask"
-	case model.ObjectType_collection:
-		return "isCollection"
-	case model.ObjectType_set:
-		return "isSet"
-	default:
-		return "isPage"
-	}
 }
 
 func getLinkIconSize(b *model.Block) (int, int) {
@@ -190,13 +196,12 @@ func getLinkIconSize(b *model.Block) (int, int) {
 func (r *Renderer) getAdditionalParams(b *model.Block, details *types.Struct) (objectTypeName string, coverTemplate templ.Component) {
 	for _, relation := range b.GetLink().GetRelations() {
 		if relation == bundle.RelationKeyType.String() {
-			objectType := details.GetFields()[bundle.RelationKeyType.String()].GetStringValue()
-			snapshot, err := r.ReadJsonpbSnapshot(filepath.Join("types", objectType+".pb"))
-			if err != nil {
-				log.Error("failed to read jsonpb snapshot", zap.Error(err))
+			objectType := getRelationField(details, bundle.RelationKeyType, relationToString)
+			snapshot := r.getObjectSnapshot(objectType)
+			if snapshot == nil {
 				continue
 			}
-			objectTypeName = snapshot.GetSnapshot().GetData().GetDetails().GetFields()[bundle.RelationKeyName.String()].GetStringValue()
+			objectTypeName = getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyName, relationToString)
 		}
 
 		if relation == "cover" {
@@ -211,22 +216,6 @@ func (r *Renderer) getAdditionalParams(b *model.Block, details *types.Struct) (o
 }
 
 func (r *Renderer) RenderLink(b *model.Block) templ.Component {
-	params := r.MakeLinkRenderParams(b)
-	return LinkTempl(params)
-}
-
-func (r *Renderer) getLinkByLayout(details *types.Struct, targetObjectId string) string {
-	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
-	switch layout {
-	case model.ObjectType_file, model.ObjectType_image, model.ObjectType_pdf, model.ObjectType_audio, model.ObjectType_video:
-		src, err := r.getFileUrl(targetObjectId)
-		if err != nil {
-			log.Error("failed to get file url", zap.Error(err))
-			return ""
-		}
-		return src
-	default:
-		spaceId := getRelationField(details, bundle.RelationKeySpaceId, relationToString)
-		return fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
-	}
+	params := r.makeLinkBlockParams(b)
+	return BlockTemplate(r, params)
 }

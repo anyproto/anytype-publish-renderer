@@ -21,7 +21,7 @@ func TestMakeFeaturedRelationsComponent(t *testing.T) {
 		r := &Renderer{Sp: &pb.SnapshotWithType{Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{}}}}
 
 		// when
-		result := r.MakeFeaturedRelationsComponent()
+		result := r.makeFeaturedRelationsComponent()
 
 		// then
 		assert.Nil(t, result)
@@ -32,7 +32,7 @@ func TestMakeFeaturedRelationsComponent(t *testing.T) {
 		r := &Renderer{Sp: &pb.SnapshotWithType{Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{Fields: map[string]*types.Value{}}}}}}
 
 		// when
-		result := r.MakeFeaturedRelationsComponent()
+		result := r.makeFeaturedRelationsComponent()
 
 		// then
 		assert.Nil(t, result)
@@ -44,7 +44,7 @@ func TestMakeFeaturedRelationsComponent(t *testing.T) {
 		}}}}}}
 
 		// when
-		result := r.MakeFeaturedRelationsComponent()
+		result := r.makeFeaturedRelationsComponent()
 
 		// then
 		assert.Nil(t, result)
@@ -72,7 +72,7 @@ func TestMakeFeaturedRelationsComponent(t *testing.T) {
 		}
 
 		// when
-		result := r.MakeFeaturedRelationsComponent()
+		result := r.makeFeaturedRelationsComponent()
 
 		// then
 		assert.Nil(t, result)
@@ -130,7 +130,7 @@ func TestMakeFeaturedRelationsComponent(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("relations", "relation2.pb")] = json
 
 		// when
-		result := r.MakeFeaturedRelationsComponent()
+		result := r.makeFeaturedRelationsComponent()
 
 		// then
 		assert.NotNil(t, result)
@@ -167,7 +167,7 @@ func TestMakeFeaturedRelationsComponent(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("relations", "tag-relation.pb")] = json
 
 		// when
-		result := r.MakeFeaturedRelationsComponent()
+		result := r.makeFeaturedRelationsComponent()
 
 		// then
 		assert.Nil(t, result)

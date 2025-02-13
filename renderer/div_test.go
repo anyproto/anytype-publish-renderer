@@ -15,7 +15,7 @@ func TestMakeRenderDivParams(t *testing.T) {
 		Classes: []string{"block", "align0", "blockDiv", "divDot"},
 	}
 
-	actual := r.MakeRenderDivParams(divBlock)
+	actual := r.makeRenderDivParams(divBlock)
 
 	assert.Equal(t, expected.Id, actual.Id)
 	assert.Equal(t, expected.Classes, actual.Classes)

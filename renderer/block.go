@@ -52,12 +52,15 @@ func blockContentTypeToName(b *model.Block) string {
 }
 
 type BlockParams struct {
-	Id          string
-	BlockType   string
-	Classes     []string
-	Content     templ.Component
-	Additional  templ.Component
-	ChildrenIds []string
+	Id                string
+	BlockType         string
+	Classes           []string
+	ContentClasses    []string
+	AdditionalClasses []string
+	Content           templ.Component
+	Additional        templ.Component
+	ChildrenIds       []string
+	Width             string
 }
 
 type BlockWrapperParams struct {

@@ -1,9 +1,5 @@
 package renderer
 
-templ NameTemplate(class string, name string) {
-    <div class={ class }> { name } </div>
-}
-
 templ CellTemplate(params *RelationRenderSetting, component templ.Component) {
     <div class={"cell ", params.Classes}>
         <div class={"cellContent", params.Classes}>

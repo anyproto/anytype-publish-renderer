@@ -10,10 +10,11 @@ import (
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 
 	"github.com/a-h/templ"
+	"github.com/gogo/protobuf/types"
+
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-	"github.com/gogo/protobuf/types"
 )
 
 const defaultName = "Untitled"
@@ -26,7 +27,7 @@ type RelationRenderSetting struct {
 	Classes      []string
 }
 
-func (r *Renderer) MakeRelationRenderParams(b *model.Block) templ.Component {
+func (r *Renderer) makeRelationTemplate(b *model.Block) templ.Component {
 	relationBlock := b.GetRelation()
 	key := relationBlock.GetKey()
 	if key == "" {
@@ -49,7 +50,7 @@ func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []temp
 	if !params.Featured {
 		components = append(components, BlocksWrapper(&BlockWrapperParams{
 			Classes:    []string{"info"},
-			Components: []templ.Component{NameTemplate("name", name)},
+			Components: []templ.Component{BasicTemplate("name", name)},
 		}))
 	}
 	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[params.Key]
@@ -57,7 +58,7 @@ func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []temp
 	params.Classes = append(params.Classes, formatClass)
 	if relationValue == nil {
 		params.Classes = append(params.Classes, "isEmpty")
-		return append(components, CellTemplate(params, NameTemplate("empty", "")))
+		return append(components, CellTemplate(params, BasicTemplate("empty", "")))
 	}
 	switch format {
 	case model.RelationFormat_object, model.RelationFormat_tag, model.RelationFormat_status, model.RelationFormat_file:
@@ -142,14 +143,14 @@ func (r *Renderer) populateRelationValue(params *RelationRenderSetting, format m
 	}
 	switch format {
 	case model.RelationFormat_shorttext, model.RelationFormat_longtext:
-		return NameTemplate("name", relationValue.GetStringValue())
+		return BasicTemplate("name", relationValue.GetStringValue())
 	case model.RelationFormat_number:
-		return NameTemplate("name", fmt.Sprintf("%g", relationValue.GetNumberValue()))
+		return BasicTemplate("name", fmt.Sprintf("%g", relationValue.GetNumberValue()))
 	case model.RelationFormat_phone, model.RelationFormat_email, model.RelationFormat_url:
 		url := getUrlScheme(format, relationValue.GetStringValue()) + relationValue.GetStringValue()
 		return ObjectElement(relationValue.GetStringValue(), templ.URL(url))
 	case model.RelationFormat_date:
-		return NameTemplate("name", r.formatDate(relationValue.GetNumberValue()))
+		return BasicTemplate("name", r.formatDate(relationValue.GetNumberValue()))
 	case model.RelationFormat_checkbox:
 		return r.generateCheckbox(params, relationValue.GetBoolValue())
 	}
@@ -265,7 +266,7 @@ func (r *Renderer) generateObjectLinks(relationValue *types.Value) []templ.Compo
 			name = defaultName
 		}
 		icon := r.getIconFromDetails(details)
-		link := r.getLinkByLayout(details, objectId)
+		link := r.makeAnytypeLink(details, objectId)
 		elements = append(elements, ListElement(ObjectElement(name, templ.SafeURL(link)), icon))
 	}
 	return elements
@@ -305,7 +306,7 @@ func (r *Renderer) getIconFromDetails(details *types.Struct) templ.Component {
 }
 
 func (r *Renderer) RenderRelations(b *model.Block) templ.Component {
-	component := r.MakeRelationRenderParams(b)
+	component := r.makeRelationTemplate(b)
 	if component == nil {
 		return NoneTemplate("")
 	}

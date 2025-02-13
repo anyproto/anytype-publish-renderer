@@ -51,7 +51,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "shortTextKey"}}}
 
 		// when
-		component := r.MakeRelationRenderParams(block)
+		component := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, component)
@@ -88,7 +88,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "longTextKey"}}}
 
 		// when
-		component := r.MakeRelationRenderParams(block)
+		component := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, component)
@@ -125,7 +125,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "numberKey"}}}
 
 		// when
-		component := r.MakeRelationRenderParams(block)
+		component := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, component)
@@ -162,7 +162,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "phone"}}}
 
 		// when
-		component := r.MakeRelationRenderParams(block)
+		component := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, component)
@@ -199,7 +199,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "email"}}}
 
 		// when
-		component := r.MakeRelationRenderParams(block)
+		component := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, component)
@@ -210,7 +210,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: ""}}}
 
 		// when
-		component := r.MakeRelationRenderParams(block)
+		component := r.makeRelationTemplate(block)
 
 		// then
 		assert.Nil(t, component)
@@ -221,7 +221,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		block := &model.Block{Content: &model.BlockContentOfRelation{Relation: &model.BlockContentRelation{Key: "unknown key"}}}
 
 		// when
-		component := r.MakeRelationRenderParams(block)
+		component := r.makeRelationTemplate(block)
 
 		// then
 		assert.Nil(t, component)
@@ -268,7 +268,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("relations", "date-relation.pb")] = json
 
 		// when
-		params := r.MakeRelationRenderParams(block)
+		params := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, params)
@@ -315,7 +315,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("relations", "checkbox-relation.pb")] = json
 
 		// when
-		params := r.MakeRelationRenderParams(block)
+		params := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, params)
@@ -376,7 +376,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("objects", "object1.pb")] = json
 
 		// when
-		params := r.MakeRelationRenderParams(block)
+		params := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, params)
@@ -441,7 +441,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("relationsOptions", "status1.pb")] = json
 
 		// when
-		params := r.MakeRelationRenderParams(block)
+		params := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, params)
@@ -522,7 +522,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("relationsOptions", "tag2.pb")] = json
 
 		// when
-		params := r.MakeRelationRenderParams(block)
+		params := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, params)
@@ -570,7 +570,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("relations", "tag-relation.pb")] = json
 
 		// when
-		params := r.MakeRelationRenderParams(block)
+		params := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, params)
@@ -622,7 +622,7 @@ func TestMakeRelationRenderParams_ShortText(t *testing.T) {
 		r.UberSp.PbFiles[filepath.Join("relations", "text-relation.pb")] = json
 
 		// when
-		params := r.MakeRelationRenderParams(block)
+		params := r.makeRelationTemplate(block)
 
 		// then
 		assert.NotNil(t, params)

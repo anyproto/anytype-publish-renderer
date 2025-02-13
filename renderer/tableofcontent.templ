@@ -4,20 +4,6 @@ import (
 	"fmt"
 )
 
-templ TableOfContentTemplate(p *TableOfContentRenderParams) {
-	<div id={"block-" + p.Id} class={"block blockTableOfContents " + p.BackgroundColor}>
-		<div class="content">
-			<div class="wrap">
-				if !p.IsEmpty {
-					for _, item := range p.Items {
-						@item
-					}
-				}
-			</div>
-		</div>
-	</div>
-}
-
 templ HeadingTemplate(id string, name string, depth int) {
     <div 
 		class="item" 
@@ -27,6 +13,6 @@ templ HeadingTemplate(id string, name string, depth int) {
 			}
 	 	}
 	>
-		<a href={ templ.URL("#block-" + id) }>{ name }</a>
+		<a href={ templ.URL("#" + id) }>{ name }</a>
 	</div>
 }

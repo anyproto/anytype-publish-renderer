@@ -1,110 +1,92 @@
 package renderer
 
 import (
-	"html"
 	"net/url"
-	"path/filepath"
-	"strings"
 
 	"github.com/a-h/templ"
+	"github.com/gogo/protobuf/types"
+	"go.uber.org/zap"
+
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-	"go.uber.org/zap"
 )
 
-type BookmarkRendererParams struct {
-	Id           string
-	Classes      string
-	InnerClasses string
-	IsEmpty      bool
-	Url          string
-	Favicon      string
-	Name         string
-	Description  string
-	Image        string
-	SafeUrl      templ.SafeURL
+func (r *Renderer) makeBookmarkBlockParams(b *model.Block) *BlockParams {
+	bookmark := b.GetBookmark()
+
+	if bookmark.GetUrl() == "" {
+		return nil
+	}
+
+	targetObjectId := bookmark.GetTargetObjectId()
+	targetBookmark := r.getObjectSnapshot(targetObjectId)
+	if targetBookmark == nil {
+		return nil
+	}
+
+	details := targetBookmark.GetSnapshot().GetData().GetDetails()
+	if details == nil || len(details.GetFields()) == 0 {
+		return nil
+	}
+
+	parsedUrl, err := url.Parse(bookmark.GetUrl())
+	if err != nil {
+		log.Error("failed to parse bookmark url", zap.Error(err))
+		return nil
+	}
+	return r.getBookmarkBlockParams(b, details, parsedUrl)
 }
 
-func (r *Renderer) MakeBookmarkRendererParams(b *model.Block) (params *BookmarkRendererParams) {
-	bookmark := b.GetBookmark()
+func (r *Renderer) getBookmarkBlockParams(b *model.Block, details *types.Struct, parsedUrl *url.URL) *BlockParams {
 	bgColor := b.GetBackgroundColor()
-	classes := []string{"block", "blockBookmark"}
 	innerClasses := []string{"inner"}
 
 	if bgColor != "" {
 		innerClasses = append(innerClasses, "bgColor", "bgColor-"+bgColor)
 	}
 
-	if bookmark.GetUrl() == "" {
-		return &BookmarkRendererParams{IsEmpty: true}
-	}
+	sideLeft := r.getSideLeftComponent(details, parsedUrl)
+	sideRightComponents, innerClasses := r.getSideRightComponent(details, innerClasses)
+	blockParams := makeDefaultBlockParams(b)
+	blockParams.Content = BookmarkLinkTemplate(templ.URL(b.GetBookmark().GetUrl()), innerClasses, []templ.Component{sideLeft, sideRightComponents})
+	return blockParams
+}
 
-	targetObjectId := bookmark.GetTargetObjectId()
-	targetBookmark, err := r.ReadJsonpbSnapshot(filepath.Join("objects", targetObjectId+".pb"))
-	if err != nil {
-		return &BookmarkRendererParams{IsEmpty: true}
-	}
-
-	details := targetBookmark.GetSnapshot().GetData().GetDetails()
-	if details == nil || len(details.GetFields()) == 0 {
-		return &BookmarkRendererParams{IsEmpty: true}
-	}
-
+func (r *Renderer) getSideLeftComponent(details *types.Struct, parsedUrl *url.URL) templ.Component {
 	var (
-		favicon, image, description, name string
+		sideLeftsComponents []templ.Component
+		linkParams          = &BlockWrapperParams{Classes: []string{"link"}}
 	)
-
-	if icon := details.Fields[bundle.RelationKeyIconImage.String()]; icon != nil && icon.GetStringValue() != "" {
-		favicon, err = r.getFileUrl(icon.GetStringValue())
-		if err != nil {
-			log.Error("failed to get bookmark favicon url", zap.Error(err))
-		}
+	icon := getRelationField(details, bundle.RelationKeyIconImage, r.relationToFileUrl)
+	if icon != "" {
+		linkParams.Components = append(linkParams.Components, ImageWithSourceTemplate(icon, "fav"))
 	}
+	linkParams.Components = append(linkParams.Components, templ.Raw(parsedUrl.Host))
+	sideLeftsComponents = append(sideLeftsComponents, BlocksWrapper(linkParams))
+	description := getRelationField(details, bundle.RelationKeyDescription, relationToString)
+	name := getRelationField(details, bundle.RelationKeyName, relationToString)
+	sideLeftsComponents = append(sideLeftsComponents, BasicTemplate("name", name), BasicTemplate("descr", description))
+	wrapper := BlocksWrapper(&BlockWrapperParams{
+		Classes:    []string{"side left"},
+		Components: sideLeftsComponents,
+	})
+	return wrapper
+}
 
-	if picture := details.Fields[bundle.RelationKeyPicture.String()]; picture != nil && picture.GetStringValue() != "" {
-		image, err = r.getFileUrl(picture.GetStringValue())
-		if err != nil {
-			log.Error("failed to get bookmark image url", zap.Error(err))
-		}
-	}
-
-	if descriptionValue := details.Fields[bundle.RelationKeyDescription.String()]; descriptionValue != nil && descriptionValue.GetStringValue() != "" {
-		description = descriptionValue.GetStringValue()
-	}
-
-	if nameValue := details.Fields[bundle.RelationKeyName.String()]; nameValue != nil && nameValue.GetStringValue() != "" {
-		name = nameValue.GetStringValue()
-	}
-
-	parsedUrl, err := url.Parse(bookmark.GetUrl())
-	if err != nil {
-		log.Error("failed to parse bookmark url", zap.Error(err))
-		return &BookmarkRendererParams{IsEmpty: true}
-	}
-
+func (r *Renderer) getSideRightComponent(details *types.Struct, innerClasses []string) (templ.Component, []string) {
+	sideRightComponent := &BlockWrapperParams{Classes: []string{"side right"}}
+	image := getRelationField(details, bundle.RelationKeyPicture, r.relationToFileUrl)
 	if image != "" {
 		innerClasses = append(innerClasses, "withImage")
+		sideRightComponent.Components = append(sideRightComponent.Components, ImageWithSourceTemplate(image, "img"))
 	}
-
-	return &BookmarkRendererParams{
-		Id:           b.Id,
-		Classes:      strings.Join(classes, " "),
-		InnerClasses: strings.Join(innerClasses, " "),
-		Url:          parsedUrl.Host,
-		Favicon:      favicon,
-		Name:         html.UnescapeString(name),
-		Description:  html.UnescapeString(description),
-		Image:        image,
-		SafeUrl:      templ.URL(bookmark.GetUrl()),
-	}
+	return BlocksWrapper(sideRightComponent), innerClasses
 }
 
 func (r *Renderer) RenderBookmark(b *model.Block) templ.Component {
-	params := r.MakeBookmarkRendererParams(b)
-
-	if params.IsEmpty {
+	params := r.makeBookmarkBlockParams(b)
+	if params == nil {
 		return NoneTemplate("")
-	} else {
-		return BookmarkTempl(params)
 	}
+	return BlockTemplate(r, params)
 }

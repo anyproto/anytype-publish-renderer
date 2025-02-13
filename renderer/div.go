@@ -5,7 +5,7 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 )
 
-func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *BlockParams) {
+func (r *Renderer) makeRenderDivParams(b *model.Block) (params *BlockParams) {
 	var divClass string
 	var comp templ.Component
 
@@ -32,6 +32,6 @@ func (r *Renderer) MakeRenderDivParams(b *model.Block) (params *BlockParams) {
 }
 
 func (r *Renderer) RenderDiv(b *model.Block) templ.Component {
-	params := r.MakeRenderDivParams(b)
+	params := r.makeRenderDivParams(b)
 	return BlockTemplate(r, params)
 }

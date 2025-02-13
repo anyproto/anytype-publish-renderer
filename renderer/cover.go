@@ -47,7 +47,7 @@ func ToCoverType(val int64) (CoverType, error) {
 	return CoverType(val), nil
 }
 
-func (r *Renderer) MakeRenderPageCoverParams() (*CoverRenderParams, error) {
+func (r *Renderer) makeRenderPageCoverParams() (*CoverRenderParams, error) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
 	return r.getCoverParams(fields, true, true, false)
 }
@@ -122,7 +122,7 @@ func (r *Renderer) getUnsplashDetails(coverId string) (string, string) {
 }
 
 func (r *Renderer) RenderPageCover() templ.Component {
-	params, err := r.MakeRenderPageCoverParams()
+	params, err := r.makeRenderPageCoverParams()
 
 	log.Warn("cover rendering failed: unknown cover type %+v", zap.Any("params", params))
 
