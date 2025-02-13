@@ -44,6 +44,7 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 							bundle.RelationKeyPicture.String():     pbtypes.String("image1"),
 							bundle.RelationKeyDescription.String(): pbtypes.String("description1"),
 							bundle.RelationKeyName.String():        pbtypes.String("name1"),
+							bundle.RelationKeySource.String():      pbtypes.String("https://example.com"),
 						}},
 					}},
 				},
@@ -106,6 +107,7 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 							bundle.RelationKeyPicture.String():     pbtypes.String("image3"),
 							bundle.RelationKeyDescription.String(): pbtypes.String("description3"),
 							bundle.RelationKeyName.String():        pbtypes.String("name3"),
+							bundle.RelationKeySource.String():      pbtypes.String("::::"),
 						}},
 					}},
 				},
@@ -117,7 +119,17 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 			block: &model.Block{
 				Id: "block3",
 				Content: &model.BlockContentOfBookmark{
-					Bookmark: &model.BlockContentBookmark{},
+					Bookmark: &model.BlockContentBookmark{TargetObjectId: "object3"},
+				},
+			},
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "object3.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeySource.String(): pbtypes.String(""),
+						}},
+					}},
 				},
 			},
 			expected: nil,

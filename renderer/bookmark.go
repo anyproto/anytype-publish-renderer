@@ -14,10 +14,6 @@ import (
 func (r *Renderer) makeBookmarkBlockParams(b *model.Block) *BlockParams {
 	bookmark := b.GetBookmark()
 
-	if bookmark.GetUrl() == "" {
-		return nil
-	}
-
 	targetObjectId := bookmark.GetTargetObjectId()
 	targetBookmark := r.getObjectSnapshot(targetObjectId)
 	if targetBookmark == nil {
@@ -29,15 +25,19 @@ func (r *Renderer) makeBookmarkBlockParams(b *model.Block) *BlockParams {
 		return nil
 	}
 
-	parsedUrl, err := url.Parse(bookmark.GetUrl())
+	return r.getBookmarkBlockParams(b, details)
+}
+
+func (r *Renderer) getBookmarkBlockParams(b *model.Block, details *types.Struct) *BlockParams {
+	bookmarkUrl := getRelationField(details, bundle.RelationKeySource, relationToString)
+	if bookmarkUrl == "" {
+		return nil
+	}
+	parsedUrl, err := url.Parse(bookmarkUrl)
 	if err != nil {
 		log.Error("failed to parse bookmark url", zap.Error(err))
 		return nil
 	}
-	return r.getBookmarkBlockParams(b, details, parsedUrl)
-}
-
-func (r *Renderer) getBookmarkBlockParams(b *model.Block, details *types.Struct, parsedUrl *url.URL) *BlockParams {
 	bgColor := b.GetBackgroundColor()
 	innerClasses := []string{"inner"}
 
@@ -48,7 +48,7 @@ func (r *Renderer) getBookmarkBlockParams(b *model.Block, details *types.Struct,
 	sideLeft := r.getSideLeftComponent(details, parsedUrl)
 	sideRightComponents, innerClasses := r.getSideRightComponent(details, innerClasses)
 	blockParams := makeDefaultBlockParams(b)
-	blockParams.Content = BookmarkLinkTemplate(templ.URL(b.GetBookmark().GetUrl()), innerClasses, []templ.Component{sideLeft, sideRightComponents})
+	blockParams.Content = BookmarkLinkTemplate(templ.URL(bookmarkUrl), innerClasses, []templ.Component{sideLeft, sideRightComponents})
 	return blockParams
 }
 
