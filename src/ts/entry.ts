@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import $ from 'jquery/dist/jquery.js';
 import raf from 'raf';
 import Prism from 'prismjs';
 import mermaid from 'mermaid';
