@@ -1,25 +1,28 @@
 package renderer
 
 import (
+	"context"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/types"
 
-	"github.com/a-h/templ"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMakeBookmarkRendererParams(t *testing.T) {
 	tests := []struct {
-		name     string
-		block    *model.Block
-		pbFiles  map[string]*pb.SnapshotWithType
-		expected *BookmarkRendererParams
+		name         string
+		block        *model.Block
+		pbFiles      map[string]*pb.SnapshotWithType
+		expected     *BlockParams
+		expectedHtml string
 	}{
 		{
 			name: "valid bookmark",
@@ -41,19 +44,16 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 							bundle.RelationKeyPicture.String():     pbtypes.String("image1"),
 							bundle.RelationKeyDescription.String(): pbtypes.String("description1"),
 							bundle.RelationKeyName.String():        pbtypes.String("name1"),
+							bundle.RelationKeySource.String():      pbtypes.String("https://example.com"),
 						}},
 					}},
 				},
 			},
-			expected: &BookmarkRendererParams{
-				Id:           "block1",
-				Url:          "example.com",
-				Name:         "name1",
-				Description:  "description1",
-				SafeUrl:      templ.SafeURL("https://example.com"),
-				InnerClasses: "inner",
-				Classes:      "block blockBookmark",
+			expected: &BlockParams{
+				Id:      "block1",
+				Classes: []string{"block", "align0", "blockBookmark"},
 			},
+			expectedHtml: `<a href="https://example.com" target="_blank" class="inner"><div class="side left"><div class="link">example.com</div><div class="name">name1</div><div class="descr">description1</div></div><div class="side right"></div></a>`,
 		},
 		{
 			name: "missing details",
@@ -61,7 +61,6 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 				Id: "block2",
 				Content: &model.BlockContentOfBookmark{
 					Bookmark: &model.BlockContentBookmark{
-						Url:            "https://example.com",
 						TargetObjectId: "object12",
 					},
 				},
@@ -72,9 +71,19 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{}},
 				},
 			},
-			expected: &BookmarkRendererParams{
-				IsEmpty: true,
+			expected: nil,
+		},
+		{
+			name: "missing bookmark",
+			block: &model.Block{
+				Id: "block2",
+				Content: &model.BlockContentOfBookmark{
+					Bookmark: &model.BlockContentBookmark{
+						TargetObjectId: "object12",
+					},
+				},
 			},
+			expected: nil,
 		},
 		{
 			name: "invalid URL",
@@ -82,7 +91,6 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 				Id: "block3",
 				Content: &model.BlockContentOfBookmark{
 					Bookmark: &model.BlockContentBookmark{
-						Url:            "::::",
 						TargetObjectId: "object3",
 					},
 				},
@@ -96,22 +104,80 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 							bundle.RelationKeyPicture.String():     pbtypes.String("image3"),
 							bundle.RelationKeyDescription.String(): pbtypes.String("description3"),
 							bundle.RelationKeyName.String():        pbtypes.String("name3"),
+							bundle.RelationKeySource.String():      pbtypes.String("::::"),
 						}},
 					}},
 				},
 			},
-			expected: &BookmarkRendererParams{
-				IsEmpty: true,
+			expected: nil,
+		},
+		{
+			name: "empty URL",
+			block: &model.Block{
+				Id: "block3",
+				Content: &model.BlockContentOfBookmark{
+					Bookmark: &model.BlockContentBookmark{TargetObjectId: "object3"},
+				},
 			},
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "object3.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyIconImage.String():   pbtypes.String("favicon3"),
+							bundle.RelationKeyPicture.String():     pbtypes.String("image3"),
+							bundle.RelationKeyDescription.String(): pbtypes.String("description3"),
+							bundle.RelationKeyName.String():        pbtypes.String("name3"),
+							bundle.RelationKeySource.String():      pbtypes.String(""),
+						}},
+					}},
+				},
+			},
+			expected: nil,
+		},
+		{
+			name: "empty URL in source, try to get from block",
+			block: &model.Block{
+				Id: "block3",
+				Content: &model.BlockContentOfBookmark{
+					Bookmark: &model.BlockContentBookmark{
+						TargetObjectId: "object3",
+						Url:            "https://example.com"},
+				},
+			},
+			pbFiles: map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "object3.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeySource.String(): pbtypes.String(""),
+						}},
+					}},
+				},
+			},
+			expected: &BlockParams{
+				Id:      "block3",
+				Classes: []string{"block", "align0", "blockBookmark"},
+			},
+			expectedHtml: `<a href="https://example.com" target="_blank" class="inner"><div class="side left"><div class="link">example.com</div><div class="name"></div><div class="descr"></div></div><div class="side right"></div></a>`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
+			r := &Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 			r.CachedPbFiles = tt.pbFiles
-			result := r.MakeBookmarkRendererParams(tt.block)
-			assert.Equal(t, tt.expected, result)
+			result := r.makeBookmarkBlockParams(tt.block)
+			if tt.expected == nil {
+				assert.Nil(t, result)
+			} else {
+				assert.Equal(t, tt.expected.Classes, result.Classes)
+				assert.Equal(t, tt.expected.Id, result.Id)
+				builder := strings.Builder{}
+				err := result.Content.Render(context.Background(), &builder)
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedHtml, builder.String())
+			}
 		})
 	}
 }

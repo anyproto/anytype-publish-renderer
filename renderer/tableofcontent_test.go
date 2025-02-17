@@ -1,6 +1,8 @@
 package renderer
 
 import (
+	"context"
+	"strings"
 	"testing"
 
 	"github.com/anyproto/anytype-heart/pb"
@@ -13,27 +15,30 @@ func TestMakeTableOfContentRenderParams(t *testing.T) {
 
 	t.Run("empty Block", func(t *testing.T) {
 		// given
-		block := &model.Block{Id: "block1"}
+		block := &model.Block{Id: "block1", Content: &model.BlockContentOfTableOfContents{}}
 
 		// when
-		params := renderer.MakeTableOfContentRenderParams(block)
+		params := renderer.makeTableOfContentBlockParams(block)
 
 		// then
 		assert.Equal(t, "block1", params.Id)
-		assert.Equal(t, "", params.BackgroundColor)
-		assert.Empty(t, params.Items)
-		assert.True(t, params.IsEmpty)
+		assert.Equal(t, []string{"block", "align0", "blockTableOfContents"}, params.Classes)
+		builder := strings.Builder{}
+		err := params.Content.Render(context.Background(), &builder)
+		assert.NoError(t, err)
+		assert.Equal(t, `<div class="wrap"></div>`, builder.String())
 	})
 
 	t.Run("with background color", func(t *testing.T) {
 		// given
-		block := &model.Block{Id: "block1", BackgroundColor: "red"}
+		block := &model.Block{Id: "block1", BackgroundColor: "red", Content: &model.BlockContentOfTableOfContents{}}
 
 		// when
-		params := renderer.MakeTableOfContentRenderParams(block)
+		params := renderer.makeTableOfContentBlockParams(block)
 
 		// then
-		assert.Equal(t, "bgColor bgColor-red", params.BackgroundColor)
+		assert.Equal(t, []string{"block", "align0", "blockTableOfContents"}, params.Classes)
+		assert.Equal(t, []string{"bgColor bgColor-red"}, params.ContentClasses)
 	})
 
 	t.Run("with headers", func(t *testing.T) {
@@ -53,12 +58,12 @@ func TestMakeTableOfContentRenderParams(t *testing.T) {
 			},
 		}
 		renderer.Root = &model.Block{Id: "root", ChildrenIds: []string{"child1", "child2"}, Content: &model.BlockContentOfSmartblock{Smartblock: &model.BlockContentSmartblock{}}}
+
 		// when
-		block := &model.Block{Id: "block1"}
-		params := renderer.MakeTableOfContentRenderParams(block)
+		block := &model.Block{Id: "block1", Content: &model.BlockContentOfTableOfContents{}}
+		params := renderer.makeTableOfContentBlockParams(block)
 
 		// then
-		assert.False(t, params.IsEmpty)
-		assert.Len(t, params.Items, 2)
+		assert.NotEmpty(t, params.Content)
 	})
 }
