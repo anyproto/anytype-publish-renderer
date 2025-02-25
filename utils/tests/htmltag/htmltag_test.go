@@ -42,7 +42,7 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"TagName", "div"},
+				{"div > Content", ""},
 			},
 			wantErr: false,
 		},
@@ -53,9 +53,9 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"attrs[id]", "main"},
-				{"attrs[class]", "container"},
-				{"attrs[data-custom]", "value"},
+				{"div > attrs[id]", "main"},
+				{"div > attrs[class]", "container"},
+				{"div > attrs[data-custom]", "value"},
 			},
 			wantErr: false,
 		},
@@ -66,9 +66,9 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"attrs[id]", "parent"},
-				{"p > attrs[class]", "child"},
-				{"span > attrs[data-test]", "true"},
+				{"div > attrs[id]", "parent"},
+				{"#parent > p.child > Content", "Text"},
+				{"#parent > span > attrs[data-test]", "true"},
 			},
 			wantErr: false,
 		},
@@ -79,10 +79,10 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"attrs[id]", "level1"},
+				{"div > attrs[id]", "level1"},
 				{"#level2 > attrs[id]", "level2"},
 				{"#level3 > attrs[id]", "level3"},
-				{"#level3 > p > attrs[class]", "deep"},
+				{"#level3 > p.deep > Content", "Content"},
 			},
 			wantErr: false,
 		},
@@ -93,10 +93,9 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"attrs[class]", "outer"},
-				{"article > attrs[data-type]", "news"},
-				{"article > div > attrs[class]", "content"},
-				{"article > div > span > attrs[class]", "highlight"},
+				{"section > attrs[class]", "outer"},
+				{"section > article > attrs[data-type]", "news"},
+				{"section > article > div.content > span.highlight > Content", "Text"},
 			},
 			wantErr: false,
 		},
@@ -107,10 +106,10 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"attrs[id]", "root"},
-				{"section > attrs[class]", "main"},
-				{"section > header > h1 > TagName", "h1"},
-				{"#root > section > footer > p > attrs[class]", "footer-text"},
+				{"div > attrs[id]", "root"},
+				{"#root > section > attrs[class]", "main"},
+				{"#root > section > header > h1 > Content", "Title"},
+				{"#root > section > footer > p.footer-text > Content", "Footer"},
 			},
 			wantErr: false,
 		},
@@ -121,7 +120,7 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"section.main > footer > p.footer-text.last > Content", "Footer"},
+				{"#root > section.main > footer > p.footer-text.last > Content", "Footer"},
 			},
 			wantErr: false,
 		},
@@ -133,8 +132,7 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"TagName", "h1"},
-				{"Content", "Title"},
+				{"h1 > Content", "Title"},
 			},
 			wantErr: false,
 		},
@@ -145,8 +143,8 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"p > Content", "Text bold text."},
-				{"p > strong > Content", "bold"},
+				{"section > p > Content", "Text bold text."},
+				{"section > p > strong > Content", "bold"},
 			},
 			wantErr: false,
 		},
@@ -160,7 +158,7 @@ func TestHtmlToTag(t *testing.T) {
 				return
 			}
 			for _, assertion := range tt.pathAssertions {
-				assertPath(t, got, assertion.path, assertion.expectedValue)
+				AssertPath(t, got, assertion.path, assertion.expectedValue)
 			}
 		})
 	}

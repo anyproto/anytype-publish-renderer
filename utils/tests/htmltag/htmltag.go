@@ -16,6 +16,7 @@ type Tag struct {
 }
 
 func HtmlToTag(htmlStr string) (*Tag, error) {
+	fmt.Printf("html: %s\n", htmlStr)
 	doc, err := html.Parse(strings.NewReader(htmlStr))
 	if err != nil {
 		return nil, err
@@ -26,7 +27,8 @@ func HtmlToTag(htmlStr string) (*Tag, error) {
 	// to be passed, which also looks not appealing.
 	// Therefore, if err != nil it will always have this first nodes, which we skip to
 	// navigate to the content.
-	firstNode := doc.FirstChild.FirstChild.NextSibling.FirstChild
+	firstNode := doc.FirstChild.FirstChild.NextSibling
+	fmt.Printf("data: %s\n", firstNode.Data)
 
 	if firstNode == nil {
 		return nil, fmt.Errorf("empty node")
@@ -72,7 +74,7 @@ func nodeToTag(n *html.Node) *Tag {
 // Note:
 // Unlike CSS accessors, it has to contain _all_ nodes, not just some of them.
 // I.e., it doesn't traverse all children nodes recursively.
-func assertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
+func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 	if tag == nil {
 		t.Fatal("Expected a Tag, but got nil")
 	}
