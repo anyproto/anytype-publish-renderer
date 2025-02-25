@@ -152,7 +152,7 @@ function renderPrism () {
 	blocks.each((i, block) => {
 		block = $(block);
 
-		const lang = block.data('lang');
+		const lang = block.data('lang') || 'plain';
 		const value = block.text();
 
 		block.html(Prism.highlight(value, Prism.languages[lang], lang));
