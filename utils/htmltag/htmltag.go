@@ -3,6 +3,7 @@ package htmltag
 import (
 	"fmt"
 	"strings"
+	"testing"
 
 	"golang.org/x/net/html"
 )
@@ -62,5 +63,118 @@ func nodeToTag(n *html.Node) *Tag {
 		return tag
 	}
 
+	return nil
+}
+
+// assertPath checks if the given path exists in the Tag structure and matches the expected value.
+// Path looks like this: "section.main > footer > p.footer-text.last > Content"
+//
+// Note:
+// Unlike CSS accessors, it has to contain _all_ nodes, not just some of them.
+// I.e., it doesn't traverse all children nodes recursively.
+func assertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
+	if tag == nil {
+		t.Fatal("Expected a Tag, but got nil")
+	}
+
+	path = strings.ReplaceAll(path, " >", ">")
+	path = strings.ReplaceAll(path, "> ", ">")
+	parts := strings.Split(path, ">")
+	current := tag
+	i := 0
+	for i < len(parts) {
+		part := parts[i]
+		if strings.HasPrefix(part, "#") && i < len(parts)-1 {
+			// Handle ID selection
+			id := strings.TrimPrefix(parts[i], "#")
+			current = findTagById(current, id)
+			if current == nil {
+				t.Errorf("Expected to find element with id %s, but it does not exist", id)
+				return
+			}
+			// Skip the next part since it's the ID
+			i++
+		} else if i == len(parts)-1 {
+			// Last part, check if it's an attribute or tag name
+			if strings.Contains(part, "attrs[") {
+				// Attribute access, e.g., "attrs[id]"
+				attrName := strings.TrimPrefix(strings.TrimSuffix(part, "]"), "attrs[")
+				if current.Attrs[attrName] != expectedValue {
+					t.Errorf("Expected attribute %s to be %s, but got %s", attrName, expectedValue, current.Attrs[attrName])
+				}
+			} else if part == "Content" {
+				// Content access
+				if current.Content != expectedValue {
+					t.Errorf("Expected content to be %s, but got %s", expectedValue, current.Content)
+				}
+			} else {
+				// Tag name access
+				if current.TagName != expectedValue {
+					t.Errorf("Expected tag name to be %s, but got %s", expectedValue, current.TagName)
+				}
+			}
+			i++
+		} else {
+			classAccessors := strings.Split(part, ".")
+			classes := make([]string, 0)
+			tagName := part
+
+			if len(classAccessors) > 1 {
+				tagName = classAccessors[0]
+				classes = classAccessors[1:]
+			}
+			// Navigate to the child tag
+			found := false
+			for _, child := range current.Children {
+				childClasses := strings.Fields(child.Attrs["class"])
+				fmt.Printf("%s:%s\n", classes, childClasses)
+				fmt.Printf("%s:%s:%d\n", child.TagName, tagName, len(classAccessors))
+				if child.TagName == tagName && containsAll(classes, childClasses) {
+					current = &child
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Errorf("Expected to find child tag %s, but it does not exist", part)
+				return
+			}
+			i++
+		}
+	}
+}
+
+// containsAll checks that all `items` are present in `target`
+func containsAll(items []string, target []string) bool {
+	targetSet := make(map[string]struct{})
+
+	// Populate the target set
+	for _, t := range target {
+		targetSet[t] = struct{}{}
+	}
+
+	// Check if all items exist in the target set
+	for _, item := range items {
+		if _, found := targetSet[item]; !found {
+			return false
+		}
+	}
+
+	return true
+}
+
+// findTagById searches for a tag with the specified ID within the current tag and its descendants.
+func findTagById(tag *Tag, id string) *Tag {
+	if tag == nil {
+		return nil
+	}
+	if tag.Attrs["id"] == id {
+		return tag
+	}
+	for _, child := range tag.Children {
+		if result := findTagById(&child, id); result != nil {
+			return result
+		}
+	}
 	return nil
 }

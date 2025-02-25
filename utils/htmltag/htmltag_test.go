@@ -1,84 +1,28 @@
 package htmltag
 
 import (
-	"strings"
 	"testing"
 )
 
-// assertPath checks if the given path exists in the Tag structure and matches the expected value.
-func assertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
-	if tag == nil {
-		t.Fatal("Expected a Tag, but got nil")
+func TestContainsAll(t *testing.T) {
+	tests := []struct {
+		items  []string
+		target []string
+		want   bool
+	}{
+		{[]string{"apple", "banana"}, []string{"banana", "orange", "apple", "grape"}, true},
+		{[]string{"apple", "banana", "cherry"}, []string{"banana", "orange", "apple", "grape"}, false},
+		{[]string{}, []string{"banana", "orange", "apple", "grape"}, true},
+		{[]string{"banana"}, []string{}, false},
+		{[]string{"apple", "banana"}, []string{"apple", "banana"}, true},
 	}
 
-	parts := strings.Split(path, ".")
-	current := tag
-	i := 0
-	for i < len(parts) {
-		part := parts[i]
-		if strings.HasPrefix(part, "#") && i < len(parts)-1 {
-			// Handle ID selection
-			id := strings.TrimPrefix(parts[i], "#")
-			current = findTagById(current, id)
-			if current == nil {
-				t.Errorf("Expected to find element with id %s, but it does not exist", id)
-				return
-			}
-			// Skip the next part since it's the ID
-			i++
-		} else if i == len(parts)-1 {
-			// Last part, check if it's an attribute or tag name
-			if strings.Contains(part, "attrs[") {
-				// Attribute access, e.g., "attrs[id]"
-				attrName := strings.TrimPrefix(strings.TrimSuffix(part, "]"), "attrs[")
-				if current.Attrs[attrName] != expectedValue {
-					t.Errorf("Expected attribute %s to be %s, but got %s", attrName, expectedValue, current.Attrs[attrName])
-				}
-			} else if part == "Content" {
-				// Content access
-				if current.Content != expectedValue {
-					t.Errorf("Expected content to be %s, but got %s", expectedValue, current.Content)
-				}
-			} else {
-				// Tag name access
-				if current.TagName != expectedValue {
-					t.Errorf("Expected tag name to be %s, but got %s", expectedValue, current.TagName)
-				}
-			}
-			i++
-		} else {
-			// Navigate to the child tag
-			found := false
-			for _, child := range current.Children {
-				if child.TagName == part {
-					current = &child
-					found = true
-					break
-				}
-			}
-			if !found {
-				t.Errorf("Expected to find child tag %s, but it does not exist", part)
-				return
-			}
-			i++
+	for _, tt := range tests {
+		got := containsAll(tt.items, tt.target)
+		if got != tt.want {
+			t.Errorf("containsAll(%v, %v) = %v; want %v", tt.items, tt.target, got, tt.want)
 		}
 	}
-}
-
-// findTagById searches for a tag with the specified ID within the current tag and its descendants.
-func findTagById(tag *Tag, id string) *Tag {
-	if tag == nil {
-		return nil
-	}
-	if tag.Attrs["id"] == id {
-		return tag
-	}
-	for _, child := range tag.Children {
-		if result := findTagById(&child, id); result != nil {
-			return result
-		}
-	}
-	return nil
 }
 
 func TestHtmlToTag(t *testing.T) {
@@ -123,8 +67,8 @@ func TestHtmlToTag(t *testing.T) {
 				expectedValue string
 			}{
 				{"attrs[id]", "parent"},
-				{"p.attrs[class]", "child"},
-				{"span.attrs[data-test]", "true"},
+				{"p > attrs[class]", "child"},
+				{"span > attrs[data-test]", "true"},
 			},
 			wantErr: false,
 		},
@@ -136,9 +80,9 @@ func TestHtmlToTag(t *testing.T) {
 				expectedValue string
 			}{
 				{"attrs[id]", "level1"},
-				{"#level2.attrs[id]", "level2"},
-				{"#level3.attrs[id]", "level3"},
-				{"#level3.p.attrs[class]", "deep"},
+				{"#level2 > attrs[id]", "level2"},
+				{"#level3 > attrs[id]", "level3"},
+				{"#level3 > p > attrs[class]", "deep"},
 			},
 			wantErr: false,
 		},
@@ -150,9 +94,9 @@ func TestHtmlToTag(t *testing.T) {
 				expectedValue string
 			}{
 				{"attrs[class]", "outer"},
-				{"article.attrs[data-type]", "news"},
-				{"article.div.attrs[class]", "content"},
-				{"article.div.span.attrs[class]", "highlight"},
+				{"article > attrs[data-type]", "news"},
+				{"article > div > attrs[class]", "content"},
+				{"article > div > span > attrs[class]", "highlight"},
 			},
 			wantErr: false,
 		},
@@ -164,12 +108,24 @@ func TestHtmlToTag(t *testing.T) {
 				expectedValue string
 			}{
 				{"attrs[id]", "root"},
-				{"section.attrs[class]", "main"},
-				{"section.header.h1.TagName", "h1"},
-				{"#root.section.footer.p.attrs[class]", "footer-text"},
+				{"section > attrs[class]", "main"},
+				{"section > header > h1 > TagName", "h1"},
+				{"#root > section > footer > p > attrs[class]", "footer-text"},
 			},
 			wantErr: false,
 		},
+		{
+			name: "Multiclass acces",
+			html: `<div id="root"><section class="main"><header><h1>Title</h1></header><footer><p class="footer-text last">Footer</p></footer></section></div>`,
+			pathAssertions: []struct {
+				path          string
+				expectedValue string
+			}{
+				{"section.main > footer > p.footer-text.last > Content", "Footer"},
+			},
+			wantErr: false,
+		},
+
 		{
 			name: "Simple text in header",
 			html: `<h1>Title</h1>`,
@@ -189,8 +145,8 @@ func TestHtmlToTag(t *testing.T) {
 				path          string
 				expectedValue string
 			}{
-				{"p.Content", "Text bold text."},
-				{"p.strong.Content", "bold"},
+				{"p > Content", "Text bold text."},
+				{"p > strong > Content", "bold"},
 			},
 			wantErr: false,
 		},
