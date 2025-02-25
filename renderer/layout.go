@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+
 	"github.com/a-h/templ"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
