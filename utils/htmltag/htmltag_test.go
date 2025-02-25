@@ -7,27 +7,30 @@ import (
 
 // assertPath checks if the given path exists in the Tag structure and matches the expected value.
 func assertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
+	if tag == nil {
+		t.Fatal("Expected a Tag, but got nil")
+	}
+
 	parts := strings.Split(path, ".")
 	current := tag
 	i := 0
-
 	for i < len(parts) {
 		part := parts[i]
-		if part == "#" && i < len(parts)-1 {
+		if strings.HasPrefix(part, "#") && i < len(parts)-1 {
 			// Handle ID selection
-			id := parts[i+1]
+			id := strings.TrimPrefix(parts[i], "#")
 			current = findTagById(current, id)
 			if current == nil {
 				t.Errorf("Expected to find element with id %s, but it does not exist", id)
 				return
 			}
 			// Skip the next part since it's the ID
-			i += 2
+			i++
 		} else if i == len(parts)-1 {
 			// Last part, check if it's an attribute or tag name
-			if strings.Contains(part, "[") {
+			if strings.Contains(part, "attrs[") {
 				// Attribute access, e.g., "attrs[id]"
-				attrName := strings.TrimPrefix(strings.TrimSuffix(part, "]"), "[")
+				attrName := strings.TrimPrefix(strings.TrimSuffix(part, "]"), "attrs[")
 				if current.Attrs[attrName] != expectedValue {
 					t.Errorf("Expected attribute %s to be %s, but got %s", attrName, expectedValue, current.Attrs[attrName])
 				}
@@ -49,7 +52,7 @@ func assertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 				}
 			}
 			if !found {
-				t.Errorf("Expected to find child tag %s, but it does not exist", part)
+				t.Errorf("Expected to find child tag %s, but it does not exist ", part)
 				return
 			}
 			i++
@@ -59,6 +62,9 @@ func assertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 
 // findTagById searches for a tag with the specified ID within the current tag and its descendants.
 func findTagById(tag *Tag, id string) *Tag {
+	if tag == nil {
+		return nil
+	}
 	if tag.Attrs["id"] == id {
 		return tag
 	}

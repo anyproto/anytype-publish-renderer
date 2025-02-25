@@ -1,12 +1,12 @@
 package htmltag
 
 import (
-	"bytes"
+	"fmt"
+	"strings"
 
 	"golang.org/x/net/html"
 )
 
-// Tag structure to be used in tests to replace html string comparison
 type Tag struct {
 	TagName  string
 	Attrs    map[string]string
@@ -14,11 +14,18 @@ type Tag struct {
 }
 
 func HtmlToTag(htmlStr string) (*Tag, error) {
-	doc, err := html.Parse(bytes.NewReader([]byte(htmlStr)))
+	doc, err := html.Parse(strings.NewReader(htmlStr))
 	if err != nil {
 		return nil, err
 	}
-	return nodeToTag(doc), nil
+
+	firstNode := doc.FirstChild.FirstChild.NextSibling.FirstChild // Navigate to <div>
+
+	if firstNode == nil {
+		return nil, fmt.Errorf("empty node")
+	}
+
+	return nodeToTag(firstNode), nil
 }
 
 func nodeToTag(n *html.Node) *Tag {
