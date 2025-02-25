@@ -34,6 +34,11 @@ func assertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 				if current.Attrs[attrName] != expectedValue {
 					t.Errorf("Expected attribute %s to be %s, but got %s", attrName, expectedValue, current.Attrs[attrName])
 				}
+			} else if part == "Content" {
+				// Content access
+				if current.Content != expectedValue {
+					t.Errorf("Expected content to be %s, but got %s", expectedValue, current.Content)
+				}
 			} else {
 				// Tag name access
 				if current.TagName != expectedValue {
@@ -162,6 +167,30 @@ func TestHtmlToTag(t *testing.T) {
 				{"section.attrs[class]", "main"},
 				{"section.header.h1.TagName", "h1"},
 				{"#root.section.footer.p.attrs[class]", "footer-text"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Simple text in header",
+			html: `<h1>Title</h1>`,
+			pathAssertions: []struct {
+				path          string
+				expectedValue string
+			}{
+				{"TagName", "h1"},
+				{"Content", "Title"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Nested HTML with mixed content",
+			html: `<section><p>Text <strong>bold</strong> text.</p></section>`,
+			pathAssertions: []struct {
+				path          string
+				expectedValue string
+			}{
+				{"p.Content", "Text bold text."},
+				{"p.strong.Content", "bold"},
 			},
 			wantErr: false,
 		},
