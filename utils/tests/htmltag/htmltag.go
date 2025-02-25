@@ -16,7 +16,6 @@ type Tag struct {
 }
 
 func HtmlToTag(htmlStr string) (*Tag, error) {
-	fmt.Printf("html: %s\n", htmlStr)
 	doc, err := html.Parse(strings.NewReader(htmlStr))
 	if err != nil {
 		return nil, err
@@ -28,7 +27,6 @@ func HtmlToTag(htmlStr string) (*Tag, error) {
 	// Therefore, if err != nil it will always have this first nodes, which we skip to
 	// navigate to the content.
 	firstNode := doc.FirstChild.FirstChild.NextSibling
-	fmt.Printf("data: %s\n", firstNode.Data)
 
 	if firstNode == nil {
 		return nil, fmt.Errorf("empty node")
@@ -129,8 +127,6 @@ func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 			found := false
 			for _, child := range current.Children {
 				childClasses := strings.Fields(child.Attrs["class"])
-				fmt.Printf("%s:%s\n", classes, childClasses)
-				fmt.Printf("%s:%s:%d\n", child.TagName, tagName, len(classAccessors))
 				if child.TagName == tagName && containsAll(classes, childClasses) {
 					current = &child
 					found = true
