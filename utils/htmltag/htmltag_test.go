@@ -52,7 +52,7 @@ func assertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 				}
 			}
 			if !found {
-				t.Errorf("Expected to find child tag %s, but it does not exist ", part)
+				t.Errorf("Expected to find child tag %s, but it does not exist", part)
 				return
 			}
 			i++
