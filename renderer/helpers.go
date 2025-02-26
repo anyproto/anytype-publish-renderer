@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+
 	"go.uber.org/zap"
 
 	"github.com/anyproto/anytype-heart/core/domain"

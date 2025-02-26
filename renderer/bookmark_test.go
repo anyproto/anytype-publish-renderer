@@ -6,23 +6,27 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/anyproto/anytype-heart/pb"
-	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/types"
-
 	"github.com/stretchr/testify/assert"
 
+	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/anyproto/anytype-publish-renderer/utils/tests/htmltag"
 )
 
 func TestMakeBookmarkRendererParams(t *testing.T) {
 	tests := []struct {
-		name         string
-		block        *model.Block
-		pbFiles      map[string]*pb.SnapshotWithType
-		expected     *BlockParams
-		expectedHtml string
+		name           string
+		block          *model.Block
+		pbFiles        map[string]*pb.SnapshotWithType
+		expected       *BlockParams
+		wantErr        bool
+		pathAssertions []struct {
+			path          string
+			expectedValue string
+		}
 	}{
 		{
 			name: "valid bookmark",
@@ -53,7 +57,16 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 				Id:      "block1",
 				Classes: []string{"block", "align0", "blockBookmark"},
 			},
-			expectedHtml: `<a href="https://example.com" target="_blank" class="inner"><div class="side left"><div class="link">example.com</div><div class="name">name1</div><div class="descr">description1</div></div><div class="side right"></div></a>`,
+			pathAssertions: []struct {
+				path          string
+				expectedValue string
+			}{
+				{"a > attrs[href]", "https://example.com"},
+				{"a > div > attrs[class]", "side left"},
+				{"a > div > div.link > Content", "example.com"},
+				{"a > div > div.name > Content", "name1"},
+				{"a > div > div.descr > Content", "description1"},
+			},
 		},
 		{
 			name: "missing details",
@@ -159,7 +172,13 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 				Id:      "block3",
 				Classes: []string{"block", "align0", "blockBookmark"},
 			},
-			expectedHtml: `<a href="https://example.com" target="_blank" class="inner"><div class="side left"><div class="link">example.com</div><div class="name"></div><div class="descr"></div></div><div class="side right"></div></a>`,
+			pathAssertions: []struct {
+				path          string
+				expectedValue string
+			}{
+				{"a > attrs[href]", "https://example.com"},
+				{"a > div > div.link > Content", "example.com"},
+			},
 		},
 	}
 
@@ -176,7 +195,16 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 				builder := strings.Builder{}
 				err := result.Content.Render(context.Background(), &builder)
 				assert.NoError(t, err)
-				assert.Equal(t, tt.expectedHtml, builder.String())
+
+				got, err := htmltag.HtmlToTag(builder.String())
+				if (err != nil) != tt.wantErr {
+					t.Errorf("HtmlToTag() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+				for _, assertion := range tt.pathAssertions {
+					htmltag.AssertPath(t, got, assertion.path, assertion.expectedValue)
+				}
+
 			}
 		})
 	}

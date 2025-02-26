@@ -9,13 +9,14 @@ import (
 	"unicode/utf16"
 
 	"github.com/a-h/templ"
+	"github.com/gogo/protobuf/types"
+	"go.uber.org/zap"
+
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/anyproto/anytype-publish-renderer/renderer/markintervaltree"
 	"github.com/anyproto/anytype-publish-renderer/utils"
-	"github.com/gogo/protobuf/types"
-	"go.uber.org/zap"
 )
 
 func emojiParam(t model.BlockContentTextStyle) int32 {
