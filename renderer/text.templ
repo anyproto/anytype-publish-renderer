@@ -17,3 +17,13 @@ templ TextCodeTemplate(code, lang string) {
 		{code}
 	</div>
 }
+
+templ TextMarkupMention(r *Renderer, link templ.SafeURL, name string, classes []string, iconObjectParams *IconObjectParams){
+	<a href={ link } target="_blank" class={"markupmention", classes}>
+		<span class="smile">
+			@IconObjectTemplate(r, iconObjectParams)
+		</span>
+		<img src="./static/img/space.svg" class="space" />
+		<span class="name">{ name }</span>
+	</a>
+}
