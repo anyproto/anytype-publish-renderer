@@ -67,8 +67,6 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 				{"a > div > div.name > Content", "name1"},
 				{"a > div > div.descr > Content", "description1"},
 			},
-
-			// expectedHtml: `<a href="https://example.com" target="_blank" class="inner"><div class="side left"><div class="link">example.com</div><div class="name">name1</div><div class="descr">description1</div></div><div class="side right"></div></a>`,
 		},
 		{
 			name: "missing details",
@@ -181,8 +179,6 @@ func TestMakeBookmarkRendererParams(t *testing.T) {
 				{"a > attrs[href]", "https://example.com"},
 				{"a > div > div.link > Content", "example.com"},
 			},
-
-			// expectedHtml: `<a href="https://example.com" target="_blank" class="inner"><div class="side left"><div class="link">example.com</div><div class="name"></div><div class="descr"></div></div><div class="side right"></div></a>`,
 		},
 	}
 
