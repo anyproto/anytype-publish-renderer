@@ -2,6 +2,8 @@ package htmltag
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestContainsAll(t *testing.T) {
@@ -33,7 +35,6 @@ func TestHtmlToTag(t *testing.T) {
 			path          string
 			expectedValue string
 		}
-		wantErr bool
 	}{
 		{
 			name: "Simple HTML with one element",
@@ -44,7 +45,6 @@ func TestHtmlToTag(t *testing.T) {
 			}{
 				{"div > Content", ""},
 			},
-			wantErr: false,
 		},
 		{
 			name: "HTML with multiple attributes",
@@ -57,7 +57,6 @@ func TestHtmlToTag(t *testing.T) {
 				{"div > attrs[class]", "container"},
 				{"div > attrs[data-custom]", "value"},
 			},
-			wantErr: false,
 		},
 		{
 			name: "Nested HTML elements with attributes",
@@ -70,7 +69,6 @@ func TestHtmlToTag(t *testing.T) {
 				{"#parent > p.child > Content", "Text"},
 				{"#parent > span > attrs[data-test]", "true"},
 			},
-			wantErr: false,
 		},
 		{
 			name: "Deeply nested HTML elements",
@@ -84,7 +82,6 @@ func TestHtmlToTag(t *testing.T) {
 				{"#level3 > attrs[id]", "level3"},
 				{"#level3 > p.deep > Content", "Content"},
 			},
-			wantErr: false,
 		},
 		{
 			name: "Nested HTML with mixed attributes",
@@ -97,7 +94,6 @@ func TestHtmlToTag(t *testing.T) {
 				{"section > article > attrs[data-type]", "news"},
 				{"section > article > div.content > span.highlight > Content", "Text"},
 			},
-			wantErr: false,
 		},
 		{
 			name: "Complex nested structure",
@@ -111,7 +107,6 @@ func TestHtmlToTag(t *testing.T) {
 				{"#root > section > header > h1 > Content", "Title"},
 				{"#root > section > footer > p.footer-text > Content", "Footer"},
 			},
-			wantErr: false,
 		},
 		{
 			name: "Multiclass acces",
@@ -122,7 +117,6 @@ func TestHtmlToTag(t *testing.T) {
 			}{
 				{"#root > section.main > footer > p.footer-text.last > Content", "Footer"},
 			},
-			wantErr: false,
 		},
 
 		{
@@ -134,7 +128,6 @@ func TestHtmlToTag(t *testing.T) {
 			}{
 				{"h1 > Content", "Title"},
 			},
-			wantErr: false,
 		},
 		{
 			name: "Nested HTML with mixed content",
@@ -146,17 +139,13 @@ func TestHtmlToTag(t *testing.T) {
 				{"section > p > Content", "Text bold text."},
 				{"section > p > strong > Content", "bold"},
 			},
-			wantErr: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := HtmlToTag(tt.html)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("HtmlToTag() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			assert.NoError(t, err)
 			for _, assertion := range tt.pathAssertions {
 				AssertPath(t, got, assertion.path, assertion.expectedValue)
 			}
