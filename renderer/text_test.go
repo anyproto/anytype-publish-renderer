@@ -10,10 +10,16 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/anyproto/anytype-publish-renderer/utils/tests/htmltag"
 	"github.com/gogo/protobuf/types"
 
 	"github.com/stretchr/testify/assert"
 )
+
+type pathAssertion struct {
+	path          string
+	expectedValue string
+}
 
 func TestMakeRenderText(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
@@ -158,10 +164,27 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content, 1)
-		builder := strings.Builder{}
-		err := actual.Content.Render(context.Background(), &builder)
-		assert.NoError(t, err)
-		expectedHtml := `<div class="flex"><div class="text"><a href=anytype://object?objectId=anytypeId&spaceId=spaceId target="_blank" class="markupmention withImage"><span class="smile"><div class="iconObject withDefault c20"><img src="/img/icon/default/page.svg" class="iconCommon c18"></div></span><img src="./static/img/space.svg" class="space" /><span class="name">test</span></a></div></div>`
-		assert.Equal(t, expectedHtml, builder.String())
+
+		// expectedHtml := `<div class="flex"><div class="text"><a href=anytype://object?objectId=anytypeId&spaceId=spaceId target="_blank" class="markupmention withImage"><span class="smile"><div class="iconObject withDefault c20"><img src="/img/icon/default/page.svg" class="iconCommon c18"></div></span><img src="./static/img/space.svg" class="space" /><span class="name">test</span></a></div></div>`
+		pathAssertions := []pathAssertion{
+			{"div.flex > div.text > a.markupmention.withImage > attrs[href]", "anytype://object?objectId=anytypeId&spaceId=spaceId"},
+			{"div.flex > div.text > a.markupmention.withImage > span.smile > div.iconObject.withDefault.c20 > img.iconCommon > attrs[src]", "/img/icon/default/page.svg"},
+			{"div.flex > div.text > a.markupmention.withImage > img.space > attrs[src]", "./static/img/space.svg"},
+		}
+		assertHtmlTag(t, actual, pathAssertions)
 	})
+}
+
+func assertHtmlTag(t *testing.T, actual *BlockParams, pathAssertions []pathAssertion) {
+	builder := strings.Builder{}
+	err := actual.Content.Render(context.Background(), &builder)
+	assert.NoError(t, err)
+
+	got, err := htmltag.HtmlToTag(builder.String())
+	assert.NoError(t, err)
+
+	for _, assertion := range pathAssertions {
+		htmltag.AssertPath(t, got, assertion.path, assertion.expectedValue)
+	}
+
 }
