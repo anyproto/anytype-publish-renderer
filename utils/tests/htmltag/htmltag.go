@@ -81,9 +81,7 @@ func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 	path = strings.ReplaceAll(path, "> ", ">")
 	parts := strings.Split(path, ">")
 	current := tag
-	i := 0
-	for i < len(parts) {
-		part := parts[i]
+	for i, part := range parts {
 		if strings.HasPrefix(part, "#") && i < len(parts)-1 {
 			// Handle ID selection
 			id := strings.TrimPrefix(parts[i], "#")
@@ -92,10 +90,8 @@ func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 				t.Errorf("Expected to find element with id %s, but it does not exist", id)
 				return
 			}
-			// Skip the next part since it's the ID
-			i++
 		} else if i == len(parts)-1 {
-			// Last part, check if it's an attribute or tag name
+			// Last part, check if it's an attribute, content or tag name
 			if strings.Contains(part, "attrs[") {
 				// Attribute access, e.g., "attrs[id]"
 				attrName := strings.TrimPrefix(strings.TrimSuffix(part, "]"), "attrs[")
@@ -113,12 +109,12 @@ func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 					t.Errorf("Expected tag name to be %s, but got %s", expectedValue, current.TagName)
 				}
 			}
-			i++
 		} else {
 			classAccessors := strings.Split(part, ".")
 			classes := make([]string, 0)
 			tagName := part
 
+			// Check classes if they are present in selector
 			if len(classAccessors) > 1 {
 				tagName = classAccessors[0]
 				classes = classAccessors[1:]
@@ -137,7 +133,6 @@ func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 				t.Errorf("Expected to find child tag %s, but it does not exist", part)
 				return
 			}
-			i++
 		}
 	}
 }
