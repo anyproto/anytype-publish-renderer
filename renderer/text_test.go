@@ -80,11 +80,13 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content)
-		builder := strings.Builder{}
-		err := actual.Content.Render(context.Background(), &builder)
-		assert.NoError(t, err)
-		expectedHtml := `<div class="flex"><div class="text"><a href="anytype://object?objectId=anytypeId&spaceId=spaceId" class="markuplink" target="_blank">test</a></div></div>`
-		assert.Equal(t, expectedHtml, builder.String())
+
+		pathAssertions := []pathAssertion{
+			{"div.flex > div.text > a.markuplink > attrs[href]", "anytype://object?objectId=anytypeId&spaceId=spaceId"},
+			{"div.flex > div.text > a.markuplink > Content", "test"},
+		}
+		assertHtmlTag(t, actual, pathAssertions)
+
 	})
 	t.Run("object is missing", func(t *testing.T) {
 		// given
@@ -116,11 +118,12 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content)
-		builder := strings.Builder{}
-		err := actual.Content.Render(context.Background(), &builder)
-		assert.NoError(t, err)
-		expectedHtml := `<div class="flex"><div class="text"><markupobject>test</markupobject></div></div>`
-		assert.Equal(t, expectedHtml, builder.String())
+
+		pathAssertions := []pathAssertion{
+			{"div.flex > div.text > markupobject > Content", "test"},
+		}
+		assertHtmlTag(t, actual, pathAssertions)
+
 	})
 	t.Run("anytype object mention in markdown", func(t *testing.T) {
 		// given
@@ -165,11 +168,11 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content, 1)
 
-		// expectedHtml := `<div class="flex"><div class="text"><a href=anytype://object?objectId=anytypeId&spaceId=spaceId target="_blank" class="markupmention withImage"><span class="smile"><div class="iconObject withDefault c20"><img src="/img/icon/default/page.svg" class="iconCommon c18"></div></span><img src="./static/img/space.svg" class="space" /><span class="name">test</span></a></div></div>`
 		pathAssertions := []pathAssertion{
 			{"div.flex > div.text > a.markupmention.withImage > attrs[href]", "anytype://object?objectId=anytypeId&spaceId=spaceId"},
 			{"div.flex > div.text > a.markupmention.withImage > span.smile > div.iconObject.withDefault.c20 > img.iconCommon > attrs[src]", "/img/icon/default/page.svg"},
 			{"div.flex > div.text > a.markupmention.withImage > img.space > attrs[src]", "./static/img/space.svg"},
+			{"div.flex > div.text > a.markupmention.withImage > span.name > Content", "test"},
 		}
 		assertHtmlTag(t, actual, pathAssertions)
 	})
