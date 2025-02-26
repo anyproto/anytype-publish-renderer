@@ -42,8 +42,7 @@ func TestMakeRenderText(t *testing.T) {
 		// given
 		r := Renderer{}
 		expected := &BlockParams{
-			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
-			ChildrenIds: nil,
+			Classes: []string{"block", "align0", "blockText", "textParagraph"},
 		}
 		pbFiles := map[string]*pb.SnapshotWithType{
 			filepath.Join("objects", "anytypeId.pb"): {
@@ -81,19 +80,21 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content)
 
+		tag, err := blockParamsToHtmlTag(actual)
+		assert.NoError(t, err)
 		pathAssertions := []pathAssertion{
 			{"div.flex > div.text > a.markuplink > attrs[href]", "anytype://object?objectId=anytypeId&spaceId=spaceId"},
 			{"div.flex > div.text > a.markuplink > Content", "test"},
 		}
-		assertHtmlTag(t, actual, pathAssertions)
+
+		assertHtmlTag(t, tag, pathAssertions)
 
 	})
 	t.Run("object is missing", func(t *testing.T) {
 		// given
 		r := Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 		expected := &BlockParams{
-			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
-			ChildrenIds: nil,
+			Classes: []string{"block", "align0", "blockText", "textParagraph"},
 		}
 
 		// when
@@ -119,18 +120,21 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content)
 
+		tag, err := blockParamsToHtmlTag(actual)
+		assert.NoError(t, err)
+
 		pathAssertions := []pathAssertion{
 			{"div.flex > div.text > markupobject > Content", "test"},
 		}
-		assertHtmlTag(t, actual, pathAssertions)
+
+		assertHtmlTag(t, tag, pathAssertions)
 
 	})
 	t.Run("anytype object mention in markdown", func(t *testing.T) {
 		// given
 		r := Renderer{}
 		expected := &BlockParams{
-			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
-			ChildrenIds: nil,
+			Classes: []string{"block", "align0", "blockText", "textParagraph"},
 		}
 		pbFiles := map[string]*pb.SnapshotWithType{
 			filepath.Join("objects", "anytypeId.pb"): {
@@ -168,26 +172,37 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content, 1)
 
+		tag, err := blockParamsToHtmlTag(actual)
+		assert.NoError(t, err)
+
 		pathAssertions := []pathAssertion{
 			{"div.flex > div.text > a.markupmention.withImage > attrs[href]", "anytype://object?objectId=anytypeId&spaceId=spaceId"},
 			{"div.flex > div.text > a.markupmention.withImage > span.smile > div.iconObject.withDefault.c20 > img.iconCommon > attrs[src]", "/img/icon/default/page.svg"},
 			{"div.flex > div.text > a.markupmention.withImage > img.space > attrs[src]", "./static/img/space.svg"},
 			{"div.flex > div.text > a.markupmention.withImage > span.name > Content", "test"},
 		}
-		assertHtmlTag(t, actual, pathAssertions)
+		assertHtmlTag(t, tag, pathAssertions)
 	})
 }
 
-func assertHtmlTag(t *testing.T, actual *BlockParams, pathAssertions []pathAssertion) {
+func blockParamsToHtmlTag(actual *BlockParams) (*htmltag.Tag, error) {
 	builder := strings.Builder{}
 	err := actual.Content.Render(context.Background(), &builder)
-	assert.NoError(t, err)
+	if err != nil {
+		return nil, err
+	}
 
-	got, err := htmltag.HtmlToTag(builder.String())
-	assert.NoError(t, err)
+	tag, err := htmltag.HtmlToTag(builder.String())
+	if err != nil {
+		return nil, err
+	}
 
+	return tag, nil
+
+}
+func assertHtmlTag(t *testing.T, tag *htmltag.Tag, pathAssertions []pathAssertion) {
 	for _, assertion := range pathAssertions {
-		htmltag.AssertPath(t, got, assertion.path, assertion.expectedValue)
+		htmltag.AssertPath(t, tag, assertion.path, assertion.expectedValue)
 	}
 
 }
