@@ -172,7 +172,7 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	defer func() {
 		if p := recover(); p != nil {
 			stack := string(debug.Stack())
-			err = fmt.Errorf("panic: %v, stack: %s", p, stack)
+			err = fmt.Errorf("panic: %v, pablishFilesPath: %s, stack: %s", p, r.Config.PublishFilesPath, stack)
 			log.Error("panic recover", zap.String("where", "NewRenderer()"), zap.Error(err), zap.String("stack", stack))
 			return
 		}
@@ -238,7 +238,7 @@ func (r *Renderer) Render(writer io.Writer) (err error) {
 	defer func() {
 		if p := recover(); p != nil {
 			stack := string(debug.Stack())
-			err = fmt.Errorf("panic: %v, stack: %s", p, stack)
+			err = fmt.Errorf("panic: %v, pablishFilesPath: %s, stack: %s", p, r.Config.PublishFilesPath, stack)
 			log.Error("panic recover", zap.String("where", "Render()"), zap.Error(err), zap.String("stack", stack))
 		}
 	}()
