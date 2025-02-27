@@ -3,8 +3,9 @@ package htmltag
 import (
 	"fmt"
 	"strings"
-	"testing"
 
+	"github.com/sergi/go-diff/diffmatchpatch"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/html"
 )
 
@@ -66,15 +67,30 @@ func nodeToTag(n *html.Node) *Tag {
 	return nil
 }
 
+func UnequalFail(t assert.TestingT, expected, actual string, doDiff bool, msgAndArgs ...interface{}) bool {
+	diff := "<diff disabled>"
+	if doDiff {
+		dmp := diffmatchpatch.New()
+		diffs := dmp.DiffMain(expected, actual, false)
+		diff = dmp.DiffPrettyText(diffs)
+	}
+
+	return assert.Fail(t, fmt.Sprintf("Not equal: \n"+
+		"expected: %s\n"+
+		"actual  : %s\n"+
+		"diff    : %s", expected, actual, diff), msgAndArgs...)
+}
+
 // assertPath checks if the given path exists in the Tag structure and matches the expected value.
 // Path looks like this: "section.main > footer > p.footer-text.last > Content"
 //
 // Note:
 // Unlike CSS accessors, it has to contain _all_ nodes, not just some of them.
 // I.e., it doesn't traverse all children nodes recursively.
-func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
+func AssertPath(t assert.TestingT, tag *Tag, path string, expectedValue string) bool {
+
 	if tag == nil {
-		t.Fatal("Expected a Tag, but got nil")
+		return UnequalFail(t, "<tag>", "nil", false, "Expected a Tag, but got nil")
 	}
 
 	path = strings.ReplaceAll(path, " >", ">")
@@ -87,8 +103,9 @@ func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 			id := strings.TrimPrefix(parts[i], "#")
 			current = findTagById(current, id)
 			if current == nil {
-				t.Errorf("Expected to find element with id %s, but it does not exist", id)
-				return
+				expected := fmt.Sprintf("`%s`", id)
+				msg := fmt.Sprintf("Expected to find element with id %s, but it does not exist", id)
+				return UnequalFail(t, expected, "`nil`", false, msg)
 			}
 		} else if i == len(parts)-1 {
 			// Last part, check if it's an attribute, content or tag name
@@ -96,17 +113,26 @@ func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 				// Attribute access, e.g., "attrs[id]"
 				attrName := strings.TrimPrefix(strings.TrimSuffix(part, "]"), "attrs[")
 				if current.Attrs[attrName] != expectedValue {
-					t.Errorf("Expected attribute %s to be %s, but got %s", attrName, expectedValue, current.Attrs[attrName])
+					expected := fmt.Sprintf("`%s`", expectedValue)
+					actual := fmt.Sprintf("`%s`", current.Attrs[attrName])
+					msg := fmt.Sprintf("Expected attribute %s to be %s, but got %s", attrName, expectedValue, current.Attrs[attrName])
+					return UnequalFail(t, expected, actual, true, msg)
 				}
 			} else if part == "Content" {
 				// Content access
 				if current.Content != expectedValue {
-					t.Errorf("Expected content to be %s, but got %s", expectedValue, current.Content)
+					expected := fmt.Sprintf("`%s`", expectedValue)
+					actual := fmt.Sprintf("`%s`", current.Content)
+					msg := fmt.Sprintf("Expected content to be %s, but got %s", expectedValue, current.Content)
+					return UnequalFail(t, expected, actual, true, msg)
 				}
 			} else {
 				// Tag name access
 				if current.TagName != expectedValue {
-					t.Errorf("Expected tag name to be %s, but got %s", expectedValue, current.TagName)
+					expected := fmt.Sprintf("`%s`", expectedValue)
+					actual := fmt.Sprintf("`%s`", current.TagName)
+					msg := fmt.Sprintf("Expected tag name to be %s, but got %s", expectedValue, current.TagName)
+					return UnequalFail(t, expected, actual, true, msg)
 				}
 			}
 		} else {
@@ -130,11 +156,14 @@ func AssertPath(t *testing.T, tag *Tag, path string, expectedValue string) {
 				}
 			}
 			if !found {
-				t.Errorf("Expected to find child tag %s, but it does not exist", part)
-				return
+				expected := fmt.Sprintf("`%s`", part)
+				actual := "`nil`"
+				msg := fmt.Sprintf("Expected to find child tag %s, but it does not exist", part)
+				return UnequalFail(t, expected, actual, false, msg)
 			}
 		}
 	}
+	return true
 }
 
 // containsAll checks that all `items` are present in `target`
