@@ -67,25 +67,24 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 	case model.BlockContentTextMark_Mention:
 		details := r.findTargetDetails(mark.Param)
 
-		var iconHtml, class, link string
-
+		var link string
+		var iconParams *IconObjectParams
+		var classes []string
 		if details != nil && len(details.Fields) != 0 {
-			params := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
-
-			var err error
-			iconHtml, err = utils.TemplToString(IconObjectTemplate(r, params))
-
-			if err != nil {
-				log.Error("Failed to render mention icon", zap.Error(err))
-			}
-
-			if iconHtml != "" {
-				class = "withImage"
+			iconParams = r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
+			classes = []string{}
+			if iconParams.Src != "" {
+				classes = append(classes, "withImage")
 			}
 			link = r.makeAnytypeLink(details, mark.Param)
 		}
 
-		return `<a href=` + link + ` target="_blank" class="markupmention ` + class + `"><span class="smile">` + iconHtml + `</span><img src="./static/img/space.svg" class="space" /><span class="name">` + s + `</span></a>`
+		html, err := utils.TemplToString(TextMarkupMention(r, templ.SafeURL(link), s, classes, iconParams))
+		if err != nil {
+			log.Error("Failed to render mention icon", zap.Error(err))
+		}
+
+		return html
 
 	case model.BlockContentTextMark_Emoji:
 		code := []rune(mark.Param)[0]
