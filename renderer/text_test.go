@@ -17,9 +17,16 @@ import (
 
 func TestMakeRenderText(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
+		r := NewTestRenderer()
 		id := "66c58b2a7e4bcd764b24c205"
-		textBlock := r.BlocksById[id]
+		textBlock := &model.Block{
+			Id: id,
+			Content: &model.BlockContentOfText{
+				Text: &model.BlockContentText{
+					Text: "test",
+				},
+			},
+		}
 
 		expected := &BlockParams{
 			Id:          id,
@@ -34,23 +41,23 @@ func TestMakeRenderText(t *testing.T) {
 	})
 	t.Run("anytype object link in markdown", func(t *testing.T) {
 		// given
-		r := Renderer{}
+		r := NewTestRenderer(
+			WithCachedPbFiles(map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "anytypeId.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("anytypeId"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
+						}},
+					}},
+				},
+			}),
+		)
 		expected := &BlockParams{
 			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
 			ChildrenIds: nil,
 		}
-		pbFiles := map[string]*pb.SnapshotWithType{
-			filepath.Join("objects", "anytypeId.pb"): {
-				SbType: model.SmartBlockType_Page,
-				Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():      pbtypes.String("anytypeId"),
-						bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
-					}},
-				}},
-			},
-		}
-		r.CachedPbFiles = pbFiles
 
 		// when
 		actual := r.makeTextBlockParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{
@@ -82,7 +89,7 @@ func TestMakeRenderText(t *testing.T) {
 	})
 	t.Run("object is missing", func(t *testing.T) {
 		// given
-		r := Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
+		r := NewTestRenderer()
 		expected := &BlockParams{
 			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
 			ChildrenIds: nil,
@@ -118,23 +125,23 @@ func TestMakeRenderText(t *testing.T) {
 	})
 	t.Run("anytype object mention in markdown", func(t *testing.T) {
 		// given
-		r := Renderer{}
+		r := NewTestRenderer(
+			WithCachedPbFiles(map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "anytypeId.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("anytypeId"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
+						}},
+					}},
+				},
+			}),
+		)
 		expected := &BlockParams{
 			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
 			ChildrenIds: nil,
 		}
-		pbFiles := map[string]*pb.SnapshotWithType{
-			filepath.Join("objects", "anytypeId.pb"): {
-				SbType: model.SmartBlockType_Page,
-				Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
-					Details: &types.Struct{Fields: map[string]*types.Value{
-						bundle.RelationKeyId.String():      pbtypes.String("anytypeId"),
-						bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
-					}},
-				}},
-			},
-		}
-		r.CachedPbFiles = pbFiles
 
 		// when
 		actual := r.makeTextBlockParams(&model.Block{Content: &model.BlockContentOfText{Text: &model.BlockContentText{

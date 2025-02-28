@@ -11,7 +11,7 @@ import (
 )
 
 func TestMakeTableOfContentRenderParams(t *testing.T) {
-	renderer := &Renderer{}
+	renderer := NewTestRenderer()
 
 	t.Run("empty Block", func(t *testing.T) {
 		// given

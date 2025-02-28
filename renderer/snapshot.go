@@ -10,6 +10,8 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/localstore/addr"
 )
 
+const pbExt = ".pb"
+
 func (r *Renderer) getObjectSnapshot(objectId string) *pb.SnapshotWithType {
 	if strings.HasPrefix(objectId, addr.DatePrefix) {
 		return r.getDateSnapshot(objectId)
@@ -20,7 +22,7 @@ func (r *Renderer) getObjectSnapshot(objectId string) *pb.SnapshotWithType {
 		err      error
 	)
 	for _, dir := range directories {
-		path := filepath.Join(dir, objectId+".pb")
+		path := filepath.Join(dir, objectId+pbExt)
 		snapshot, err = r.ReadJsonpbSnapshot(path)
 		if err == nil {
 			return snapshot
