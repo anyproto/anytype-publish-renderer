@@ -138,8 +138,13 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 	rangeSet[0] = true
 	rangeSet[int32(len(rText))] = true
 	for _, mark := range marks {
-		rangeSet[mark.Range.From] = true
-		rangeSet[mark.Range.To] = true
+		if mark.Range.From < int32(len(rText)) {
+			rangeSet[mark.Range.From] = true
+		}
+		if mark.Range.To <= int32(len(rText)) {
+			rangeSet[mark.Range.To] = true
+		}
+
 	}
 
 	rangeRay := make([]int32, len(rangeSet))
@@ -152,8 +157,6 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 	slices.Sort(rangeRay)
 
 	var markedText strings.Builder
-
-	log.Debug("rangeRay", zap.String("ray", fmt.Sprintf("%#v", rangeRay)))
 	for i := 0; i < len(rangeRay)-1; i++ {
 		curRange := &model.Range{
 			From: rangeRay[i],
@@ -161,18 +164,11 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 		}
 		marksToApply := make([]*model.BlockContentTextMark, 0)
 		markintervaltree.SearchOverlaps(root, curRange, &marksToApply)
-
 		markedPart := string(rText[curRange.From:curRange.To])
-		log.Debug("apply marks",
-			zap.String("markedPart", markedPart),
-			zap.Int32("from", curRange.From),
-			zap.Int32("to", curRange.To))
 		markedPart = html.EscapeString(markedPart)
 		for _, m := range marksToApply {
 			markedPart = r.applyMark(style, markedPart, m)
-			log.Debug("apply mark", zap.String("markedPart", markedPart), zap.Int32("from", m.Range.From), zap.Int32("to", m.Range.To))
 		}
-		log.Debug("final marked part", zap.String("m", markedPart))
 		markedText.WriteString(markedPart)
 	}
 
