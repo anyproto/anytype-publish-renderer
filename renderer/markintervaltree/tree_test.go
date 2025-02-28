@@ -39,17 +39,16 @@ func TestMarkIntervalTree(t *testing.T) {
 			To:   31,
 		},
 	}
-	root := &MarkIntervalTreeNode{
-		Mark: &model.BlockContentTextMark{
-			Range: ranges[0],
-		},
+
+	marks := make([]*model.BlockContentTextMark, 0)
+	for _, r := range ranges {
+		mark := &model.BlockContentTextMark{
+			Range: r,
+		}
+		marks = append(marks, mark)
 	}
 
-	for i := 1; i < len(ranges); i++ {
-		root.Insert(&model.BlockContentTextMark{
-			Range: ranges[i],
-		})
-	}
+	root := New(marks)
 
 	t.Run("simple test", func(t *testing.T) {
 		results := root.SearchOverlaps(&model.Range{

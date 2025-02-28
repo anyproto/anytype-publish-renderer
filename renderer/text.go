@@ -160,19 +160,6 @@ func makeMarksRangeRay(marks []*model.BlockContentTextMark, textLen int32) []int
 	return rangeRay
 }
 
-func buildMarksIntervalTree(marks []*model.BlockContentTextMark) *markintervaltree.MarkIntervalTreeNode {
-	root := &markintervaltree.MarkIntervalTreeNode{
-		Mark:        marks[0],
-		MaxUpperVal: marks[0].Range.To,
-	}
-
-	for i := 1; i < len(marks); i++ {
-		root.Insert(marks[i])
-	}
-
-	return root
-}
-
 // - make borders
 //   - make set from ranges, from-to
 //   - sort
@@ -188,7 +175,7 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 
 	// convert to JSRunes to cut marks.Range in the same way as JS does
 	rText := toJSRunes(text)
-	marksIntervalTree := buildMarksIntervalTree(marks)
+	marksIntervalTree := markintervaltree.New(marks)
 	rangeRay := makeMarksRangeRay(marks, int32(len(rText)))
 
 	for i := 0; i < len(rangeRay)-1; i++ {

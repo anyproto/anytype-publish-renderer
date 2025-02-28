@@ -11,6 +11,20 @@ type MarkIntervalTreeNode struct {
 	Right       *MarkIntervalTreeNode
 }
 
+func New(marks []*model.BlockContentTextMark) *MarkIntervalTreeNode {
+	root := &MarkIntervalTreeNode{
+		Mark:        marks[0],
+		MaxUpperVal: marks[0].Range.To,
+	}
+
+	for i := 1; i < len(marks); i++ {
+		root.Insert(marks[i])
+	}
+
+	return root
+
+}
+
 func (r *MarkIntervalTreeNode) Insert(m *model.BlockContentTextMark) {
 	node := r
 	for node != nil {
