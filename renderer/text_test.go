@@ -10,10 +10,16 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/anyproto/anytype-publish-renderer/utils/tests/htmltag"
 	"github.com/gogo/protobuf/types"
 
 	"github.com/stretchr/testify/assert"
 )
+
+type pathAssertion struct {
+	path          string
+	expectedValue string
+}
 
 func TestMakeRenderText(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
@@ -36,8 +42,7 @@ func TestMakeRenderText(t *testing.T) {
 		// given
 		r := Renderer{}
 		expected := &BlockParams{
-			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
-			ChildrenIds: nil,
+			Classes: []string{"block", "align0", "blockText", "textParagraph"},
 		}
 		pbFiles := map[string]*pb.SnapshotWithType{
 			filepath.Join("objects", "anytypeId.pb"): {
@@ -74,18 +79,22 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content)
-		builder := strings.Builder{}
-		err := actual.Content.Render(context.Background(), &builder)
+
+		tag, err := blockParamsToHtmlTag(actual)
 		assert.NoError(t, err)
-		expectedHtml := `<div class="flex"><div class="text"><a href="anytype://object?objectId=anytypeId&spaceId=spaceId" class="markuplink" target="_blank">test</a></div></div>`
-		assert.Equal(t, expectedHtml, builder.String())
+		pathAssertions := []pathAssertion{
+			{"div.flex > div.text > a.markuplink > attrs[href]", "anytype://object?objectId=anytypeId&spaceId=spaceId"},
+			{"div.flex > div.text > a.markuplink > Content", "test"},
+		}
+
+		assertHtmlTag(t, tag, pathAssertions)
+
 	})
 	t.Run("object is missing", func(t *testing.T) {
 		// given
 		r := Renderer{CachedPbFiles: make(map[string]*pb.SnapshotWithType), UberSp: &PublishingUberSnapshot{PbFiles: make(map[string]string)}}
 		expected := &BlockParams{
-			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
-			ChildrenIds: nil,
+			Classes: []string{"block", "align0", "blockText", "textParagraph"},
 		}
 
 		// when
@@ -110,18 +119,22 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content)
-		builder := strings.Builder{}
-		err := actual.Content.Render(context.Background(), &builder)
+
+		tag, err := blockParamsToHtmlTag(actual)
 		assert.NoError(t, err)
-		expectedHtml := `<div class="flex"><div class="text"><markupobject>test</markupobject></div></div>`
-		assert.Equal(t, expectedHtml, builder.String())
+
+		pathAssertions := []pathAssertion{
+			{"div.flex > div.text > markupobject > Content", "test"},
+		}
+
+		assertHtmlTag(t, tag, pathAssertions)
+
 	})
 	t.Run("anytype object mention in markdown", func(t *testing.T) {
 		// given
 		r := Renderer{}
 		expected := &BlockParams{
-			Classes:     []string{"block", "align0", "blockText", "textParagraph"},
-			ChildrenIds: nil,
+			Classes: []string{"block", "align0", "blockText", "textParagraph"},
 		}
 		pbFiles := map[string]*pb.SnapshotWithType{
 			filepath.Join("objects", "anytypeId.pb"): {
@@ -158,10 +171,38 @@ func TestMakeRenderText(t *testing.T) {
 		assert.Equal(t, expected.Id, actual.Id)
 		assert.Equal(t, expected.Classes, actual.Classes)
 		assert.NotNil(t, actual.Content, 1)
-		builder := strings.Builder{}
-		err := actual.Content.Render(context.Background(), &builder)
+
+		tag, err := blockParamsToHtmlTag(actual)
 		assert.NoError(t, err)
-		expectedHtml := `<div class="flex"><div class="text"><a href=anytype://object?objectId=anytypeId&spaceId=spaceId target="_blank" class="markupmention withImage"><span class="smile"><div class="iconObject withDefault c20"><img src="/img/icon/default/page.svg" class="iconCommon c18"></div></span><img src="./static/img/space.svg" class="space" /><span class="name">test</span></a></div></div>`
-		assert.Equal(t, expectedHtml, builder.String())
+
+		pathAssertions := []pathAssertion{
+			{"div.flex > div.text > a.markupmention.withImage > attrs[href]", "anytype://object?objectId=anytypeId&spaceId=spaceId"},
+			{"div.flex > div.text > a.markupmention.withImage > span.smile > div.iconObject.withDefault.c20 > img.iconCommon > attrs[src]", "/img/icon/default/page.svg"},
+			{"div.flex > div.text > a.markupmention.withImage > img.space > attrs[src]", "./static/img/space.svg"},
+			{"div.flex > div.text > a.markupmention.withImage > span.name > Content", "test"},
+		}
+		assertHtmlTag(t, tag, pathAssertions)
 	})
+}
+
+func blockParamsToHtmlTag(actual *BlockParams) (*htmltag.Tag, error) {
+	builder := strings.Builder{}
+	err := actual.Content.Render(context.Background(), &builder)
+	if err != nil {
+		return nil, err
+	}
+
+	tag, err := htmltag.HtmlToTag(builder.String())
+	if err != nil {
+		return nil, err
+	}
+
+	return tag, nil
+
+}
+func assertHtmlTag(t *testing.T, tag *htmltag.Tag, pathAssertions []pathAssertion) {
+	for _, assertion := range pathAssertions {
+		htmltag.AssertPath(t, tag, assertion.path, assertion.expectedValue)
+	}
+
 }
