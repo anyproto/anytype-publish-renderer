@@ -52,11 +52,10 @@ func TestMarkIntervalTree(t *testing.T) {
 	}
 
 	t.Run("simple test", func(t *testing.T) {
-		results := make([]*model.BlockContentTextMark, 0)
-		SearchOverlaps(root, &model.Range{
+		results := root.SearchOverlaps(&model.Range{
 			From: 17,
 			To:   19,
-		}, &results)
+		})
 
 		expected := []*model.BlockContentTextMark{
 			&model.BlockContentTextMark{
@@ -83,11 +82,10 @@ func TestMarkIntervalTree(t *testing.T) {
 	})
 
 	t.Run("single range", func(t *testing.T) {
-		results := make([]*model.BlockContentTextMark, 0)
-		SearchOverlaps(root, &model.Range{
+		results := root.SearchOverlaps(&model.Range{
 			From: 5,
 			To:   6,
-		}, &results)
+		})
 
 		expected := []*model.BlockContentTextMark{
 			&model.BlockContentTextMark{
@@ -108,11 +106,10 @@ func TestMarkIntervalTree(t *testing.T) {
 			MaxUpperVal: ranges[0].To,
 		}
 
-		results := make([]*model.BlockContentTextMark, 0)
-		SearchOverlaps(singleRoot, &model.Range{
+		results := singleRoot.SearchOverlaps(&model.Range{
 			From: 5,
 			To:   6,
-		}, &results)
+		})
 
 		expected := []*model.BlockContentTextMark{
 			&model.BlockContentTextMark{

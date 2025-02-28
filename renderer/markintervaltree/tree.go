@@ -49,11 +49,17 @@ func rangeOverlap(a, b *model.Range) bool {
 		b.To && a.To > b.From) || (a.From == b.From && a.To == b.To)
 }
 
-func SearchOverlaps(n *MarkIntervalTreeNode, i *model.Range, result *[]*model.BlockContentTextMark) {
+func (r *MarkIntervalTreeNode) SearchOverlaps(i *model.Range) []*model.BlockContentTextMark {
+	marksToApply := make([]*model.BlockContentTextMark, 0)
+	searchOverlaps(r, i, &marksToApply)
+	return marksToApply
+}
+
+func searchOverlaps(n *MarkIntervalTreeNode, i *model.Range, result *[]*model.BlockContentTextMark) {
 	if n == nil || n.MaxUpperVal < i.From {
 		return
 	}
-	SearchOverlaps(n.Left, i, result)
+	searchOverlaps(n.Left, i, result)
 
 	if rangeOverlap(n.Mark.Range, i) {
 		*result = append(*result, n.Mark)
@@ -62,5 +68,5 @@ func SearchOverlaps(n *MarkIntervalTreeNode, i *model.Range, result *[]*model.Bl
 		return
 	}
 
-	SearchOverlaps(n.Right, i, result)
+	searchOverlaps(n.Right, i, result)
 }

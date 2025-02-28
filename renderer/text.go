@@ -140,30 +140,10 @@ func fromJSRunes(jsRunes []rune) string {
 	return string(runes)
 }
 
-// - make borders
-//   - make set from ranges, from-to
-//   - sort
-//   - for each range, find overlapping intervals
-//     add props from each of this ranges to this range
-func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, text string, marks []*model.BlockContentTextMark) string {
-	if len(marks) == 0 {
-		text = html.EscapeString(text)
-		return text
-	}
-
-	rText := toJSRunes(text)
-	root := &markintervaltree.MarkIntervalTreeNode{
-		Mark:        marks[0],
-		MaxUpperVal: marks[0].Range.To,
-	}
-
-	for i := 1; i < len(marks); i++ {
-		root.Insert(marks[i])
-	}
-
+func makeMarksRangeRay(marks []*model.BlockContentTextMark, textLen int32) []int32 {
 	rangeSet := make(map[int32]bool)
 	rangeSet[0] = true
-	rangeSet[int32(len(rText))] = true
+	rangeSet[textLen] = true
 	for _, mark := range marks {
 		rangeSet[mark.Range.From] = true
 		rangeSet[mark.Range.To] = true
@@ -177,16 +157,44 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 	}
 
 	slices.Sort(rangeRay)
+	return rangeRay
+}
+
+func buildMarksIntervalTree(marks []*model.BlockContentTextMark) *markintervaltree.MarkIntervalTreeNode {
+	root := &markintervaltree.MarkIntervalTreeNode{
+		Mark:        marks[0],
+		MaxUpperVal: marks[0].Range.To,
+	}
+
+	for i := 1; i < len(marks); i++ {
+		root.Insert(marks[i])
+	}
+
+	return root
+}
+
+// - make borders
+//   - make set from ranges, from-to
+//   - sort
+//   - for each range, find overlapping intervals
+//     add props from each of this ranges to this range
+func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, text string, marks []*model.BlockContentTextMark) string {
+	if len(marks) == 0 {
+		text = html.EscapeString(text)
+		return text
+	}
 
 	var markedText strings.Builder
+	rText := toJSRunes(text)
+	marksIntervalTree := buildMarksIntervalTree(marks)
+	rangeRay := makeMarksRangeRay(marks, int32(len(rText)))
+
 	for i := 0; i < len(rangeRay)-1; i++ {
 		curRange := &model.Range{
 			From: rangeRay[i],
 			To:   rangeRay[i+1],
 		}
-		marksToApply := make([]*model.BlockContentTextMark, 0)
-		markintervaltree.SearchOverlaps(root, curRange, &marksToApply)
-
+		marksToApply := marksIntervalTree.SearchOverlaps(curRange)
 		markedPart := fromJSRunes(rText[curRange.From:curRange.To])
 		markedPart = html.EscapeString(markedPart)
 		for _, m := range marksToApply {
