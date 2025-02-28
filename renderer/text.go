@@ -109,8 +109,35 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 	return "<markupobject>" + s + "</markupobject>"
 }
 
-func StrToUTF16(str string) []uint16 {
-	return utf16.Encode([]rune(str))
+// Convert a string into "JS-like" rune slices (surrogate pairs split)
+//
+// When we get Range from anytype-ts, it is calculates emojies by codepoints.
+// Which means, that js calculates `":man-woman-boy-girl: asdf".length == 16`, but not 5
+func toJSRunes(s string) []rune {
+	var jsRunes []rune
+	for _, r := range s {
+		if r > 0xFFFF {
+			// Convert to surrogate pair (two runes)
+			high, low := utf16.EncodeRune(r)
+			jsRunes = append(jsRunes, rune(high), rune(low))
+		} else {
+			jsRunes = append(jsRunes, r)
+		}
+	}
+
+	return jsRunes
+}
+
+func fromJSRunes(jsRunes []rune) string {
+	var utf16Units []uint16
+	for _, r := range jsRunes {
+		utf16Units = append(utf16Units, uint16(r))
+	}
+	// Decode UTF-16 (reconstruct surrogate pairs into full runes)
+	runes := utf16.Decode(utf16Units)
+
+	// Convert runes back to a string
+	return string(runes)
 }
 
 // - make borders
@@ -124,7 +151,7 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 		return text
 	}
 
-	rText := utf16.Decode(StrToUTF16(text))
+	rText := toJSRunes(text)
 	root := &markintervaltree.MarkIntervalTreeNode{
 		Mark:        marks[0],
 		MaxUpperVal: marks[0].Range.To,
@@ -138,13 +165,8 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 	rangeSet[0] = true
 	rangeSet[int32(len(rText))] = true
 	for _, mark := range marks {
-		if mark.Range.From < int32(len(rText)) {
-			rangeSet[mark.Range.From] = true
-		}
-		if mark.Range.To <= int32(len(rText)) {
-			rangeSet[mark.Range.To] = true
-		}
-
+		rangeSet[mark.Range.From] = true
+		rangeSet[mark.Range.To] = true
 	}
 
 	rangeRay := make([]int32, len(rangeSet))
@@ -164,11 +186,13 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 		}
 		marksToApply := make([]*model.BlockContentTextMark, 0)
 		markintervaltree.SearchOverlaps(root, curRange, &marksToApply)
-		markedPart := string(rText[curRange.From:curRange.To])
+
+		markedPart := fromJSRunes(rText[curRange.From:curRange.To])
 		markedPart = html.EscapeString(markedPart)
 		for _, m := range marksToApply {
 			markedPart = r.applyMark(style, markedPart, m)
 		}
+
 		markedText.WriteString(markedPart)
 	}
 
@@ -211,6 +235,8 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 		marks := blockText.GetMarks().Marks
 		text = r.applyNonOverlapingMarks(style, text, marks)
 		text = replaceNewlineBr(text)
+		log.Debug("final text", zap.String("m", text))
+
 		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
 		fields := b.GetFields()
