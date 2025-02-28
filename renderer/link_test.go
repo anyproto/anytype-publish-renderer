@@ -25,11 +25,15 @@ func TestMakeLinkRenderParams(t *testing.T) {
 				},
 			},
 		}
+
+		// when
 		actual := r.makeLinkBlockParams(block)
 		pathAssertions := []pathAssertion{
-			{"div.deleted > div.iconObject.withDefault.c20 > img.iconCommon.c18 > attrs[src]", "/static/img/icon/ghost.svg"},
+			{"div.deleted > div.iconObject.withDefault.c20 > img.iconCommon.c18 > attrs[src]", "/img/icon/ghost.svg"},
 			{"div.deleted > div.name > Content", "Non-existent object"},
 		}
+
+		// then
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 
 	})
@@ -56,11 +60,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 		}
 
+		expected := &BlockParams{Classes: []string{"block", "align0", "blockLink", "withIcon", "c20"}}
+
+		// when
 		actual := r.makeLinkBlockParams(block)
 		pathAssertions := []pathAssertion{
 			{"div.deleted > div.iconObject.withDefault.c20 > img.iconCommon.c18 > attrs[src]", "/img/icon/ghost.svg"},
 			{"div.deleted > div.name > Content", "Non-existent object"},
 		}
+
+		// then
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 	})
 	t.Run("archived block", func(t *testing.T) {
@@ -90,12 +99,15 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 		}
 
+		// when
 		actual := r.makeLinkBlockParams(block)
 		pathAssertions := []pathAssertion{
 			{"a.linkCard.isPage.c1 > attrs[href]", "anytype://object?objectId=archived-id&spaceId=spaceId"},
 			{"a.linkCard.isPage.c1 > div.sides > div.side.left > div.cardName > div.name > Content", "Archived Block"},
 			{"a.linkCard.isPage.c1 > div.sides > div.side.left > div.cardName > div.tagItem.isMultiSelect.archive > Content", "Deleted"},
 		}
+
+		// then
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 
 	})
@@ -126,12 +138,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 		}
 
 		expected := &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}
+
+		// when
 		actual := r.makeLinkBlockParams(block)
 		pathAssertions := []pathAssertion{
 			{"a.linkCard.isPage.withIcon.c20.c1 > attrs[href]", "anytype://object?objectId=emoji-icon-id&spaceId=spaceId"},
-			{"a > div.sides > div.side.left > div.cardName > div.iconObject.c20 > img.smileImage.c20 > attrs[src]", "https://anytype-static.fra1.cdn.digitaloceanspaces.com/emojies/1f60a.png"},
+			{"a > div.sides > div.side.left > div.cardName > div.iconObject.c20 > img.smileImage.c20 > attrs[src]", "/emojies/1f60a.png"},
 			{"a > div.sides > div.side.left > div.cardName > div.name > Content", "Emoji Icon Block"},
 		}
+
+		// then
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 
 	})
@@ -153,7 +169,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			}),
 		)
 
-		// when
 		block := &model.Block{
 			Content: &model.BlockContentOfLink{
 				Link: &model.BlockContentLink{
@@ -162,12 +177,15 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 		}
 		expected := &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}
+
+		// when
 		actual := r.makeLinkBlockParams(block)
 		pathAssertions := []pathAssertion{
 			{"a.linkCard.isCollection.c1 > attrs[href]", "anytype://object?objectId=collection-id&spaceId=spaceId"},
 			{"a.linkCard.isCollection.c1 > div.sides > div.side.left > div.cardName > div.name > Content", "Collection Block"}}
-		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 
+		// then
+		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 	})
 	t.Run("todo layout", func(t *testing.T) {
 		// given
@@ -195,11 +213,15 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 		}
 		expected := &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}
+
+		// when
 		actual := r1.makeLinkBlockParams(block)
 		pathAssertions := []pathAssertion{
 			{"a.linkCard.isTask.c1 > attrs[href]", "anytype://object?objectId=todo-id&spaceId=spaceId"},
 			{"a.linkCard.isTask.c1 > div.sides > div.side.left > div.cardName > div.name > Content", "Todo"},
 		}
+
+		// then
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 	})
 
@@ -211,9 +233,9 @@ func TestMakeLinkRenderParams(t *testing.T) {
 					SbType: model.SmartBlockType_Page,
 					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
 						Details: &types.Struct{Fields: map[string]*types.Value{
-							bundle.RelationKeyId.String():      pbtypes.String("todo-id"),
-							bundle.RelationKeyLayout.String():  pbtypes.Float64(float64(model.ObjectType_todo)),
-							bundle.RelationKeyName.String():    pbtypes.String("Todo"),
+							bundle.RelationKeyId.String():     pbtypes.String("todo-id"),
+							bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
+							bundle.RelationKeyName.String():   pbtypes.String("Todo"),
 							// TODO: same test, nothing changed with this relation enabled?bundle.RelationKeyDone.String():    pbtypes.Bool(true),
 							bundle.RelationKeySpaceId.String(): pbtypes.String("spaceId"),
 						}},
@@ -222,7 +244,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			}),
 		)
 
-		// when
 		block := &model.Block{
 			Content: &model.BlockContentOfLink{
 				Link: &model.BlockContentLink{
@@ -231,11 +252,15 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 		}
 		expected := &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}
+
+		// when
 		actual := r.makeLinkBlockParams(block)
 		pathAssertions := []pathAssertion{
 			{"a.linkCard.isTask.c1 > attrs[href]", "anytype://object?objectId=todo-id&spaceId=spaceId"},
 			{"a.linkCard.isTask.c1 > div.sides > div.side.left > div.cardName > div.name > Content", "Todo"},
 		}
+
+		// then
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 
 	})
@@ -258,7 +283,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			}),
 		)
 
-		// when
 		block := &model.Block{
 			Content: &model.BlockContentOfLink{
 				Link: &model.BlockContentLink{
@@ -268,12 +292,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 		}
 		expected := &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}
+
+		// when
 		actual := r.makeLinkBlockParams(block)
 		pathAssertions := []pathAssertion{
 			{"a.linkCard.isHuman.c2 > attrs[href]", "anytype://object?objectId=test-id&spaceId=spaceId"},
 			{"a.linkCard.isHuman.c2 > div.sides > div.side.left > div.cardName > div.name > Content", "Test"},
 			{"a.linkCard.isHuman.c2 > div.sides > div.side.left > div.relationItem.cardDescription > div.description > Content", "description"},
 		}
+
+		// then
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 
@@ -307,6 +335,8 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 		}
 		expected := &BlockParams{Classes: []string{"block", "align0", "blockLink", "card"}}
+
+		// when
 		actual := r1.makeLinkBlockParams(block)
 
 		pathAssertions := []pathAssertion{
@@ -315,6 +345,7 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			{"a.linkCard.isParticipant.c2 > div.sides > div.side.left > div.relationItem.cardDescription > div.description > Content", "snippet"},
 		}
 
+		// then
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 
 	})
@@ -338,7 +369,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			}),
 		)
 
-		// when
 		block := &model.Block{
 			Content: &model.BlockContentOfLink{
 				Link: &model.BlockContentLink{
@@ -348,12 +378,16 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 		}
 		expected := &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}
-		actual := r1.makeLinkBlockParams(block)
+
+		// when
+		actual := r.makeLinkBlockParams(block)
 		pathAssertions := []pathAssertion{
 			{"a.linkCard.isSet.c1 > attrs[href]", "anytype://object?objectId=test-id&spaceId=spaceId"},
 			{"a.linkCard.isSet.c1 > div.sides > div.side.left > div.cardName > div.name > Content", "Test"},
 			{"a.linkCard.isSet.c1 > div.sides > div.side.right > div.cover.type2.gray > attrs[style]", "background-position:0% 0%;background-size:100%;"},
 		}
+
+		// then
 		assertLinkBlockAndHtmlTag(t, expected, actual, pathAssertions)
 
 	})
@@ -385,7 +419,6 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			}),
 		)
 
-		// when
 		block := &model.Block{
 			Content: &model.BlockContentOfLink{
 				Link: &model.BlockContentLink{
@@ -395,7 +428,11 @@ func TestMakeLinkRenderParams(t *testing.T) {
 			},
 		}
 		expected := &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}
+
+		// when
 		actual := r.makeLinkBlockParams(block)
+
+		// then
 		pathAssertions := []pathAssertion{
 			{"a.linkCard.isSet.c2 > attrs[href]", "anytype://object?objectId=test-id&spaceId=spaceId"},
 			{"a.linkCard.isSet.c2 > div.sides > div.side.left > div.cardName > div.name > Content", "Test"},
