@@ -232,8 +232,6 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 		marks := blockText.GetMarks().Marks
 		text = r.applyNonOverlapingMarks(style, text, marks)
 		text = replaceNewlineBr(text)
-		log.Debug("final text", zap.String("m", text))
-
 		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
 		fields := b.GetFields()
@@ -248,7 +246,6 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Numbered:
 		number := r.BlockNumbers[b.Id]
-		log.Debug("number", zap.Int("num", number), zap.String("id", b.Id))
 		externalComp := NumberMarkerTemplate(fmt.Sprintf("%d", number))
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Marked:
