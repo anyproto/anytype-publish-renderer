@@ -185,6 +185,8 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 	}
 
 	var markedText strings.Builder
+
+	// convert to JSRunes to cut marks.Range in the same way as JS does
 	rText := toJSRunes(text)
 	marksIntervalTree := buildMarksIntervalTree(marks)
 	rangeRay := makeMarksRangeRay(marks, int32(len(rText)))
