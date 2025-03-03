@@ -3,7 +3,6 @@ package integration
 import (
 	"bytes"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,7 +12,7 @@ import (
 
 func TestRenderer(t *testing.T) {
 	// given
-	testDir := filepath.Join("testdata", "test-me")
+	testDir := "testdata"
 	testRenderer, err := makeTestRenderer(testDir)
 	assert.NoError(t, err)
 	buffer := bytes.NewBuffer(nil)
