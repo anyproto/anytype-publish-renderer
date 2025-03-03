@@ -24,7 +24,7 @@ func TestRenderer(t *testing.T) {
 	assert.NoError(t, err)
 	fileContent, err := os.ReadFile("index.html")
 	assert.NoError(t, err)
-	assert.Equal(t, fileContent, buffer.Bytes())
+	assert.Equal(t, string(fileContent), buffer.String())
 }
 
 func makeTestRenderer(dir string) (*renderer.Renderer, error) {
