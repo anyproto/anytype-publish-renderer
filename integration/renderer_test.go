@@ -14,10 +14,7 @@ func TestRenderer(t *testing.T) {
 	testRenderer, err := makeTestRenderer(testDir)
 	assert.NoError(t, err)
 
-	file, err := os.Create("index.html")
-	assert.NoError(t, err)
-	defer file.Close()
-	err = testRenderer.Render(file)
+	err = testRenderer.Render(os.Stdout)
 	assert.NoError(t, err)
 }
 
