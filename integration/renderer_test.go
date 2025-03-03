@@ -18,7 +18,7 @@ func TestRenderer(t *testing.T) {
 	assert.NoError(t, err)
 	buffer := bytes.NewBuffer(nil)
 
-	// when
+	// then
 	err = testRenderer.Render(buffer)
 
 	// when
