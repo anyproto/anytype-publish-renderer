@@ -1,21 +1,31 @@
 package integration
 
 import (
-	"github.com/stretchr/testify/assert"
+	"bytes"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/anyproto/anytype-publish-renderer/renderer"
 )
 
 func TestRenderer(t *testing.T) {
-	testDir := filepath.Join("testdata", "Anytype.WebPublish.20241217.112212.67")
+	// given
+	testDir := filepath.Join("testdata", "test-me")
 	testRenderer, err := makeTestRenderer(testDir)
 	assert.NoError(t, err)
+	buffer := bytes.NewBuffer(nil)
 
-	err = testRenderer.Render(os.Stdout)
+	// when
+	err = testRenderer.Render(buffer)
+
+	// when
 	assert.NoError(t, err)
+	fileContent, err := os.ReadFile("index.html")
+	assert.NoError(t, err)
+	assert.Equal(t, fileContent, buffer.Bytes())
 }
 
 func makeTestRenderer(dir string) (*renderer.Renderer, error) {
