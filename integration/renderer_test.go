@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/sergi/go-diff/diffmatchpatch"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,8 @@ func TestRenderer(t *testing.T) {
 	assert.NoError(t, err)
 	fileContent, err := os.ReadFile("index.html")
 	assert.NoError(t, err)
-	if string(fileContent) != buffer.String() {
+	fileContentStr := strings.TrimSuffix(string(fileContent), "\n")
+	if fileContentStr != buffer.String() {
 		assert.Fail(t, "")
 		diffHTML(string(fileContent), buffer.String())
 	}
