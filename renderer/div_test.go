@@ -1,17 +1,28 @@
 package renderer
 
 import (
+	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMakeRenderDivParams(t *testing.T) {
-	r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
-	divBlock := r.BlocksById["66c5b61a7e4bcd764b24c213"]
+	id := "66c5b61a7e4bcd764b24c213"
+	r := NewTestRenderer(
+		WithBlocksById(map[string]*model.Block{
+			id: {
+				Id: id,
+				Content: &model.BlockContentOfDiv{
+					Div: &model.BlockContentDiv{Style: model.BlockContentDiv_Dots},
+				},
+			}},
+		),
+	)
 
+	divBlock := r.BlocksById[id]
 	expected := &BlockParams{
-		Id:      "66c5b61a7e4bcd764b24c213",
+		Id:      id,
 		Classes: []string{"block", "align0", "blockDiv", "divDot"},
 	}
 

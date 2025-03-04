@@ -1,6 +1,11 @@
 package renderer
 
 import (
+	"github.com/anyproto/anytype-heart/pb"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/gogo/protobuf/types"
+	"path/filepath"
 	"testing"
 
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -10,9 +15,21 @@ import (
 
 func TestMakeRenderPageIconImageParams(t *testing.T) {
 	t.Run("icon image emoji", func(t *testing.T) {
-		r := getTestRenderer("test-emoji-icon")
+		r := NewTestRenderer(
+			WithRootSnapshot(&pb.SnapshotWithType{
+				Snapshot: &pb.ChangeSnapshot{
+					Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{
+							Fields: map[string]*types.Value{
+								bundle.RelationKeyIconEmoji.String(): pbtypes.String("😃"),
+							},
+						},
+					},
+				},
+			}),
+		)
 		expected := &IconImageRenderParams{
-			Src: "https://anytype-static.fra1.cdn.digitaloceanspaces.com/emojies/1f972.png",
+			Src: "/emojies/1f603.png",
 		}
 
 		actual := r.MakeRenderIconObjectParams(r.Sp.GetSnapshot().GetData().GetDetails(), &IconObjectProps{
@@ -23,9 +40,33 @@ func TestMakeRenderPageIconImageParams(t *testing.T) {
 	})
 
 	t.Run("icon image uploaded", func(t *testing.T) {
-		r := getTestRenderer("test-uploaded-image-icon")
+		r := NewTestRenderer(
+			WithRootSnapshot(&pb.SnapshotWithType{
+				Snapshot: &pb.ChangeSnapshot{
+					Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{
+							Fields: map[string]*types.Value{
+								bundle.RelationKeyIconImage.String(): pbtypes.String("iconImage"),
+							},
+						},
+					},
+				},
+			}),
+			WithCachedPbFiles(map[string]*pb.SnapshotWithType{
+				filepath.Join("filesObjects", "iconImage"+pbExt): {
+					SbType: model.SmartBlockType_FileObject,
+					Snapshot: &pb.ChangeSnapshot{
+						Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{
+							Fields: map[string]*types.Value{
+								bundle.RelationKeySource.String(): pbtypes.String("test.jpg"),
+							},
+						}},
+					},
+				},
+			}),
+		)
 		expected := &IconImageRenderParams{
-			Src: "../test_snapshots/test-uploaded-image-icon/files/1737028923-16-01-25_13-02-03.png",
+			Src: "/test.jpg",
 		}
 
 		actual := r.MakeRenderIconObjectParams(r.Sp.GetSnapshot().GetData().GetDetails(), &IconObjectProps{
