@@ -2,6 +2,8 @@ package integration
 
 import (
 	"bytes"
+	"fmt"
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"os"
 	"testing"
 
@@ -24,7 +26,30 @@ func TestRenderer(t *testing.T) {
 	assert.NoError(t, err)
 	fileContent, err := os.ReadFile("index.html")
 	assert.NoError(t, err)
-	assert.Equal(t, string(fileContent), buffer.String())
+	if string(fileContent) != buffer.String() {
+		assert.Fail(t, "")
+		diffHTML(string(fileContent), buffer.String())
+	}
+}
+
+func diffHTML(expected, actual string) {
+	dmp := diffmatchpatch.New()
+	diffs := dmp.DiffMain(expected, actual, false)
+	dmp.DiffPrettyText(diffs)
+	prettyPrintDiff(diffs)
+}
+
+func prettyPrintDiff(diffs []diffmatchpatch.Diff) {
+	for _, diff := range diffs {
+		switch diff.Type {
+		case diffmatchpatch.DiffInsert:
+			fmt.Printf("\033[32m+ %s\033[0m\n", diff.Text)
+		case diffmatchpatch.DiffDelete:
+			fmt.Printf("\033[31m- %s\033[0m\n", diff.Text)
+		case diffmatchpatch.DiffEqual:
+			fmt.Printf("  %s\n", diff.Text)
+		}
+	}
 }
 
 func makeTestRenderer(dir string) (*renderer.Renderer, error) {
