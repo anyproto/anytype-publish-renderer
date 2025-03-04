@@ -241,9 +241,9 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 
 		details := &types.Struct{
 			Fields: map[string]*types.Value{
-				bundle.RelationKeyIconEmoji.String(): pbtypes.String(iconEmoji),
-				bundle.RelationKeyIconImage.String(): pbtypes.String(iconImage),
-				bundle.RelationKeyLayout.String():    pbtypes.Float64(float64(model.ObjectType_basic)),
+				bundle.RelationKeyIconEmoji.String():      pbtypes.String(iconEmoji),
+				bundle.RelationKeyIconImage.String():      pbtypes.String(iconImage),
+				bundle.RelationKeyResolvedLayout.String(): pbtypes.Float64(float64(model.ObjectType_basic)),
 			},
 		}
 
@@ -254,15 +254,14 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 		innerFlex = append(innerFlex, additionalTemplate, textComp)
 	case model.BlockContentText_Title:
 		details := r.Sp.Snapshot.Data.GetDetails()
-		layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 		done := getRelationField(details, bundle.RelationKeyDone, relationToBool)
 		additionalTemplate := NoneTemplate("")
 
-		if isTodoLayout(layout) {
+		if isTodoLayout(r.ResolvedLayout) {
 			iconDetails := &types.Struct{
 				Fields: map[string]*types.Value{
-					bundle.RelationKeyDone.String():   pbtypes.Bool(done),
-					bundle.RelationKeyLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
+					bundle.RelationKeyDone.String():           pbtypes.Bool(done),
+					bundle.RelationKeyResolvedLayout.String(): pbtypes.Float64(float64(model.ObjectType_todo)),
 				},
 			}
 

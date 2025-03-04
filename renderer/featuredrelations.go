@@ -41,7 +41,8 @@ func (r *Renderer) makeFeaturedRelationsComponent() templ.Component {
 
 func (r *Renderer) retrieveFeaturedRelations(details *types.Struct) *types.ListValue {
 	featuredRelationsList := details.GetFields()[bundle.RelationKeyFeaturedRelations.String()].GetListValue()
-	if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
+	if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 || (len(featuredRelationsList.GetValues()) == 1 &&
+		featuredRelationsList.GetValues()[0].GetStringValue() == bundle.RelationKeyDescription.URL()) {
 		featuredRelationsList = r.ObjectTypeDetails.GetFields()[bundle.RelationKeyRecommendedFeaturedRelations.String()].GetListValue()
 		if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
 			return nil

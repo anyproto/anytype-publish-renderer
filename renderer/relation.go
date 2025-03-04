@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"github.com/ipfs/go-cid"
 	"net/url"
 	"path/filepath"
 	"strconv"
@@ -94,32 +95,39 @@ func (r *Renderer) buildListComponent(params *RelationRenderSetting, format mode
 }
 
 func (r *Renderer) retrieveRelationInfo(key string) (string, model.RelationFormat, bool) {
-	relationKey := domain.RelationKey(key)
-	relation, _ := bundle.GetRelation(relationKey)
-
-	name, format, found := r.fetchRelationMetadata(relation, relationKey)
+	name, format, found := r.fetchRelationMetadata(key)
 	if name == "" {
 		name = defaultName
 	}
 	return name, format, found
 }
 
-func (r *Renderer) fetchRelationMetadata(relation *model.Relation, relationKey domain.RelationKey) (string, model.RelationFormat, bool) {
-	if relation != nil {
-		return relation.Name, relation.Format, true
-	}
-
-	for _, snapshot := range r.UberSp.PbFiles {
-		sn, err := readJsonpbSnapshot(snapshot)
-		if err != nil || sn.SbType != model.SmartBlockType_STRelation {
-			continue
-		}
-
-		fields := sn.GetSnapshot().GetData().GetDetails().GetFields()
-		if uniqueKey := fields[bundle.RelationKeyUniqueKey.String()]; uniqueKey != nil && uniqueKey.GetStringValue() == relationKey.URL() {
-			name := fields[bundle.RelationKeyName.String()].GetStringValue()
-			format := model.RelationFormat(int32(fields[bundle.RelationKeyRelationFormat.String()].GetNumberValue()))
+func (r *Renderer) fetchRelationMetadata(key string) (string, model.RelationFormat, bool) {
+	_, err := cid.Decode(key)
+	if err == nil {
+		snapshot := r.getObjectSnapshot(key)
+		if snapshot != nil {
+			name := getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyName, relationToString)
+			format := getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyRelationFormat, relationToRelationFormat)
 			return name, format, true
+		}
+	} else {
+		relationKey := domain.RelationKey(key)
+		relation, _ := bundle.GetRelation(relationKey)
+		if relation != nil {
+			return relation.Name, relation.Format, true
+		}
+		for _, sn := range r.UberSp.PbFiles {
+			sn, err := readJsonpbSnapshot(sn)
+			if err != nil || sn.SbType != model.SmartBlockType_STRelation {
+				continue
+			}
+			fields := sn.GetSnapshot().GetData().GetDetails().GetFields()
+			if uniqueKey := fields[bundle.RelationKeyUniqueKey.String()]; uniqueKey != nil && uniqueKey.GetStringValue() == relationKey.URL() {
+				name := fields[bundle.RelationKeyName.String()].GetStringValue()
+				format := model.RelationFormat(int32(fields[bundle.RelationKeyRelationFormat.String()].GetNumberValue()))
+				return name, format, true
+			}
 		}
 	}
 	return "", model.RelationFormat_longtext, false

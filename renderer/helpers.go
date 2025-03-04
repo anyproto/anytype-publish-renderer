@@ -104,8 +104,7 @@ func getRelationField[V relType](targetDetails *types.Struct, relationKey domain
 }
 
 func (r *Renderer) makeAnytypeLink(targetDetails *types.Struct, targetObjectId string) string {
-	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
-	switch layout {
+	switch r.ResolvedLayout {
 	case model.ObjectType_file, model.ObjectType_image, model.ObjectType_pdf, model.ObjectType_audio, model.ObjectType_video:
 		src, err := r.getFileUrl(targetObjectId)
 		if err != nil {

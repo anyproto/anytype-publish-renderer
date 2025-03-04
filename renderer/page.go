@@ -22,11 +22,10 @@ type RenderPageParams struct {
 
 func (r *Renderer) hasPageIcon() bool {
 	details := r.Sp.Snapshot.Data.GetDetails()
-	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 	iconEmoji := getRelationField(details, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(details, bundle.RelationKeyIconImage, r.relationToFileUrl)
 
-	if isTodoLayout(layout) {
+	if isTodoLayout(r.ResolvedLayout) {
 		return false
 	}
 
@@ -64,7 +63,6 @@ func (r *Renderer) hasPageCover() bool {
 
 func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
-	layout := getRelationField(fields, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 
 	layoutAlign := pbtypes.GetInt64(r.ObjectTypeDetails, bundle.RelationKeyLayoutAlign.String())
 	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", layoutAlign)}
@@ -87,7 +85,7 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 		class = "withCover"
 	}
 
-	classes = append(classes, class, getLayoutClass(layout))
+	classes = append(classes, class, getLayoutClass(r.ResolvedLayout))
 
 	descr := description
 	if descr == "" {
