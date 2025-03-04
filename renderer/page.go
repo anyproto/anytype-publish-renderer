@@ -66,7 +66,7 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
 	layout := getRelationField(fields, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 
-	layoutAlign := pbtypes.GetInt64(fields, "layoutAlign")
+	layoutAlign := pbtypes.GetInt64(r.ObjectTypeDetails, bundle.RelationKeyLayoutAlign.String())
 	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", layoutAlign)}
 	headerClasses := []string{"header"}
 	name := pbtypes.GetString(fields, "name")

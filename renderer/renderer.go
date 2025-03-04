@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/gogo/protobuf/types"
 	"io"
 	"net/http"
 	"net/url"
@@ -68,7 +69,8 @@ type Renderer struct {
 	Root       *model.Block
 	BlocksById map[string]*model.Block
 
-	BlockNumbers map[string]int
+	BlockNumbers      map[string]int
+	ObjectTypeDetails *types.Struct
 }
 
 func readJsonpbSnapshot(snapshotStr string) (snapshot pb.SnapshotWithType, err error) {
@@ -211,6 +213,13 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 		Root:          blocks[0],
 		Config:        config,
 	}
+
+	if len(snapshot.Snapshot.Data.GetObjectTypes()) == 0 {
+		log.Error("no object type in snapshot")
+		return
+	}
+
+	r.ObjectTypeDetails = r.findTargetDetails(snapshot.Snapshot.Data.GetObjectTypes()[0])
 
 	r.maybeAddDebugCss()
 	r.hydrateSpecialBlocks()

@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -16,6 +17,10 @@ func (r *Renderer) makeRootRenderParams(b *model.Block) (params *RootRenderParam
 	var width float64
 	if fields != nil && fields.Fields != nil && fields.Fields["width"] != nil {
 		width = fields.Fields["width"].GetNumberValue()
+	}
+
+	if width == 0 {
+		width = getRelationField(r.ObjectTypeDetails, bundle.RelationKeyLayoutWidth, relationToFloat64)
 	}
 
 	min := "60%"

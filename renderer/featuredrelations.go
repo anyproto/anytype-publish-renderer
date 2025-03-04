@@ -17,8 +17,8 @@ func (r *Renderer) makeFeaturedRelationsComponent() templ.Component {
 	if details == nil || len(details.GetFields()) == 0 {
 		return nil
 	}
-	featuredRelationsList := details.GetFields()[bundle.RelationKeyFeaturedRelations.String()].GetListValue()
-	if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
+	featuredRelationsList := r.retrieveFeaturedRelations(details)
+	if featuredRelationsList == nil {
 		return nil
 	}
 	cells := make([]templ.Component, 0, len(featuredRelationsList.Values))
@@ -37,6 +37,17 @@ func (r *Renderer) makeFeaturedRelationsComponent() templ.Component {
 		Components: cells,
 	})
 	return wrapper
+}
+
+func (r *Renderer) retrieveFeaturedRelations(details *types.Struct) *types.ListValue {
+	featuredRelationsList := details.GetFields()[bundle.RelationKeyFeaturedRelations.String()].GetListValue()
+	if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
+		featuredRelationsList = r.ObjectTypeDetails.GetFields()[bundle.RelationKeyRecommendedFeaturedRelations.String()].GetListValue()
+		if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
+			return nil
+		}
+	}
+	return featuredRelationsList
 }
 
 func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details *types.Struct, lastClass string, cells []templ.Component) []templ.Component {
