@@ -22,7 +22,7 @@ func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
 }
 
 type relType interface {
-	string | bool | int64 | model.ObjectTypeLayout | model.RelationFormat | float64
+	string | bool | int64 | model.ObjectTypeLayout | model.RelationFormat | float64 | *types.ListValue
 }
 
 type relTransformer[V relType] func(*types.Value) V
@@ -90,6 +90,14 @@ func relationToFloat64(field *types.Value) float64 {
 	var null float64
 	if field != nil {
 		return field.GetNumberValue()
+	}
+	return null
+}
+
+func relationToList(field *types.Value) *types.ListValue {
+	var null *types.ListValue
+	if field != nil {
+		return field.GetListValue()
 	}
 	return null
 }

@@ -2,20 +2,19 @@ package renderer
 
 import (
 	"fmt"
-	"github.com/ipfs/go-cid"
 	"net/url"
 	"path/filepath"
 	"strconv"
 	"time"
 
-	"github.com/anyproto/anytype-heart/util/pbtypes"
-
 	"github.com/a-h/templ"
 	"github.com/gogo/protobuf/types"
+	"github.com/ipfs/go-cid"
 
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
 )
 
 const defaultName = "Untitled"
@@ -105,32 +104,41 @@ func (r *Renderer) retrieveRelationInfo(key string) (string, model.RelationForma
 func (r *Renderer) fetchRelationMetadata(key string) (string, model.RelationFormat, bool) {
 	_, err := cid.Decode(key)
 	if err == nil {
-		snapshot := r.getObjectSnapshot(key)
-		if snapshot != nil {
-			name := getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyName, relationToString)
-			format := getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyRelationFormat, relationToRelationFormat)
+		return r.getRelationDataById(key)
+	} else {
+		return r.getRelationByKey(key)
+	}
+}
+
+func (r *Renderer) getRelationByKey(key string) (string, model.RelationFormat, bool) {
+	relationKey := domain.RelationKey(key)
+	relation, _ := bundle.GetRelation(relationKey)
+	if relation != nil {
+		return relation.Name, relation.Format, true
+	}
+	for _, sn := range r.UberSp.PbFiles {
+		sn, err := readJsonpbSnapshot(sn)
+		if err != nil || sn.SbType != model.SmartBlockType_STRelation {
+			continue
+		}
+		fields := sn.GetSnapshot().GetData().GetDetails().GetFields()
+		if uniqueKey := fields[bundle.RelationKeyUniqueKey.String()]; uniqueKey != nil && uniqueKey.GetStringValue() == relationKey.URL() {
+			name := fields[bundle.RelationKeyName.String()].GetStringValue()
+			format := model.RelationFormat(int32(fields[bundle.RelationKeyRelationFormat.String()].GetNumberValue()))
 			return name, format, true
 		}
-	} else {
-		relationKey := domain.RelationKey(key)
-		relation, _ := bundle.GetRelation(relationKey)
-		if relation != nil {
-			return relation.Name, relation.Format, true
-		}
-		for _, sn := range r.UberSp.PbFiles {
-			sn, err := readJsonpbSnapshot(sn)
-			if err != nil || sn.SbType != model.SmartBlockType_STRelation {
-				continue
-			}
-			fields := sn.GetSnapshot().GetData().GetDetails().GetFields()
-			if uniqueKey := fields[bundle.RelationKeyUniqueKey.String()]; uniqueKey != nil && uniqueKey.GetStringValue() == relationKey.URL() {
-				name := fields[bundle.RelationKeyName.String()].GetStringValue()
-				format := model.RelationFormat(int32(fields[bundle.RelationKeyRelationFormat.String()].GetNumberValue()))
-				return name, format, true
-			}
-		}
 	}
-	return "", model.RelationFormat_longtext, false
+	return "", 0, false
+}
+
+func (r *Renderer) getRelationDataById(id string) (string, model.RelationFormat, bool) {
+	snapshot := r.getObjectSnapshot(id)
+	if snapshot != nil {
+		name := getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyName, relationToString)
+		format := getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyRelationFormat, relationToRelationFormat)
+		return name, format, true
+	}
+	return "", 0, false
 }
 
 func (r *Renderer) populateRelationListValue(format model.RelationFormat, relationValue *types.Value) []templ.Component {

@@ -40,15 +40,19 @@ func (r *Renderer) makeFeaturedRelationsComponent() templ.Component {
 }
 
 func (r *Renderer) retrieveFeaturedRelations(details *types.Struct) *types.ListValue {
-	featuredRelationsList := details.GetFields()[bundle.RelationKeyFeaturedRelations.String()].GetListValue()
-	if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 || (len(featuredRelationsList.GetValues()) == 1 &&
-		featuredRelationsList.GetValues()[0].GetStringValue() == bundle.RelationKeyDescription.URL()) {
-		featuredRelationsList = r.ObjectTypeDetails.GetFields()[bundle.RelationKeyRecommendedFeaturedRelations.String()].GetListValue()
+	featuredRelationsList := getRelationField(details, bundle.RelationKeyFeaturedRelations, relationToList)
+	if r.isFeaturedRelationsEmpty(featuredRelationsList) {
+		featuredRelationsList = getRelationField(r.ObjectTypeDetails, bundle.RelationKeyRecommendedFeaturedRelations, relationToList)
 		if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
 			return nil
 		}
 	}
 	return featuredRelationsList
+}
+
+func (r *Renderer) isFeaturedRelationsEmpty(featuredRelationsList *types.ListValue) bool {
+	return featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 || (len(featuredRelationsList.GetValues()) == 1 &&
+		featuredRelationsList.GetValues()[0].GetStringValue() == bundle.RelationKeyDescription.String())
 }
 
 func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details *types.Struct, lastClass string, cells []templ.Component) []templ.Component {

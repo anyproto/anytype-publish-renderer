@@ -5,8 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
-	"github.com/gogo/protobuf/types"
 	"io"
 	"net/http"
 	"net/url"
@@ -15,14 +13,16 @@ import (
 	"runtime/debug"
 	"strings"
 
+	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pb"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-	"github.com/anyproto/anytype-publish-renderer/renderer/blockutils"
+	"github.com/gogo/protobuf/jsonpb"
+	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
 
-	"github.com/a-h/templ"
-	"github.com/gogo/protobuf/jsonpb"
+	"github.com/anyproto/anytype-publish-renderer/renderer/blockutils"
 )
 
 var log = logging.Logger("renderer").Desugar()
