@@ -1,6 +1,12 @@
 package renderer
 
 import (
+	"github.com/anyproto/anytype-heart/pb"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
+	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/gogo/protobuf/types"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,11 +14,35 @@ import (
 
 func TestMakeRenderCoverParams(t *testing.T) {
 	t.Run("cover params", func(t *testing.T) {
-		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
+		coverId := "coverId"
+		r := NewTestRenderer(
+			WithRootSnapshot(&pb.SnapshotWithType{
+				Snapshot: &pb.ChangeSnapshot{
+					Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{
+							Fields: map[string]*types.Value{
+								bundle.RelationKeyCoverType.String(): pbtypes.Int64(1),
+								bundle.RelationKeyCoverId.String():   pbtypes.String(coverId),
+							},
+						},
+					},
+				},
+			}),
+			WithLinkedSnapshot(t, filepath.Join("filesObjects", coverId+pbExt), &pb.SnapshotWithType{
+				SbType: model.SmartBlockType_FileObject,
+				Snapshot: &pb.ChangeSnapshot{
+					Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{
+						Fields: map[string]*types.Value{
+							bundle.RelationKeySource.String(): pbtypes.String("test.jpg"),
+						},
+					}},
+				}},
+			),
+		)
 		expected := &CoverRenderParams{
-			Id:      "bafyreic35rt6o6jbpfoibui4oskwo2dqurapsyuub4k7o42uatcteucan4",
-			Classes: "type1 bafyreic35rt6o6jbpfoibui4oskwo2dqurapsyuub4k7o42uatcteucan4",
-			Src:     "../test_snapshots/Anytype.WebPublish.20241217.112212.67/files/640px-anatomy_of_a_sunset-2.webp",
+			Id:      coverId,
+			Classes: "type1 " + coverId,
+			Src:     "/test.jpg",
 		}
 
 		actual, err := r.makeRenderPageCoverParams()
@@ -24,7 +54,18 @@ func TestMakeRenderCoverParams(t *testing.T) {
 	})
 
 	t.Run("solid color cover", func(t *testing.T) {
-		r := getTestRenderer("test-solid-color-cover")
+		r := &Renderer{Sp: &pb.SnapshotWithType{
+			Snapshot: &pb.ChangeSnapshot{
+				Data: &model.SmartBlockSnapshotBase{
+					Details: &types.Struct{
+						Fields: map[string]*types.Value{
+							bundle.RelationKeyCoverType.String(): pbtypes.Int64(2),
+							bundle.RelationKeyCoverId.String():   pbtypes.String("red"),
+						},
+					},
+				},
+			},
+		}}
 		expected := &CoverRenderParams{
 			Id:        "red",
 			Classes:   "type2 red",
@@ -40,7 +81,20 @@ func TestMakeRenderCoverParams(t *testing.T) {
 	})
 
 	t.Run("gradient cover", func(t *testing.T) {
-		r := getTestRenderer("test-gradient-cover")
+		r := NewTestRenderer(
+			WithRootSnapshot(&pb.SnapshotWithType{
+				Snapshot: &pb.ChangeSnapshot{
+					Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{
+							Fields: map[string]*types.Value{
+								bundle.RelationKeyCoverType.String(): pbtypes.Int64(3),
+								bundle.RelationKeyCoverId.String():   pbtypes.String("blue"),
+							},
+						},
+					},
+				},
+			}),
+		)
 		expected := &CoverRenderParams{
 			Id:        "blue",
 			Classes:   "type3 blue",

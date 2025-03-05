@@ -211,10 +211,12 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 	text := blockText.Text
 	var textComp templ.Component
 	if style != model.BlockContentText_Code {
-		marks := blockText.GetMarks().Marks
-		text = r.applyNonOverlapingMarks(style, text, marks)
-		text = replaceNewlineBr(text)
-		textComp = PlainTextWrapTemplate(templ.Raw(text))
+		if blockText.GetMarks() != nil {
+			marks := blockText.GetMarks().Marks
+			text = r.applyNonOverlapingMarks(style, text, marks)
+			text = replaceNewlineBr(text)
+			textComp = PlainTextWrapTemplate(templ.Raw(text))
+		}
 	} else {
 		fields := b.GetFields()
 		lang := pbtypes.GetString(fields, "lang")

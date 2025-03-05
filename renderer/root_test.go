@@ -12,7 +12,7 @@ import (
 func TestRenderer_MakeRootRenderParams(t *testing.T) {
 	t.Run("non empty width", func(t *testing.T) {
 		// given
-		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
+		r := NewTestRenderer()
 		id := "blockId"
 		width := 100
 		expected := &RootRenderParams{
@@ -38,7 +38,8 @@ func TestRenderer_MakeRootRenderParams(t *testing.T) {
 		assert.Equal(t, expected.Style, actual.Style)
 	})
 	t.Run("empty width", func(t *testing.T) {
-		r := getTestRenderer("Anytype.WebPublish.20241217.112212.67")
+		// given
+		r := NewTestRenderer()
 		id := "blockId"
 		expected := &RootRenderParams{
 			Style: `
