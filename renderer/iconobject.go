@@ -279,7 +279,6 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		isDeleted = true
 	}
 
-	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 	iconEmoji := getRelationField(targetDetails, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(targetDetails, bundle.RelationKeyIconImage, r.relationToFileUrl)
 	hasIconEmoji := iconEmoji != ""
@@ -290,7 +289,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		src = iconImage
 	}
 
-	switch layout {
+	switch r.ResolvedLayout {
 	default:
 		fallthrough
 	case model.ObjectType_collection, model.ObjectType_set:
@@ -403,7 +402,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		IsDeleted:    isDeleted,
 	}
 
-	iconSize := getIconSize(props, layout, gsProps)
+	iconSize := getIconSize(props, r.ResolvedLayout, gsProps)
 	if iconSize != 0 {
 		iconClasses = append(iconClasses, fmt.Sprintf("c%d", iconSize))
 	}
