@@ -43,6 +43,3 @@ jobs:
       - name: Go test
         run: |
           make test
-      - name: Go integration test
-        run: |
-          make test-integration

@@ -85,6 +85,14 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details
 }
 
 func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
+	blockParams := r.makeFeaturedRelationsBlockParams(block)
+	if blockParams == nil {
+		return NoneTemplate("")
+	}
+	return BlockTemplate(r, blockParams)
+}
+
+func (r *Renderer) makeFeaturedRelationsBlockParams(block *model.Block) *BlockParams {
 	block.Align = model.BlockAlign(r.LayoutAlign)
 	blockParams := makeDefaultBlockParams(block)
 	color := block.GetBackgroundColor()
@@ -93,8 +101,8 @@ func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
 	}
 	params := r.makeFeaturedRelationsComponent()
 	if params == nil {
-		return NoneTemplate("")
+		return nil
 	}
 	blockParams.Content = params
-	return BlockTemplate(r, blockParams)
+	return blockParams
 }

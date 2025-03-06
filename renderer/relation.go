@@ -55,12 +55,12 @@ func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []temp
 		}))
 	}
 	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[key]
-	formatClass := r.getFormatClass(format)
-	params.Classes = append(params.Classes, formatClass)
 	if relationValue == nil {
 		params.Classes = append(params.Classes, "isEmpty")
 		return append(components, CellTemplate(params, BasicTemplate("empty", "")))
 	}
+	formatClass := r.getFormatClass(format)
+	params.Classes = append(params.Classes, formatClass)
 	switch format {
 	case model.RelationFormat_object, model.RelationFormat_tag, model.RelationFormat_status, model.RelationFormat_file:
 		listTemplate := r.buildListComponent(params, format, relationValue)
