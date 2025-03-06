@@ -9,6 +9,7 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
 )
 
@@ -22,11 +23,10 @@ type RenderPageParams struct {
 
 func (r *Renderer) hasPageIcon() bool {
 	details := r.Sp.Snapshot.Data.GetDetails()
-	layout := getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 	iconEmoji := getRelationField(details, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(details, bundle.RelationKeyIconImage, r.relationToFileUrl)
 
-	if isTodoLayout(layout) {
+	if isTodoLayout(r.ResolvedLayout) {
 		return false
 	}
 
@@ -64,10 +64,8 @@ func (r *Renderer) hasPageCover() bool {
 
 func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	fields := r.Sp.Snapshot.Data.GetDetails()
-	layout := getRelationField(fields, bundle.RelationKeyLayout, relationToObjectTypeLayout)
 
-	layoutAlign := pbtypes.GetInt64(fields, "layoutAlign")
-	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", layoutAlign)}
+	classes := []string{"blocks", fmt.Sprintf("layoutAlign%d", r.LayoutAlign)}
 	headerClasses := []string{"header"}
 	name := pbtypes.GetString(fields, "name")
 	description := pbtypes.GetString(fields, "description")
@@ -87,7 +85,7 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 		class = "withCover"
 	}
 
-	classes = append(classes, class, getLayoutClass(layout))
+	classes = append(classes, class, getLayoutClass(r.ResolvedLayout))
 
 	descr := description
 	if descr == "" {
@@ -105,6 +103,14 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 		Description:   descr,
 		SpaceLink:     spaceLink,
 	}
+}
+
+func (r *Renderer) fillLayoutAlign(details *types.Struct) {
+	if value, ok := details.GetFields()[bundle.RelationKeyLayoutAlign.String()]; ok {
+		r.LayoutAlign = int64(value.GetNumberValue())
+		return
+	}
+	r.LayoutAlign = pbtypes.GetInt64(r.ObjectTypeDetails, bundle.RelationKeyLayoutAlign.String())
 }
 
 func (r *Renderer) RenderPage() templ.Component {

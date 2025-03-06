@@ -82,3 +82,9 @@ func WithLinkedSnapshot(test *testing.T, fileName string, sn *pb.SnapshotWithTyp
 		}
 	}
 }
+
+func WithObjectTypeDetails(details *types.Struct) Option {
+	return func(t *TestRenderer) {
+		t.ObjectTypeDetails = details
+	}
+}

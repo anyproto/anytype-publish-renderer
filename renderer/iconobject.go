@@ -279,7 +279,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		isDeleted = true
 	}
 
-	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	layout := r.resolveObjectLayout(targetDetails)
 	iconEmoji := getRelationField(targetDetails, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(targetDetails, bundle.RelationKeyIconImage, r.relationToFileUrl)
 	hasIconEmoji := iconEmoji != ""

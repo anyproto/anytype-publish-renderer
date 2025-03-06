@@ -172,4 +172,97 @@ func TestMakeFeaturedRelationsComponent(t *testing.T) {
 		// then
 		assert.Nil(t, result)
 	})
+	t.Run("featured relations are from object type", func(t *testing.T) {
+		// given
+		r := NewTestRenderer(
+			WithRootSnapshot(&pb.SnapshotWithType{
+				Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyType.String(): pbtypes.String("objectType"),
+						"relation":                      pbtypes.String("test"),
+					},
+				}}}}),
+			WithLinkedSnapshot(t, filepath.Join("relations", "bafyreihja7bgkhxjhcan26ts44qqbjoxl4sr5ckqoxdlty4edlrueoylj4.pb"), &pb.SnapshotWithType{
+				SbType: model.SmartBlockType_STRelation,
+				Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+					Details: &types.Struct{
+						Fields: map[string]*types.Value{
+							bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("relation").URL()),
+							bundle.RelationKeyName.String():           pbtypes.String("Relation"),
+							bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_longtext)),
+							bundle.RelationKeyId.String():             pbtypes.String("bafyreihja7bgkhxjhcan26ts44qqbjoxl4sr5ckqoxdlty4edlrueoylj4"),
+						},
+					},
+				}},
+			}),
+			WithObjectTypeDetails(&types.Struct{
+				Fields: map[string]*types.Value{
+					bundle.RelationKeyName.String():                         pbtypes.String("Type"),
+					bundle.RelationKeyId.String():                           pbtypes.String("objectType"),
+					bundle.RelationKeyResolvedLayout.String():               pbtypes.Int64(int64(model.ObjectType_objectType)),
+					bundle.RelationKeyRecommendedFeaturedRelations.String(): pbtypes.StringList([]string{"bafyreihja7bgkhxjhcan26ts44qqbjoxl4sr5ckqoxdlty4edlrueoylj4"}),
+				},
+			}),
+		)
+
+		// when
+		result := r.makeFeaturedRelationsBlockParams(&model.Block{
+			Content: &model.BlockContentOfFeaturedRelations{FeaturedRelations: &model.BlockContentFeaturedRelations{}},
+		})
+
+		// then
+		assert.NotNil(t, result)
+		tag, err := blockParamsToHtmlTag(result)
+		assert.NoError(t, err)
+		pathAssertions := []pathAssertion{
+			{"div.wrap > div > attrs[class]", "cell last c-longText"},
+			{"div.wrap > div.cell.last.c-longText > div.cellContent.last.c-longText > div.name > Content", "test"}}
+		assertHtmlTag(t, tag, pathAssertions)
+	})
+	t.Run("featured relations have only description", func(t *testing.T) {
+		// given
+		r := NewTestRenderer(
+			WithRootSnapshot(&pb.SnapshotWithType{
+				Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{
+					Fields: map[string]*types.Value{
+						bundle.RelationKeyFeaturedRelations.String(): pbtypes.StringList([]string{bundle.RelationKeyDescription.String()}),
+					},
+				}}}}),
+			WithLinkedSnapshot(t, filepath.Join("relations", "bafyreihja7bgkhxjhcan26ts44qqbjoxl4sr5ckqoxdlty4edlrueoylj4.pb"), &pb.SnapshotWithType{
+				SbType: model.SmartBlockType_STRelation,
+				Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+					Details: &types.Struct{
+						Fields: map[string]*types.Value{
+							bundle.RelationKeyUniqueKey.String():      pbtypes.String(domain.RelationKey("tag-relation").URL()),
+							bundle.RelationKeyName.String():           pbtypes.String("Tag Relation"),
+							bundle.RelationKeyRelationFormat.String(): pbtypes.Int64(int64(model.RelationFormat_tag)),
+							bundle.RelationKeyId.String():             pbtypes.String("bafyreihja7bgkhxjhcan26ts44qqbjoxl4sr5ckqoxdlty4edlrueoylj4"),
+						},
+					},
+				}},
+			}),
+			WithObjectTypeDetails(&types.Struct{
+				Fields: map[string]*types.Value{
+					bundle.RelationKeyName.String():                         pbtypes.String("Type"),
+					bundle.RelationKeyId.String():                           pbtypes.String("objectType"),
+					bundle.RelationKeyResolvedLayout.String():               pbtypes.Int64(int64(model.ObjectType_objectType)),
+					bundle.RelationKeyRecommendedFeaturedRelations.String(): pbtypes.StringList([]string{"bafyreihja7bgkhxjhcan26ts44qqbjoxl4sr5ckqoxdlty4edlrueoylj4"}),
+				},
+			}),
+		)
+
+		// when
+		result := r.makeFeaturedRelationsBlockParams(&model.Block{
+			Content: &model.BlockContentOfFeaturedRelations{FeaturedRelations: &model.BlockContentFeaturedRelations{}},
+		})
+
+		// then
+		assert.NotNil(t, result)
+		tag, err := blockParamsToHtmlTag(result)
+		assert.NoError(t, err)
+		pathAssertions := []pathAssertion{
+			{"div.wrap > div > attrs[class]", "cell last isEmpty"},
+			{"div.wrap > div.cell.last.isEmpty > div.cellContent.last.isEmpty > div > attrs[class]", "empty"}}
+		assertHtmlTag(t, tag, pathAssertions)
+	})
 }
