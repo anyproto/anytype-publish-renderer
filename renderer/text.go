@@ -108,34 +108,41 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 	return "<markupobject>" + s + "</markupobject>"
 }
 
-func StrToUTF16(str string) []uint16 {
-	return utf16.Encode([]rune(str))
+// Convert a string into "JS-like" rune slices (surrogate pairs split)
+//
+// When we get Range from anytype-ts, it is calculates emojies by codepoints.
+// Which means, that js calculates `":man-woman-boy-girl: asdf".length == 16`, but not 5
+func toJSRunes(s string) []rune {
+	var jsRunes []rune
+	for _, r := range s {
+		if r > 0xFFFF {
+			// Convert to surrogate pair (two runes)
+			high, low := utf16.EncodeRune(r)
+			jsRunes = append(jsRunes, rune(high), rune(low))
+		} else {
+			jsRunes = append(jsRunes, r)
+		}
+	}
+
+	return jsRunes
 }
 
-// - make borders
-//   - make set from ranges, from-to
-//   - sort
-//   - for each range, find overlapping intervals
-//     add props from each of this ranges to this range
-func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, text string, marks []*model.BlockContentTextMark) string {
-	if len(marks) == 0 {
-		text = html.EscapeString(text)
-		return text
+func fromJSRunes(jsRunes []rune) string {
+	var utf16Units []uint16
+	for _, r := range jsRunes {
+		utf16Units = append(utf16Units, uint16(r))
 	}
+	// Decode UTF-16 (reconstruct surrogate pairs into full runes)
+	runes := utf16.Decode(utf16Units)
 
-	rText := utf16.Decode(StrToUTF16(text))
-	root := &markintervaltree.MarkIntervalTreeNode{
-		Mark:        marks[0],
-		MaxUpperVal: marks[0].Range.To,
-	}
+	// Convert runes back to a string
+	return string(runes)
+}
 
-	for i := 1; i < len(marks); i++ {
-		root.Insert(marks[i])
-	}
-
+func makeMarksRangeRay(marks []*model.BlockContentTextMark, textLen int32) []int32 {
 	rangeSet := make(map[int32]bool)
 	rangeSet[0] = true
-	rangeSet[int32(len(rText))] = true
+	rangeSet[textLen] = true
 	for _, mark := range marks {
 		rangeSet[mark.Range.From] = true
 		rangeSet[mark.Range.To] = true
@@ -149,29 +156,39 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 	}
 
 	slices.Sort(rangeRay)
+	return rangeRay
+}
+
+// - make borders
+//   - make set from ranges, from-to
+//   - sort
+//   - for each range, find overlapping intervals
+//     add props from each of this ranges to this range
+func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, text string, marks []*model.BlockContentTextMark) string {
+	if len(marks) == 0 {
+		text = html.EscapeString(text)
+		return text
+	}
 
 	var markedText strings.Builder
 
-	log.Debug("rangeRay", zap.String("ray", fmt.Sprintf("%#v", rangeRay)))
+	// convert to JSRunes to cut marks.Range in the same way as JS does
+	rText := toJSRunes(text)
+	marksIntervalTree := markintervaltree.New(marks)
+	rangeRay := makeMarksRangeRay(marks, int32(len(rText)))
+
 	for i := 0; i < len(rangeRay)-1; i++ {
 		curRange := &model.Range{
 			From: rangeRay[i],
 			To:   rangeRay[i+1],
 		}
-		marksToApply := make([]*model.BlockContentTextMark, 0)
-		markintervaltree.SearchOverlaps(root, curRange, &marksToApply)
-
-		markedPart := string(rText[curRange.From:curRange.To])
-		log.Debug("apply marks",
-			zap.String("markedPart", markedPart),
-			zap.Int32("from", curRange.From),
-			zap.Int32("to", curRange.To))
+		marksToApply := marksIntervalTree.SearchOverlaps(curRange)
+		markedPart := fromJSRunes(rText[curRange.From:curRange.To])
 		markedPart = html.EscapeString(markedPart)
 		for _, m := range marksToApply {
 			markedPart = r.applyMark(style, markedPart, m)
-			log.Debug("apply mark", zap.String("markedPart", markedPart), zap.Int32("from", m.Range.From), zap.Int32("to", m.Range.To))
 		}
-		log.Debug("final marked part", zap.String("m", markedPart))
+
 		markedText.WriteString(markedPart)
 	}
 
@@ -230,7 +247,6 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Numbered:
 		number := r.BlockNumbers[b.Id]
-		log.Debug("number", zap.Int("num", number), zap.String("id", b.Id))
 		externalComp := NumberMarkerTemplate(fmt.Sprintf("%d", number))
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Marked:
