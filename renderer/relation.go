@@ -5,21 +5,22 @@ import (
 	"net/url"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/a-h/templ"
-	"github.com/gogo/protobuf/types"
-	"github.com/ipfs/go-cid"
-
 	"github.com/anyproto/anytype-heart/core/domain"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
+	"github.com/anyproto/anytype-heart/pkg/lib/localstore/addr"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
+	"github.com/gogo/protobuf/types"
 )
 
 const defaultName = "Untitled"
 
 type RelationRenderSetting struct {
+	Id           string
 	Key          string
 	Name         string
 	Featured     bool
@@ -42,7 +43,7 @@ func (r *Renderer) makeRelationTemplate(b *model.Block) templ.Component {
 }
 
 func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []templ.Component {
-	name, format, found := r.retrieveRelationInfo(params.Key)
+	name, format, key, found := r.retrieveRelationInfo(params)
 	if !found {
 		return nil
 	}
@@ -53,7 +54,7 @@ func (r *Renderer) buildRelationComponents(params *RelationRenderSetting) []temp
 			Components: []templ.Component{BasicTemplate("name", name)},
 		}))
 	}
-	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[params.Key]
+	relationValue := r.Sp.GetSnapshot().GetData().GetDetails().GetFields()[key]
 	formatClass := r.getFormatClass(format)
 	params.Classes = append(params.Classes, formatClass)
 	if relationValue == nil {
@@ -93,28 +94,29 @@ func (r *Renderer) buildListComponent(params *RelationRenderSetting, format mode
 	return listTemplate
 }
 
-func (r *Renderer) retrieveRelationInfo(key string) (string, model.RelationFormat, bool) {
-	name, format, found := r.fetchRelationMetadata(key)
+func (r *Renderer) retrieveRelationInfo(params *RelationRenderSetting) (string, model.RelationFormat, string, bool) {
+	name, format, key, found := r.fetchRelationMetadata(params)
 	if name == "" {
 		name = defaultName
 	}
-	return name, format, found
+	return name, format, key, found
 }
 
-func (r *Renderer) fetchRelationMetadata(key string) (string, model.RelationFormat, bool) {
-	_, err := cid.Decode(key)
-	if err == nil {
-		return r.getRelationDataById(key)
-	} else {
-		return r.getRelationByKey(key)
+func (r *Renderer) fetchRelationMetadata(params *RelationRenderSetting) (string, model.RelationFormat, string, bool) {
+	if params.Id != "" {
+		return r.getRelationDataById(params)
 	}
+	if params.Key != "" {
+		return r.getRelationByKey(params.Key)
+	}
+	return "", 0, "", false
 }
 
-func (r *Renderer) getRelationByKey(key string) (string, model.RelationFormat, bool) {
+func (r *Renderer) getRelationByKey(key string) (string, model.RelationFormat, string, bool) {
 	relationKey := domain.RelationKey(key)
 	relation, _ := bundle.GetRelation(relationKey)
 	if relation != nil {
-		return relation.Name, relation.Format, true
+		return relation.Name, relation.Format, key, true
 	}
 	for _, sn := range r.UberSp.PbFiles {
 		sn, err := readJsonpbSnapshot(sn)
@@ -125,20 +127,21 @@ func (r *Renderer) getRelationByKey(key string) (string, model.RelationFormat, b
 		if uniqueKey := fields[bundle.RelationKeyUniqueKey.String()]; uniqueKey != nil && uniqueKey.GetStringValue() == relationKey.URL() {
 			name := fields[bundle.RelationKeyName.String()].GetStringValue()
 			format := model.RelationFormat(int32(fields[bundle.RelationKeyRelationFormat.String()].GetNumberValue()))
-			return name, format, true
+			return name, format, key, true
 		}
 	}
-	return "", 0, false
+	return "", 0, "", false
 }
 
-func (r *Renderer) getRelationDataById(id string) (string, model.RelationFormat, bool) {
-	snapshot := r.getObjectSnapshot(id)
+func (r *Renderer) getRelationDataById(params *RelationRenderSetting) (string, model.RelationFormat, string, bool) {
+	snapshot := r.getObjectSnapshot(params.Id)
 	if snapshot != nil {
 		name := getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyName, relationToString)
 		format := getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyRelationFormat, relationToRelationFormat)
-		return name, format, true
+		uk := getRelationField(snapshot.GetSnapshot().GetData().GetDetails(), bundle.RelationKeyUniqueKey, relationToString)
+		return name, format, strings.TrimPrefix(uk, addr.RelationKeyToIdPrefix), true
 	}
-	return "", 0, false
+	return "", 0, "", false
 }
 
 func (r *Renderer) populateRelationListValue(format model.RelationFormat, relationValue *types.Value) []templ.Component {

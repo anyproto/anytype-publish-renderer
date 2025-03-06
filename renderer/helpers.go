@@ -112,7 +112,8 @@ func getRelationField[V relType](targetDetails *types.Struct, relationKey domain
 }
 
 func (r *Renderer) makeAnytypeLink(targetDetails *types.Struct, targetObjectId string) string {
-	switch r.ResolvedLayout {
+	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	switch layout {
 	case model.ObjectType_file, model.ObjectType_image, model.ObjectType_pdf, model.ObjectType_audio, model.ObjectType_video:
 		src, err := r.getFileUrl(targetObjectId)
 		if err != nil {
@@ -124,6 +125,21 @@ func (r *Renderer) makeAnytypeLink(targetDetails *types.Struct, targetObjectId s
 		spaceId := getRelationField(targetDetails, bundle.RelationKeySpaceId, relationToString)
 		return fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
 	}
+}
+
+func (r *Renderer) resolveObjectLayout(details *types.Struct) model.ObjectTypeLayout {
+	_, ok := details.GetFields()[bundle.RelationKeyResolvedLayout.String()]
+	if ok {
+		return getRelationField(details, bundle.RelationKeyResolvedLayout, relationToObjectTypeLayout)
+	}
+	_, ok = details.GetFields()[bundle.RelationKeyLayout.String()]
+	if ok {
+		return getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	}
+
+	objectType := getRelationField(details, bundle.RelationKeyType, relationToString)
+	objectTypeDetails := r.findTargetDetails(objectType)
+	return getRelationField(objectTypeDetails, bundle.RelationKeyRecommendedLayout, relationToObjectTypeLayout)
 }
 
 func getLayoutClass(layout model.ObjectTypeLayout) string {

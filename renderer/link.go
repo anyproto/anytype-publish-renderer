@@ -29,7 +29,7 @@ func (r *Renderer) makeLinkBlockParams(b *model.Block) *BlockParams {
 		return blockParams
 	}
 	archiveClass := r.fillArchiveClass(targetDetails, b.GetLink().GetCardStyle(), blockParams)
-	cardClasses := r.fillLayoutClass()
+	cardClasses := r.fillLayoutClass(targetDetails)
 
 	name := getNameValue(targetDetails, bundle.RelationKeyName.String(), defaultName)
 	description := getDescription(b, targetDetails)
@@ -70,8 +70,9 @@ func (r *Renderer) fillArchiveClass(targetDetails *types.Struct, style model.Blo
 	return archiveClass
 }
 
-func (r *Renderer) fillLayoutClass() []string {
-	layoutClass := getLayoutClass(r.ResolvedLayout)
+func (r *Renderer) fillLayoutClass(targetDetails *types.Struct) []string {
+	layout := r.resolveObjectLayout(targetDetails)
+	layoutClass := getLayoutClass(layout)
 	cardClasses := []string{"linkCard", layoutClass}
 	return cardClasses
 }

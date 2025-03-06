@@ -73,6 +73,7 @@ type Renderer struct {
 	BlockNumbers      map[string]int
 	ObjectTypeDetails *types.Struct
 	ResolvedLayout    model.ObjectTypeLayout
+	LayoutAlign       int64
 }
 
 func readJsonpbSnapshot(snapshotStr string) (snapshot pb.SnapshotWithType, err error) {
@@ -216,14 +217,16 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 		Config:        config,
 	}
 
-	if len(snapshot.Snapshot.Data.GetObjectTypes()) == 0 {
+	objectType := getRelationField(snapshot.Snapshot.Data.GetDetails(), bundle.RelationKeyType, relationToString)
+	if objectType == "" {
 		log.Error("no object type in snapshot")
 		return
 	}
 
-	r.ObjectTypeDetails = r.findTargetDetails(snapshot.Snapshot.Data.GetObjectTypes()[0])
+	r.ObjectTypeDetails = r.findTargetDetails(objectType)
 	r.ResolvedLayout = r.resolveObjectLayout(snapshot.Snapshot.GetData().GetDetails())
 
+	r.fillLayoutAlign(snapshot.Snapshot.GetData().GetDetails())
 	r.maybeAddDebugCss()
 	r.hydrateSpecialBlocks()
 	r.hydrateNumberBlocks()
@@ -362,18 +365,6 @@ func (r *Renderer) hydrateSpecialBlocks() {
 
 	}
 
-}
-
-func (r *Renderer) resolveObjectLayout(details *types.Struct) model.ObjectTypeLayout {
-	_, ok := details.GetFields()[bundle.RelationKeyResolvedLayout.String()]
-	if ok {
-		return getRelationField(details, bundle.RelationKeyResolvedLayout, relationToObjectTypeLayout)
-	}
-	_, ok = details.GetFields()[bundle.RelationKeyLayout.String()]
-	if ok {
-		return getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
-	}
-	return getRelationField(r.ObjectTypeDetails, bundle.RelationKeyRecommendedLayout, relationToObjectTypeLayout)
 }
 
 func Comment(text string) templ.ComponentFunc {

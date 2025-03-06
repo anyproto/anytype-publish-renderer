@@ -187,6 +187,9 @@ func replaceNewlineBr(text string) string {
 func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 	blockText := b.GetText()
 	style := blockText.GetStyle()
+	if style == model.BlockContentText_Title {
+		b.Align = model.BlockAlign(r.LayoutAlign)
+	}
 	bgColor := b.GetBackgroundColor()
 	color := blockText.GetColor()
 	iconEmoji := blockText.GetIconEmoji()

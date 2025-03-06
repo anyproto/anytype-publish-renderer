@@ -2,9 +2,9 @@ package renderer
 
 import (
 	"fmt"
-
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/types"
+	"github.com/ipfs/go-cid"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
@@ -73,13 +73,19 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details
 		Featured:     true,
 		LimitDisplay: true,
 		Classes:      []string{lastClass},
-		Key:          relationKey,
+	}
+	_, err := cid.Decode(relationKey)
+	if err != nil {
+		settings.Key = relationKey
+	} else {
+		settings.Id = relationKey
 	}
 	cells = append(cells, r.buildRelationComponents(settings)...)
 	return cells
 }
 
 func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
+	block.Align = model.BlockAlign(r.LayoutAlign)
 	blockParams := makeDefaultBlockParams(block)
 	color := block.GetBackgroundColor()
 	if color != "" {
