@@ -64,6 +64,14 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 					</div>
 				</div>
 
+                <div class="space">
+                    if p.SpaceIcon != nil {
+                		@p.SpaceIcon
+                	}
+                    if p.SpaceName != "" {
+						<div class="name"> { p.SpaceName } </div>
+					}
+                </div>
 				<header class={p.HeaderClasses}>
 					if p.SpaceLink != "" {
 						<a href={p.SpaceLink} target="_blank" class="button black c28 fathom" data-event="PublishJoinSpaceClick">

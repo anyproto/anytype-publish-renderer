@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/anyproto/anytype-heart/pb"
+	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-publish-renderer/renderer/blockutils"
@@ -350,6 +351,16 @@ func (r *Renderer) hydrateSpecialBlocks() {
 
 	}
 
+}
+
+func (r *Renderer) getSpaceData() (string, templ.Component) {
+	details, err := r.findWorkspaceDetails()
+	if err != nil {
+		return "", nil
+	}
+	spaceName := getRelationField(details, bundle.RelationKeyName, relationToString)
+	iconTemplate := r.getIconFromDetails(details)
+	return spaceName, iconTemplate
 }
 
 func Comment(text string) templ.ComponentFunc {
