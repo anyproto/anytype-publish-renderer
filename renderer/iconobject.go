@@ -1,10 +1,14 @@
 package renderer
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
+	"go.uber.org/zap"
+	"os"
 	"slices"
 	"strings"
+	"text/template"
 	"unicode"
 
 	"github.com/a-h/templ"
@@ -61,6 +65,19 @@ var FontSize = map[int]int{
 	96:  64,
 	108: 64,
 	128: 64,
+}
+
+var typeIconColor = map[int64]string{
+	1:  "#949494",
+	2:  "#ecd91b",
+	3:  "#ffb522",
+	4:  "#f55522",
+	5:  "#e51ca0",
+	6:  "#ab50cc",
+	7:  "#3e58eb",
+	8:  "#2aa7ee",
+	9:  "#0fc8ba",
+	10: "#5dd400",
 }
 
 type IconObjectParams struct {
@@ -355,11 +372,19 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			iconClasses = append(iconClasses, "smileImage")
 			src = iconEmoji
 		} else {
-			if !props.NoDefault {
-				defaultIcon = "type"
-				classes = append(classes, "withDefault")
+			var err error
+			src, err = r.processIconName(targetDetails)
+			if err != nil {
+				log.Error("failed to generate svg for type", zap.Error(err))
+			} else if src == "" {
+				if !props.NoDefault {
+					defaultIcon = "type"
+					classes = append(classes, "withDefault")
+					iconClasses = append(iconClasses, "iconCommon")
+					src = r.getDefaultIconPath(defaultIcon)
+				}
+			} else {
 				iconClasses = append(iconClasses, "iconCommon")
-				src = r.getDefaultIconPath(defaultIcon)
 			}
 		}
 	case model.ObjectType_relation:
@@ -421,4 +446,35 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		IconClasses: iconClasses,
 		Src:         src,
 	}
+}
+
+func (r *Renderer) processIconName(targetDetails *types.Struct) (string, error) {
+	iconName := getRelationField(targetDetails, bundle.RelationKeyIconName, relationToString)
+	if iconName == "" {
+		return "", nil
+	}
+	svgSrc := r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/type/%s.svg", iconName))
+	iconOption := getRelationField(targetDetails, bundle.RelationKeyIconOption, relationToInt64)
+	return generateSVGFromFile(iconOption, svgSrc)
+}
+
+func generateSVGFromFile(iconOption int64, filename string) (string, error) {
+	color, exists := typeIconColor[iconOption]
+	if !exists {
+		return "", fmt.Errorf("color for option %d not found", iconOption)
+	}
+	svgTemplate, err := os.ReadFile(filename)
+	if err != nil {
+		return "", fmt.Errorf("failed to read SVG file: %v", err)
+	}
+	tmpl, err := template.New("svg").Parse(string(svgTemplate))
+	if err != nil {
+		return "", fmt.Errorf("failed to parse SVG template: %v", err)
+	}
+	buf := bytes.NewBuffer(make([]byte, 0, len(svgTemplate)))
+	err = tmpl.Execute(buf, map[string]string{"Color": color})
+	if err != nil {
+		return "", fmt.Errorf("failed to execute template: %v", err)
+	}
+	return encodeSVGToDataURL(buf.String()), nil
 }
