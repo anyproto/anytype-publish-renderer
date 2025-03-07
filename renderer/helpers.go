@@ -13,6 +13,19 @@ import (
 
 const linkTemplate = "anytype://object?objectId=%s&spaceId=%s"
 
+func (r *Renderer) findWorkspaceDetails() (*types.Struct, error) {
+	for _, sn := range r.UberSp.PbFiles {
+		snapshot, err := readJsonpbSnapshot(sn)
+		if err != nil {
+			return nil, err
+		}
+		if snapshot.SbType == model.SmartBlockType_Workspace {
+			return snapshot.GetSnapshot().GetData().GetDetails(), nil
+		}
+	}
+	return nil, fmt.Errorf("could not find workspace details")
+}
+
 func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
 	snapshot := r.getObjectSnapshot(targetObjectId)
 	if snapshot == nil {

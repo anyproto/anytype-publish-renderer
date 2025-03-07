@@ -388,7 +388,11 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		iconClasses = append(iconClasses, "iconFile")
 		iconName := fileIconName(targetDetails)
 		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/file/%s.svg", iconName))
-
+	case model.ObjectType_space:
+		if hasIconImage {
+			classes = append(classes, "withImage")
+			iconClasses = append(iconClasses, "iconImage")
+		}
 	case model.ObjectType_spaceView, model.ObjectType_dashboard:
 		break
 	}

@@ -18,6 +18,8 @@ type RenderPageParams struct {
 	Name          string
 	Description   string
 	SpaceLink     templ.SafeURL
+	SpaceIcon     templ.Component
+	SpaceName     string
 }
 
 func (r *Renderer) hasPageIcon() bool {
@@ -73,6 +75,7 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 	description := pbtypes.GetString(fields, "description")
 	snippet := pbtypes.GetString(fields, "snippet")
 	spaceLink := r.joinSpaceLink()
+	spaceName, spaceIcon := r.getSpaceData()
 
 	hasPageIcon := r.hasPageIcon()
 	hasPageCover := r.hasPageCover()
@@ -104,6 +107,8 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 		Name:          name,
 		Description:   descr,
 		SpaceLink:     spaceLink,
+		SpaceIcon:     spaceIcon,
+		SpaceName:     spaceName,
 	}
 }
 
