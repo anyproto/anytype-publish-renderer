@@ -359,6 +359,9 @@ func (r *Renderer) getSpaceData() (string, templ.Component) {
 		return "", nil
 	}
 	spaceName := getRelationField(details, bundle.RelationKeyName, relationToString)
+	if spaceName == "" {
+		spaceName = "Untitled"
+	}
 	iconTemplate := r.getIconFromDetails(details)
 	return spaceName, iconTemplate
 }
