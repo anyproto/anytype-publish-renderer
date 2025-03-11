@@ -64,20 +64,26 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 					</div>
 				</div>
 
-                if p.SpaceName != "" && p.SpaceIcon != nil{
-                    <div class="space">
-                		@p.SpaceIcon
-					    <div class="name"> { p.SpaceName } </div>
-                    </div>
-                }
 				<header class={p.HeaderClasses}>
-					if p.SpaceLink != "" {
-						<a href={p.SpaceLink} target="_blank" class="button black c28 fathom" data-event="PublishJoinSpaceClick">
-							Join Space
-						</a>
-					}
+					<div class="side left">
+						if p.SpaceName != ""{ 
+							<div class="space">
+								if p.SpaceIcon != nil {
+									@p.SpaceIcon
+								}
+								<div class="name"> { p.SpaceName } </div>
+							</div>
+						}
+					</div>
+					<div class="side right">
+						if p.SpaceLink != "" {
+							<a href={p.SpaceLink} target="_blank" class="button black c28 fathom" data-event="PublishJoinSpaceClick">
+								Join Space
+							</a>
+						}
 
-					<div class="icon more withBackground menuButton" data-menu-id="more" data-horizontal="right"></div>
+						<div class="icon more withBackground menuButton" data-menu-id="more" data-horizontal="right"></div>
+					</div>
 				</header>
 
 				<div class="coverWrapper">
