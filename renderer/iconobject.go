@@ -1,14 +1,11 @@
 package renderer
 
 import (
-	"bytes"
 	"encoding/base64"
 	"fmt"
 	"go.uber.org/zap"
-	"os"
 	"slices"
 	"strings"
-	"text/template"
 	"unicode"
 
 	"github.com/a-h/templ"
@@ -84,6 +81,8 @@ type IconObjectParams struct {
 	Classes     []string
 	IconClasses []string
 	Src         string
+	Svg         string
+	SvgColor    templ.Component
 }
 
 type IconObjectProps struct {
@@ -288,7 +287,8 @@ func (r *Renderer) getDefaultIconPath(name string) (path string) {
 }
 
 func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
-	var src string
+	var src, svg string
+	var colorStyle templ.Component
 	classes := []string{"iconObject"}
 	var iconClasses []string
 	var isDeleted bool
@@ -373,10 +373,10 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			src = iconEmoji
 		} else {
 			var err error
-			src, err = r.processIconName(targetDetails)
+			svg, colorStyle, err = r.processIconName(targetDetails)
 			if err != nil {
 				log.Error("failed to generate svg for type", zap.Error(err))
-			} else if src == "" {
+			} else if svg == "" {
 				if !props.NoDefault {
 					defaultIcon = "type"
 					classes = append(classes, "withDefault")
@@ -445,36 +445,28 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		Classes:     classes,
 		IconClasses: iconClasses,
 		Src:         src,
+		Svg:         svg,
+		SvgColor:    colorStyle,
 	}
 }
 
-func (r *Renderer) processIconName(targetDetails *types.Struct) (string, error) {
+func (r *Renderer) processIconName(targetDetails *types.Struct) (string, templ.Component, error) {
 	iconName := getRelationField(targetDetails, bundle.RelationKeyIconName, relationToString)
 	if iconName == "" {
-		return "", nil
+		return "", nil, nil
 	}
 	svgSrc := r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/type/%s.svg", iconName))
 	iconOption := getRelationField(targetDetails, bundle.RelationKeyIconOption, relationToInt64)
-	return generateSVGFromFile(iconOption, svgSrc)
-}
-
-func generateSVGFromFile(iconOption int64, filename string) (string, error) {
 	color, exists := typeIconColor[iconOption]
 	if !exists {
-		return "", fmt.Errorf("color for option %d not found", iconOption)
+		return "", nil, fmt.Errorf("color for option %d not found", iconOption)
 	}
-	svgTemplate, err := os.ReadFile(filename)
-	if err != nil {
-		return "", fmt.Errorf("failed to read SVG file: %v", err)
-	}
-	tmpl, err := template.New("svg").Parse(string(svgTemplate))
-	if err != nil {
-		return "", fmt.Errorf("failed to parse SVG template: %v", err)
-	}
-	buf := bytes.NewBuffer(make([]byte, 0, len(svgTemplate)))
-	err = tmpl.Execute(buf, map[string]string{"Color": color})
-	if err != nil {
-		return "", fmt.Errorf("failed to execute template: %v", err)
-	}
-	return encodeSVGToDataURL(buf.String()), nil
+	colorStyle := templ.Raw(fmt.Sprintf(`
+		<style> 
+			svg.iconSvg {
+	            fill: %s;
+	        }
+		</style> 
+	`, color))
+	return svgSrc, colorStyle, nil
 }
