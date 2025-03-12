@@ -371,6 +371,35 @@ function renderColumn () {
 	});
 };
 
+function renderPrimitivesSvgs () {
+    document.querySelectorAll(".svg-container").forEach(container => {
+        const svgUrl = container.getAttribute("data-src");
+		console.log("svgUrl:", svgUrl);
+
+        const color = container.getAttribute("data-color");
+
+        if (!svgUrl || !color) return;
+
+        fetch(svgUrl)
+            .then(response => response.text())
+            .then(svgText => {
+                const updatedSvg = svgText.replace(/_COLOR_VAR_/g, color);
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(updatedSvg, "image/svg+xml").documentElement;
+
+				// some svgs in assets have width and height set to e.g. 512
+				// redefine to 100% to respect the parrent
+				svgDoc.attributes.width.value = "100%"
+				svgDoc.attributes.height.value = "100%"
+
+
+                container.innerHTML = "";
+                container.appendChild(svgDoc);
+            })
+            .catch(error => console.error("Error loading SVG:", error));
+    });
+}
+
 window.onMessage = (data) => {
 	const { type, height, blockId, url } = data;
 
@@ -410,6 +439,7 @@ $(document).ready(() => {
 		renderInlineLatex,
 		renderPdf,
 		renderMenu,
+		renderPrimitivesSvgs,
 	];
 
 	renderFns.forEach(f => {
