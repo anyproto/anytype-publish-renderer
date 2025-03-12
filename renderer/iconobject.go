@@ -3,10 +3,11 @@ package renderer
 import (
 	"encoding/base64"
 	"fmt"
-	"go.uber.org/zap"
 	"slices"
 	"strings"
 	"unicode"
+
+	"go.uber.org/zap"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
@@ -81,8 +82,8 @@ type IconObjectParams struct {
 	Classes     []string
 	IconClasses []string
 	Src         string
-	Svg         string
-	SvgColor    templ.Component
+	SvgSrc      string
+	SvgColor    string
 }
 
 type IconObjectProps struct {
@@ -287,8 +288,7 @@ func (r *Renderer) getDefaultIconPath(name string) (path string) {
 }
 
 func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
-	var src, svg string
-	var colorStyle templ.Component
+	var src, svgSrc, svgColor string
 	classes := []string{"iconObject"}
 	var iconClasses []string
 	var isDeleted bool
@@ -372,11 +372,8 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			iconClasses = append(iconClasses, "smileImage")
 			src = iconEmoji
 		} else {
-			var err error
-			svg, colorStyle, err = r.processIconName(targetDetails)
-			if err != nil {
-				log.Error("failed to generate svg for type", zap.Error(err))
-			} else if svg == "" {
+			iconName := getRelationField(targetDetails, bundle.RelationKeyIconName, relationToString)
+			if iconName == "" {
 				if !props.NoDefault {
 					defaultIcon = "type"
 					classes = append(classes, "withDefault")
@@ -385,6 +382,14 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 				}
 			} else {
 				iconClasses = append(iconClasses, "iconCommon")
+				svgSrc = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/type/%s.svg", iconName))
+				iconOption := getRelationField(targetDetails, bundle.RelationKeyIconOption, relationToInt64)
+				if color, exists := typeIconColor[iconOption]; exists {
+					svgColor = color
+				} else {
+					log.Error("color for option not found", zap.Int64("iconOption", iconOption))
+				}
+
 			}
 		}
 	case model.ObjectType_relation:
@@ -445,28 +450,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		Classes:     classes,
 		IconClasses: iconClasses,
 		Src:         src,
-		Svg:         svg,
-		SvgColor:    colorStyle,
+		SvgSrc:      svgSrc,
+		SvgColor:    svgColor,
 	}
-}
-
-func (r *Renderer) processIconName(targetDetails *types.Struct) (string, templ.Component, error) {
-	iconName := getRelationField(targetDetails, bundle.RelationKeyIconName, relationToString)
-	if iconName == "" {
-		return "", nil, nil
-	}
-	svgSrc := r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/type/%s.svg", iconName))
-	iconOption := getRelationField(targetDetails, bundle.RelationKeyIconOption, relationToInt64)
-	color, exists := typeIconColor[iconOption]
-	if !exists {
-		return "", nil, fmt.Errorf("color for option %d not found", iconOption)
-	}
-	colorStyle := templ.Raw(fmt.Sprintf(`
-		<style> 
-			svg.iconSvg {
-	            fill: %s;
-	        }
-		</style> 
-	`, color))
-	return svgSrc, colorStyle, nil
 }
