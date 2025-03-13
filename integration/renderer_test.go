@@ -3,19 +3,30 @@ package integration
 import (
 	"bytes"
 	"fmt"
-	"github.com/sergi/go-diff/diffmatchpatch"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/anyproto/anytype-publish-renderer/renderer"
 )
 
 func TestRenderer(t *testing.T) {
+	t.Run("test snapshot", func(t *testing.T) {
+		testDir := "testdata"
+		testRendering(t, testDir)
+	})
+	t.Run("test primitives snapshots", func(t *testing.T) {
+		testDir := "primitives"
+		testRendering(t, testDir)
+	})
+}
+
+func testRendering(t *testing.T, testDir string) {
 	// given
-	testDir := "testdata"
 	testRenderer, err := makeTestRenderer(testDir)
 	assert.NoError(t, err)
 	buffer := bytes.NewBuffer(nil)
@@ -25,7 +36,7 @@ func TestRenderer(t *testing.T) {
 
 	// when
 	assert.NoError(t, err)
-	fileContent, err := os.ReadFile("index.html")
+	fileContent, err := os.ReadFile(filepath.Join(testDir, "index.html"))
 	assert.NoError(t, err)
 	fileContentStr := strings.TrimSuffix(string(fileContent), "\n")
 	if fileContentStr != buffer.String() {

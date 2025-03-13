@@ -7,6 +7,8 @@ import (
 	"strings"
 	"unicode"
 
+	"go.uber.org/zap"
+
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
@@ -67,6 +69,8 @@ type IconObjectParams struct {
 	Classes     []string
 	IconClasses []string
 	Src         string
+	SvgSrc      string
+	SvgColor    string
 }
 
 type IconObjectProps struct {
@@ -96,6 +100,7 @@ type UserSvgProps struct {
 }
 
 var iconColor = map[int64]string{
+	0:  "#e3e3e3",
 	1:  "#949494",
 	2:  "#ecd91b",
 	3:  "#ffb522",
@@ -265,13 +270,21 @@ func fileIconName(details *types.Struct) string {
 	return icon
 }
 
-func (r *Renderer) getDefaultIconPath(name string) (path string) {
-	path = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/default/%s.svg", name))
+func (r *Renderer) getDefaultIconPath(objectDetails *types.Struct, name string) (path, svgSrc, svgColor string) {
+	objectType := getRelationField(objectDetails, bundle.RelationKeyType, relationToString)
+	objectTypeDetails := r.findTargetDetails(objectType)
+	iconName := getRelationField(objectTypeDetails, bundle.RelationKeyIconName, relationToString)
+	if iconName != "" {
+		svgSrc = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/type/%s.svg", iconName))
+		svgColor = iconColor[0]
+	} else {
+		path = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/default/%s.svg", name))
+	}
 	return
 }
 
 func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props *IconObjectProps) (params *IconObjectParams) {
-	var src string
+	var src, svgSrc, svgColor string
 	classes := []string{"iconObject"}
 	var iconClasses []string
 	var isDeleted bool
@@ -279,7 +292,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		isDeleted = true
 	}
 
-	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	layout := r.resolveObjectLayout(targetDetails)
 	iconEmoji := getRelationField(targetDetails, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
 	iconImage := getRelationField(targetDetails, bundle.RelationKeyIconImage, r.relationToFileUrl)
 	hasIconEmoji := iconEmoji != ""
@@ -307,7 +320,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			if !props.NoDefault {
 				classes = append(classes, "withDefault")
 				iconClasses = append(iconClasses, "iconCommon")
-				src = r.getDefaultIconPath(defaultIcon)
+				src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 			}
 		}
 
@@ -334,7 +347,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		defaultIcon = "date"
 		classes = append(classes, "withDefault")
 		iconClasses = append(iconClasses, "iconCommon")
-		src = r.getDefaultIconPath(defaultIcon)
+		src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 	case model.ObjectType_todo:
 		done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
 		checkIconNum := 0
@@ -348,18 +361,31 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			defaultIcon = "page"
 			classes = append(classes, "withDefault")
 			iconClasses = append(iconClasses, "iconCommon")
-			src = r.getDefaultIconPath(defaultIcon)
+			src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 		}
 	case model.ObjectType_objectType:
 		if hasIconEmoji {
 			iconClasses = append(iconClasses, "smileImage")
 			src = iconEmoji
 		} else {
-			if !props.NoDefault {
-				defaultIcon = "type"
-				classes = append(classes, "withDefault")
+			iconName := getRelationField(targetDetails, bundle.RelationKeyIconName, relationToString)
+			if iconName == "" {
+				if !props.NoDefault {
+					defaultIcon = "type"
+					classes = append(classes, "withDefault")
+					iconClasses = append(iconClasses, "iconCommon")
+					src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
+				}
+			} else {
 				iconClasses = append(iconClasses, "iconCommon")
-				src = r.getDefaultIconPath(defaultIcon)
+				svgSrc = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/type/%s.svg", iconName))
+				iconOption := getRelationField(targetDetails, bundle.RelationKeyIconOption, relationToInt64)
+				if color, exists := iconColor[iconOption]; exists {
+					svgColor = color
+				} else {
+					log.Error("color for option not found", zap.Int64("iconOption", iconOption))
+				}
+
 			}
 		}
 	case model.ObjectType_relation:
@@ -374,7 +400,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		defaultIcon = "bookmark"
 		classes = append(classes, "withDefault")
 		iconClasses = append(iconClasses, "iconCommon")
-		src = r.getDefaultIconPath(defaultIcon)
+		src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 	case model.ObjectType_image:
 		// TODO: should show image preview when we will have cropped images in snapshot
 		fallthrough
@@ -426,6 +452,8 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		Classes:     classes,
 		IconClasses: iconClasses,
 		Src:         src,
+		SvgSrc:      svgSrc,
+		SvgColor:    svgColor,
 	}
 }
 

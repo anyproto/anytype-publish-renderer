@@ -1,13 +1,14 @@
 package renderer
 
 import (
+	"path/filepath"
+	"testing"
+
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/types"
-	"path/filepath"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
