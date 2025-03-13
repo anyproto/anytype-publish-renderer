@@ -112,6 +112,19 @@ type UserSvgProps struct {
 	Letter     string
 }
 
+var iconColor = map[int64]string{
+	1:  "#949494",
+	2:  "#ecd91b",
+	3:  "#ffb522",
+	4:  "#f55522",
+	5:  "#e51ca0",
+	6:  "#ab50cc",
+	7:  "#3e58eb",
+	8:  "#2aa7ee",
+	9:  "#0fc8ba",
+	10: "#5dd400",
+}
+
 func firstAlnumChar(s string, defaultLetter string) string {
 	for _, r := range s {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
@@ -133,28 +146,15 @@ func encodeSVGToDataURL(svg string) string {
 }
 
 func makeUserSvgProps(size int, username string) *UserSvgProps {
-	sizeStr := fmt.Sprintf("%dpx", size)
 	viewBox := fmt.Sprintf("0 0 %d %d", size, size)
 
-	fontWeight := "500"
-	if size > 18 {
-		fontWeight = "600"
-	}
-
-	fontSize := 72
-	if fs, ok := FontSize[size]; ok {
-		fontSize = min(fontSize, fs)
-	}
-	fontSizeStr := fmt.Sprintf("%dpx", fontSize)
-
-	// "U" stands for "Untitled"
-	letter := firstAlnumChar(username, "U")
+	sizeStr, fontWeight, fontSizeStr, letter := getParamsForSvg(size, username)
 
 	return &UserSvgProps{
-		Size:       sizeStr,
+		Size:       fmt.Sprintf("%spx", sizeStr),
 		ViewBox:    viewBox,
 		FontWeight: fontWeight,
-		FontSize:   fontSizeStr,
+		FontSize:   fmt.Sprintf("%spx", fontSizeStr),
 		Letter:     letter,
 	}
 }
@@ -418,7 +418,13 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		iconClasses = append(iconClasses, "iconFile")
 		iconName := fileIconName(targetDetails)
 		src = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/file/%s.svg", iconName))
-
+	case model.ObjectType_space:
+		classes = append(classes, "withImage")
+		iconClasses = append(iconClasses, "iconImage")
+		if !hasIconImage {
+			classes = append(classes, "withOption")
+			src = makeSpaceSvgIcon(targetDetails, int(props.Size))
+		}
 	case model.ObjectType_spaceView, model.ObjectType_dashboard:
 		break
 	}
@@ -453,4 +459,47 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		SvgSrc:      svgSrc,
 		SvgColor:    svgColor,
 	}
+}
+
+func makeSpaceSvgIcon(targetDetails *types.Struct, size int) string {
+	name := getRelationField(targetDetails, bundle.RelationKeyName, relationToString)
+	if name == "" {
+		name = "Untitled"
+	}
+	colorOption := getRelationField(targetDetails, bundle.RelationKeyIconOption, relationToInt64)
+	sizeStr, fontWeight, fontSizeStr, letter := getParamsForSvg(size, name)
+	color := iconColor[colorOption]
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf(
+		`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 %[1]s %[1]s" xml:space="preserve" height="%[1]spx" width="%[1]spx">`,
+		sizeStr,
+	))
+	sb.WriteString(fmt.Sprintf(
+		`<rect width="%[1]s" height="%[1]s" fill="%[2]s"/>`,
+		sizeStr, color,
+	))
+	sb.WriteString(fmt.Sprintf(
+		`<text x="50%%" y="50%%" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="Inter, Helvetica" font-weight="%s" font-size="%spx">%s</text></svg>`,
+		fontWeight, fontSizeStr, letter,
+	))
+
+	return encodeSVGToDataURL(sb.String())
+}
+
+func getParamsForSvg(size int, name string) (string, string, string, string) {
+	sizeStr := fmt.Sprintf("%d", size)
+
+	fontWeight := "500"
+	if size > 18 {
+		fontWeight = "600"
+	}
+
+	fontSize := 72
+	if fs, ok := FontSize[size]; ok {
+		fontSize = min(fontSize, fs)
+	}
+	fontSizeStr := fmt.Sprintf("%d", fontSize)
+
+	letter := firstAlnumChar(name, "U")
+	return sizeStr, fontWeight, fontSizeStr, letter
 }

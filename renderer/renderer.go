@@ -367,6 +367,19 @@ func (r *Renderer) hydrateSpecialBlocks() {
 
 }
 
+func (r *Renderer) getSpaceData() (string, templ.Component) {
+	details, err := r.findWorkspaceDetails()
+	if err != nil {
+		return "", nil
+	}
+	spaceName := getRelationField(details, bundle.RelationKeyName, relationToString)
+	if spaceName == "" {
+		spaceName = "Untitled"
+	}
+	iconTemplate := r.getIconFromDetails(details)
+	return spaceName, iconTemplate
+}
+
 func Comment(text string) templ.ComponentFunc {
 	return func(ctx context.Context, w io.Writer) error {
 		io.WriteString(w, "<!--comment:\n")
