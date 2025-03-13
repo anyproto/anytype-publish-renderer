@@ -65,19 +65,6 @@ var FontSize = map[int]int{
 	128: 64,
 }
 
-var typeIconColor = map[int64]string{
-	1:  "#949494",
-	2:  "#ecd91b",
-	3:  "#ffb522",
-	4:  "#f55522",
-	5:  "#e51ca0",
-	6:  "#ab50cc",
-	7:  "#3e58eb",
-	8:  "#2aa7ee",
-	9:  "#0fc8ba",
-	10: "#5dd400",
-}
-
 type IconObjectParams struct {
 	Classes     []string
 	IconClasses []string
@@ -113,6 +100,7 @@ type UserSvgProps struct {
 }
 
 var iconColor = map[int64]string{
+	0:  "#e3e3e3",
 	1:  "#949494",
 	2:  "#ecd91b",
 	3:  "#ffb522",
@@ -282,8 +270,16 @@ func fileIconName(details *types.Struct) string {
 	return icon
 }
 
-func (r *Renderer) getDefaultIconPath(name string) (path string) {
-	path = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/default/%s.svg", name))
+func (r *Renderer) getDefaultIconPath(objectDetails *types.Struct, name string) (path, svgSrc, svgColor string) {
+	objectType := getRelationField(objectDetails, bundle.RelationKeyType, relationToString)
+	objectTypeDetails := r.findTargetDetails(objectType)
+	iconName := getRelationField(objectTypeDetails, bundle.RelationKeyIconName, relationToString)
+	if iconName != "" {
+		svgSrc = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/type/%s.svg", iconName))
+		svgColor = iconColor[0]
+	} else {
+		path = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/default/%s.svg", name))
+	}
 	return
 }
 
@@ -324,7 +320,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			if !props.NoDefault {
 				classes = append(classes, "withDefault")
 				iconClasses = append(iconClasses, "iconCommon")
-				src = r.getDefaultIconPath(defaultIcon)
+				src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 			}
 		}
 
@@ -351,7 +347,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		defaultIcon = "date"
 		classes = append(classes, "withDefault")
 		iconClasses = append(iconClasses, "iconCommon")
-		src = r.getDefaultIconPath(defaultIcon)
+		src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 	case model.ObjectType_todo:
 		done := getRelationField(targetDetails, bundle.RelationKeyDone, relationToBool)
 		checkIconNum := 0
@@ -365,7 +361,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			defaultIcon = "page"
 			classes = append(classes, "withDefault")
 			iconClasses = append(iconClasses, "iconCommon")
-			src = r.getDefaultIconPath(defaultIcon)
+			src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 		}
 	case model.ObjectType_objectType:
 		if hasIconEmoji {
@@ -378,13 +374,13 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 					defaultIcon = "type"
 					classes = append(classes, "withDefault")
 					iconClasses = append(iconClasses, "iconCommon")
-					src = r.getDefaultIconPath(defaultIcon)
+					src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 				}
 			} else {
 				iconClasses = append(iconClasses, "iconCommon")
 				svgSrc = r.GetStaticFolderUrl(fmt.Sprintf("/img/icon/type/%s.svg", iconName))
 				iconOption := getRelationField(targetDetails, bundle.RelationKeyIconOption, relationToInt64)
-				if color, exists := typeIconColor[iconOption]; exists {
+				if color, exists := iconColor[iconOption]; exists {
 					svgColor = color
 				} else {
 					log.Error("color for option not found", zap.Int64("iconOption", iconOption))
@@ -404,7 +400,7 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 		defaultIcon = "bookmark"
 		classes = append(classes, "withDefault")
 		iconClasses = append(iconClasses, "iconCommon")
-		src = r.getDefaultIconPath(defaultIcon)
+		src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 	case model.ObjectType_image:
 		// TODO: should show image preview when we will have cropped images in snapshot
 		fallthrough
