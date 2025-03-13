@@ -1,5 +1,5 @@
 SNAPSHOTS_DIR:=./test_snapshots
-SNAPSHOT_PATH:=./test_snapshots/testdata
+SNAPSHOT_PATH:=./test_snapshots/test-me
 
 EXEC:=./bin/anytype-publish-renderer
 TEMPL_VER:=$(shell cat go.mod | grep templ | cut -d' ' -f2)
