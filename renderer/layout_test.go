@@ -1,8 +1,9 @@
 package renderer
 
 import (
-	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"testing"
+
+	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 
 	"github.com/stretchr/testify/assert"
 )

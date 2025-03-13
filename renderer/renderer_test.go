@@ -1,12 +1,13 @@
 package renderer
 
 import (
+	"testing"
+
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/types"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 type TestRenderer struct {

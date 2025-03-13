@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"fmt"
+
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/types"
 	"github.com/ipfs/go-cid"
