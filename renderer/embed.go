@@ -245,7 +245,7 @@ func extractYoutubeId(url string) string {
 	tm := regexp.MustCompile(`(\?t=|&t=)(\d+)`).FindStringSubmatch(url)
 
 	// Check if video ID was found
-	if pm == nil || len(pm) < 3 || len(pm[2]) == 0 {
+	if len(pm) < 3 || len(pm[2]) == 0 {
 		return ""
 	}
 

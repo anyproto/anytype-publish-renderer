@@ -382,9 +382,18 @@ func (r *Renderer) getSpaceData() (string, templ.Component) {
 
 func Comment(text string) templ.ComponentFunc {
 	return func(ctx context.Context, w io.Writer) error {
-		io.WriteString(w, "<!--comment:\n")
-		io.WriteString(w, text)
-		io.WriteString(w, "\n-->\n")
+		_, err := io.WriteString(w, "<!--comment:\n")
+		if err != nil {
+			log.Error("comment error", zap.Error(err))
+		}
+		_, err = io.WriteString(w, text)
+		if err != nil {
+			log.Error("comment error", zap.Error(err))
+		}
+		_, err = io.WriteString(w, "\n-->\n")
+		if err != nil {
+			log.Error("comment error", zap.Error(err))
+		}
 		return nil
 	}
 }
