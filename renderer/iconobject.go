@@ -364,6 +364,11 @@ func (r *Renderer) MakeRenderIconObjectParams(targetDetails *types.Struct, props
 			src, svgSrc, svgColor = r.getDefaultIconPath(targetDetails, defaultIcon)
 		}
 	case model.ObjectType_objectType:
+		if hasIconImage {
+			classes = append(classes, "withImage")
+			iconClasses = append(iconClasses, "iconImage")
+			break
+		}
 		if hasIconEmoji {
 			iconClasses = append(iconClasses, "smileImage")
 			src = iconEmoji
