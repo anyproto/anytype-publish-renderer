@@ -35,7 +35,7 @@ func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
 }
 
 type relType interface {
-	string | bool | int64 | model.ObjectTypeLayout | model.RelationFormat
+	string | bool | int64 | model.ObjectTypeLayout | model.RelationFormat | float64 | *types.ListValue
 }
 
 type relTransformer[V relType] func(*types.Value) V
@@ -99,6 +99,22 @@ func relationToInt64(field *types.Value) int64 {
 	return null
 }
 
+func relationToFloat64(field *types.Value) float64 {
+	var null float64
+	if field != nil {
+		return field.GetNumberValue()
+	}
+	return null
+}
+
+func relationToList(field *types.Value) *types.ListValue {
+	var null *types.ListValue
+	if field != nil {
+		return field.GetListValue()
+	}
+	return null
+}
+
 func getRelationField[V relType](targetDetails *types.Struct, relationKey domain.RelationKey, tr relTransformer[V]) V {
 	var null V
 	if f, ok := targetDetails.GetFields()[relationKey.String()]; ok {
@@ -122,6 +138,21 @@ func (r *Renderer) makeAnytypeLink(targetDetails *types.Struct, targetObjectId s
 		spaceId := getRelationField(targetDetails, bundle.RelationKeySpaceId, relationToString)
 		return fmt.Sprintf(linkTemplate, targetObjectId, spaceId)
 	}
+}
+
+func (r *Renderer) resolveObjectLayout(details *types.Struct) model.ObjectTypeLayout {
+	_, ok := details.GetFields()[bundle.RelationKeyResolvedLayout.String()]
+	if ok {
+		return getRelationField(details, bundle.RelationKeyResolvedLayout, relationToObjectTypeLayout)
+	}
+	_, ok = details.GetFields()[bundle.RelationKeyLayout.String()]
+	if ok {
+		return getRelationField(details, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	}
+
+	objectType := getRelationField(details, bundle.RelationKeyType, relationToString)
+	objectTypeDetails := r.findTargetDetails(objectType)
+	return getRelationField(objectTypeDetails, bundle.RelationKeyRecommendedLayout, relationToObjectTypeLayout)
 }
 
 func getLayoutClass(layout model.ObjectTypeLayout) string {

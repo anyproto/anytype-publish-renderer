@@ -71,7 +71,7 @@ func (r *Renderer) fillArchiveClass(targetDetails *types.Struct, style model.Blo
 }
 
 func (r *Renderer) fillLayoutClass(targetDetails *types.Struct) []string {
-	layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+	layout := r.resolveObjectLayout(targetDetails)
 	layoutClass := getLayoutClass(layout)
 	cardClasses := []string{"linkCard", layoutClass}
 	return cardClasses

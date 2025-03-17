@@ -1,12 +1,13 @@
 package renderer
 
 import (
+	"testing"
+
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/types"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 type TestRenderer struct {
@@ -80,5 +81,11 @@ func WithLinkedSnapshot(test *testing.T, fileName string, sn *pb.SnapshotWithTyp
 		if assert.NoError(test, err) {
 			t.UberSp.PbFiles[fileName] = json
 		}
+	}
+}
+
+func WithObjectTypeDetails(details *types.Struct) Option {
+	return func(t *TestRenderer) {
+		t.ObjectTypeDetails = details
 	}
 }

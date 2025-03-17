@@ -33,10 +33,10 @@ func (r *Renderer) getDateSnapshot(objectId string) *pb.SnapshotWithType {
 	return &pb.SnapshotWithType{
 		SbType: model.SmartBlockType_Date,
 		Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{Details: &types.Struct{Fields: map[string]*types.Value{
-			bundle.RelationKeyName.String():    pbtypes.String(name),
-			bundle.RelationKeyId.String():      pbtypes.String(objectId),
-			bundle.RelationKeyLayout.String():  pbtypes.Int64(int64(model.ObjectType_date)),
-			bundle.RelationKeySpaceId.String(): spaceId,
+			bundle.RelationKeyName.String():           pbtypes.String(name),
+			bundle.RelationKeyId.String():             pbtypes.String(objectId),
+			bundle.RelationKeyResolvedLayout.String(): pbtypes.Int64(int64(model.ObjectType_date)),
+			bundle.RelationKeySpaceId.String():        spaceId,
 		}}}},
 	}
 }

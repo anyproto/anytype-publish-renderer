@@ -13,15 +13,16 @@ import (
 	"runtime/debug"
 	"strings"
 
+	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pb"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
-	"github.com/anyproto/anytype-publish-renderer/renderer/blockutils"
+	"github.com/gogo/protobuf/jsonpb"
+	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
 
-	"github.com/a-h/templ"
-	"github.com/gogo/protobuf/jsonpb"
+	"github.com/anyproto/anytype-publish-renderer/renderer/blockutils"
 )
 
 var log = logging.Logger("renderer").Desugar()
@@ -69,7 +70,10 @@ type Renderer struct {
 	Root       *model.Block
 	BlocksById map[string]*model.Block
 
-	BlockNumbers map[string]int
+	BlockNumbers      map[string]int
+	ObjectTypeDetails *types.Struct
+	ResolvedLayout    model.ObjectTypeLayout
+	LayoutAlign       int64
 }
 
 func readJsonpbSnapshot(snapshotStr string) (snapshot pb.SnapshotWithType, err error) {
@@ -213,6 +217,16 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 		Config:        config,
 	}
 
+	objectType := getRelationField(snapshot.Snapshot.Data.GetDetails(), bundle.RelationKeyType, relationToString)
+	if objectType == "" {
+		log.Error("no object type in snapshot")
+		return
+	}
+
+	r.ObjectTypeDetails = r.findTargetDetails(objectType)
+	r.ResolvedLayout = r.resolveObjectLayout(snapshot.Snapshot.GetData().GetDetails())
+
+	r.fillLayoutAlign(snapshot.Snapshot.GetData().GetDetails())
 	r.maybeAddDebugCss()
 	r.hydrateSpecialBlocks()
 	r.hydrateNumberBlocks()
@@ -368,9 +382,18 @@ func (r *Renderer) getSpaceData() (string, templ.Component) {
 
 func Comment(text string) templ.ComponentFunc {
 	return func(ctx context.Context, w io.Writer) error {
-		io.WriteString(w, "<!--comment:\n")
-		io.WriteString(w, text)
-		io.WriteString(w, "\n-->\n")
+		_, err := io.WriteString(w, "<!--comment:\n")
+		if err != nil {
+			log.Error("comment error", zap.Error(err))
+		}
+		_, err = io.WriteString(w, text)
+		if err != nil {
+			log.Error("comment error", zap.Error(err))
+		}
+		_, err = io.WriteString(w, "\n-->\n")
+		if err != nil {
+			log.Error("comment error", zap.Error(err))
+		}
 		return nil
 	}
 }

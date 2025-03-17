@@ -7,4 +7,7 @@ templ IconObjectTemplate(r *Renderer, p *IconObjectParams) {
 			<img src={ p.Src } class={ p.IconClasses } />
 		</div>
 	}
+	if p.SvgSrc != "" {
+		<div class={"svg-container", p.Classes } data-src={ p.SvgSrc } data-color={ p.SvgColor }></div>
+	}
 }

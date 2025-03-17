@@ -29,7 +29,7 @@ func CellTemplate(params *RelationRenderSetting, component templ.Component) temp
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{"cell ", params.Classes}
+		var templ_7745c5c3_Var2 = []any{"cell", params.Classes}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

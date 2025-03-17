@@ -5,6 +5,7 @@ import (
 
 	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/types"
+	"github.com/ipfs/go-cid"
 
 	"github.com/a-h/templ"
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
@@ -17,8 +18,8 @@ func (r *Renderer) makeFeaturedRelationsComponent() templ.Component {
 	if details == nil || len(details.GetFields()) == 0 {
 		return nil
 	}
-	featuredRelationsList := details.GetFields()[bundle.RelationKeyFeaturedRelations.String()].GetListValue()
-	if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
+	featuredRelationsList := r.retrieveFeaturedRelations(details)
+	if featuredRelationsList == nil {
 		return nil
 	}
 	cells := make([]templ.Component, 0, len(featuredRelationsList.Values))
@@ -39,6 +40,22 @@ func (r *Renderer) makeFeaturedRelationsComponent() templ.Component {
 	return wrapper
 }
 
+func (r *Renderer) retrieveFeaturedRelations(details *types.Struct) *types.ListValue {
+	featuredRelationsList := getRelationField(details, bundle.RelationKeyFeaturedRelations, relationToList)
+	if r.isFeaturedRelationsEmpty(featuredRelationsList) {
+		featuredRelationsList = getRelationField(r.ObjectTypeDetails, bundle.RelationKeyRecommendedFeaturedRelations, relationToList)
+		if featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 {
+			return nil
+		}
+	}
+	return featuredRelationsList
+}
+
+func (r *Renderer) isFeaturedRelationsEmpty(featuredRelationsList *types.ListValue) bool {
+	return featuredRelationsList == nil || len(featuredRelationsList.GetValues()) == 0 || (len(featuredRelationsList.GetValues()) == 1 &&
+		featuredRelationsList.GetValues()[0].GetStringValue() == bundle.RelationKeyDescription.String())
+}
+
 func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details *types.Struct, lastClass string, cells []templ.Component) []templ.Component {
 	if featuredRelation == nil {
 		return cells
@@ -57,13 +74,27 @@ func (r *Renderer) processFeatureRelation(featuredRelation *types.Value, details
 		Featured:     true,
 		LimitDisplay: true,
 		Classes:      []string{lastClass},
-		Key:          relationKey,
+	}
+	_, err := cid.Decode(relationKey)
+	if err != nil {
+		settings.Key = relationKey
+	} else {
+		settings.Id = relationKey
 	}
 	cells = append(cells, r.buildRelationComponents(settings)...)
 	return cells
 }
 
 func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
+	blockParams := r.makeFeaturedRelationsBlockParams(block)
+	if blockParams == nil {
+		return NoneTemplate("")
+	}
+	return BlockTemplate(r, blockParams)
+}
+
+func (r *Renderer) makeFeaturedRelationsBlockParams(block *model.Block) *BlockParams {
+	block.Align = model.BlockAlign(r.LayoutAlign)
 	blockParams := makeDefaultBlockParams(block)
 	color := block.GetBackgroundColor()
 	if color != "" {
@@ -71,8 +102,8 @@ func (r *Renderer) RenderFeaturedRelations(block *model.Block) templ.Component {
 	}
 	params := r.makeFeaturedRelationsComponent()
 	if params == nil {
-		return NoneTemplate("")
+		return nil
 	}
 	blockParams.Content = params
-	return BlockTemplate(r, blockParams)
+	return blockParams
 }
