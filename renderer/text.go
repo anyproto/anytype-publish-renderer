@@ -68,8 +68,8 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		details := r.findTargetDetails(mark.Param)
 
 		var link string
-		var iconParams *IconObjectParams
 		var classes []string
+		iconParams := &IconObjectParams{}
 		if details != nil && len(details.Fields) != 0 {
 			iconParams = r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
 			classes = []string{}
