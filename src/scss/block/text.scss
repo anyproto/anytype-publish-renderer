@@ -52,7 +52,7 @@
 
 /* Title */
 
-.block.blockText.textTitle { padding: 6px 0px 0px 0px !important; @include text-title; }
+.block.blockText.textTitle, h1 { padding: 6px 0px 0px 0px !important; @include text-title; }
 .block.blockText.textTitle {
 	> .content {
 		> .flex { gap: 0px 8px; }
@@ -71,14 +71,14 @@
 
 /* Header2 */
 
-.block.blockText.textHeader2 { padding: 14px 0px 0px 0px; @include text-header2; }
+.block.blockText.textHeader2, h2 { padding: 14px 0px 0px 0px; @include text-header2; }
 
 /* Header3 */
 
-.block.blockText.textHeader3 { padding: 13px 0px 2px 0px; @include text-header3; }
+.block.blockText.textHeader3, h3 { padding: 13px 0px 2px 0px; @include text-header3; }
 
 /* Callout */
-	
+
 .block.blockText.textCallout { min-width: 130px; background-color: var(--color-shape-tertiary); border-radius: 8px; margin: 6px 0px; padding: 16px; }
 .block.blockText.textCallout {
 	> .content { padding: 0px; }

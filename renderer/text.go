@@ -21,15 +21,35 @@ import (
 
 func emojiParam(t model.BlockContentTextStyle) int32 {
 	switch t {
-	default:
-		return 20
 	case model.BlockContentText_Header1:
 		return 30
 	case model.BlockContentText_Header2:
 		return 26
 	case model.BlockContentText_Header3:
 		return 22
+	default:
+		return 20
 	}
+}
+
+func applyHeader(style model.BlockContentTextStyle, s string) string {
+	var tagName string
+	switch style {
+	case model.BlockContentText_Header1:
+	case model.BlockContentText_Title:
+		tagName = "h1"
+	case model.BlockContentText_Header2:
+		tagName = "h2"
+	case model.BlockContentText_Header3:
+		tagName = "h3"
+
+	}
+
+	if tagName == "" {
+		return s
+	}
+
+	return fmt.Sprintf("<%s>%s</%s>", tagName, s, tagName)
 }
 
 func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *model.BlockContentTextMark) string {
@@ -233,8 +253,9 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 			marks := blockText.GetMarks().Marks
 			text = r.applyNonOverlapingMarks(style, text, marks)
 			text = replaceNewlineBr(text)
-			textComp = PlainTextWrapTemplate(templ.Raw(text))
 		}
+		text = applyHeader(style, text)
+		textComp = PlainTextWrapTemplate(templ.Raw(text))
 	} else {
 		fields := b.GetFields()
 		lang := pbtypes.GetString(fields, "lang")
