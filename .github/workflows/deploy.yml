@@ -71,14 +71,15 @@ jobs:
             echo "AWS_KEY_ID=${{ secrets.PROD_AWS_KEY_ID }}" >> $GITHUB_ENV
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
             echo "AWS_REGION=eu-central-2" >> $GITHUB_ENV
+            echo "DEPLOY_TARGET=aws" >> $GITHUB_ENV
           else
-            echo "S3_BUCKET=anytype-stage1-publishserver" >> $GITHUB_ENV
-            echo "AWS_KEY_ID=${{ secrets.STAGE_AWS_KEY_ID }}" >> $GITHUB_ENV
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGE_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-            echo "AWS_REGION=eu-central-1" >> $GITHUB_ENV
+            echo "GCS_BUCKET=anytype-stage1-publishserver" >> $GITHUB_ENV
+            echo "DEPLOY_TARGET=gcs" >> $GITHUB_ENV
           fi
 
+      # Prod: uplaod on AWS {
       - name: Configure AWS Credentials
+        if: env.DEPLOY_TARGET == 'aws'
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ env.AWS_KEY_ID }}
@@ -86,9 +87,11 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy static site to S3 bucket
+        if: env.DEPLOY_TARGET == 'aws'
         run: aws s3 sync static/ s3://$S3_BUCKET/static/ --delete --region $AWS_REGION
 
       - name: Set content-encoding for js.gz files
+        if: env.DEPLOY_TARGET == 'aws'
         run: |
           aws s3 ls s3://$S3_BUCKET/static/ --recursive | awk '{print $4}' | grep '\.js\.gz$' | while read file; do
             aws s3 cp "s3://$S3_BUCKET/$file" "s3://$S3_BUCKET/$file" \
@@ -99,5 +102,35 @@ jobs:
           done
 
       - name: Verify uploaded files
+        if: env.DEPLOY_TARGET == 'aws'
         run: |
           aws s3 ls s3://$S3_BUCKET/static/ --region $AWS_REGION
+      # }
+
+      # Stage: uplaod on Google storage {
+      - name: Google cloud auth
+        if: env.DEPLOY_TARGET == 'gcs'
+        uses: google-github-actions/auth@2.1.10
+        with:
+          credentials_json: ${{ secrets.STAGE_GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        if: env.DEPLOY_TARGET == 'gcs'
+        uses: google-github-actions/setup-gcloud@2.1.4
+
+      - name: Deploy static site to S3 bucket
+        if: env.DEPLOY_TARGET == 'gcs'
+        run: gsutil -m rsync -d -r static/ gs://$GCS_BUCKET/static/
+
+      - name: Set content-encoding for js.gz files
+        if: env.DEPLOY_TARGET == 'gcs'
+        run: |
+          gsutil ls "gs://$GCS_BUCKET/static/**/*.js.gz" | while read file; do
+            gsutil setmeta -h "Content-Type:application/javascript" -h "Content-Encoding:gzip" "$file"
+          done
+
+      - name: Verify uploaded files
+        if: env.DEPLOY_TARGET == 'gcs'
+        run: |
+          gsutil ls gs://$GCS_BUCKET/static/**
+      # }
