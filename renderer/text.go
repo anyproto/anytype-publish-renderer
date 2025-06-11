@@ -90,8 +90,11 @@ func (r *Renderer) applyMark(style model.BlockContentTextStyle, s string, mark *
 		if details != nil && len(details.Fields) != 0 {
 			iconParams := r.MakeRenderIconObjectParams(details, &IconObjectProps{Size: emojiSize})
 			classes := []string{}
-			if iconParams.Src != "" {
+			if iconParams.Src != "" || iconParams.SvgSrc != "" {
 				classes = append(classes, "withImage")
+			}
+			if iconParams.SvgSrc != "" {
+				iconParams.IconClasses = append(iconParams.IconClasses, "withSvg")
 			}
 			link := r.makeAnytypeLink(details, mark.Param)
 			html, err := utils.TemplToString(TextMarkupMention(r, templ.SafeURL(link), s, classes, iconParams))
