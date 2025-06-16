@@ -374,8 +374,6 @@ function renderColumn () {
 function renderPrimitivesSvgs () {
     document.querySelectorAll(".svg-container").forEach(container => {
         const svgUrl = container.getAttribute("data-src");
-		console.log("svgUrl:", svgUrl);
-
         const color = container.getAttribute("data-color");
 
         if (!svgUrl || !color) return;
