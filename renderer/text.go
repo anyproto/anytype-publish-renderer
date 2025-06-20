@@ -5,6 +5,7 @@ import (
 	"html"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"unicode/utf16"
 
@@ -196,13 +197,40 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 	// convert to JSRunes to cut marks.Range in the same way as JS does
 	rText := toJSRunes(text)
 	marksIntervalTree := markintervaltree.New(marks)
-	rangeRay := makeMarksRangeRay(marks, int32(len(rText)))
+	rtextLen := int32(len(rText))
+	rangeRay := makeMarksRangeRay(marks, rtextLen)
 
-	for i := 0; i < len(rangeRay)-1; i++ {
+	for i := range len(rangeRay) - 1 {
 		curRange := &model.Range{
 			From: rangeRay[i],
 			To:   rangeRay[i+1],
 		}
+		// skip marks out of range, catch info in logs
+
+		if curRange.From > rtextLen || curRange.To > rtextLen {
+			var sb strings.Builder
+			sb.WriteString("[ ")
+			for _, m := range marks {
+				sb.WriteString("{ type: ")
+				sb.WriteString(m.Type.String())
+				sb.WriteString(", param: ")
+				sb.WriteString(m.Param)
+				sb.WriteString(", from: ")
+				sb.WriteString(strconv.Itoa(int(m.Range.From)))
+				sb.WriteString(", to: ")
+				sb.WriteString(strconv.Itoa(int(m.Range.To)))
+				sb.WriteString("}; ")
+			}
+			sb.WriteString(" ]")
+			log.Error("panic: markup index out of range, skipping markup block",
+				zap.Int32("from", curRange.From), zap.Int32("to", curRange.To),
+				zap.String("text", text), zap.Int("len", len(text)),
+				zap.String("all marks", sb.String()),
+			)
+
+			continue
+		}
+
 		marksToApply := marksIntervalTree.SearchOverlaps(curRange)
 		markedPart := fromJSRunes(rText[curRange.From:curRange.To])
 		markedPart = html.EscapeString(markedPart)
