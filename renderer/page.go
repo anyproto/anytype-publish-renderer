@@ -20,7 +20,41 @@ type RenderPageParams struct {
 	Description   string
 	SpaceLink     templ.SafeURL
 	SpaceIcon     templ.Component
+	OgImageUrl    string
 	SpaceName     string
+}
+
+func (r *Renderer) getOgImageUrl() string {
+	defaultImage := r.GetStaticFolderUrl("/img/og-image.png")
+	details := r.Sp.Snapshot.Data.GetDetails()
+	iconImage := getRelationField(details, bundle.RelationKeyIconImage, r.relationToFileUrl)
+	if iconImage != "" {
+		return iconImage
+	}
+
+	iconEmoji := getRelationField(details, bundle.RelationKeyIconEmoji, r.relationToEmojiUrl)
+	if iconEmoji != "" {
+		return iconEmoji
+	}
+
+	coverType, err := ToCoverType(pbtypes.GetInt64(details, "coverType"))
+
+	if err != nil {
+		return defaultImage
+	}
+
+	coverId := pbtypes.GetString(details, "coverId")
+	if coverId != "" {
+		switch coverType {
+		case CoverType_Image, CoverType_Source:
+			coverImageUrl, _ := r.getFileUrl(coverId)
+			if coverImageUrl != "" {
+				return coverImageUrl
+			}
+		}
+	}
+	return defaultImage
+
 }
 
 func (r *Renderer) hasPageIcon() bool {
@@ -107,6 +141,7 @@ func (r *Renderer) MakeRenderPageParams() (params *RenderPageParams) {
 		SpaceLink:     spaceLink,
 		SpaceIcon:     spaceIcon,
 		SpaceName:     spaceName,
+		OgImageUrl:    r.getOgImageUrl(),
 	}
 }
 
