@@ -222,7 +222,8 @@ func (r *Renderer) applyNonOverlapingMarks(style model.BlockContentTextStyle, te
 				sb.WriteString("}; ")
 			}
 			sb.WriteString(" ]")
-			log.Error("panic: markup index out of range, skipping markup block",
+			log.Error("markup index out of range, skipping markup block",
+				zap.String("PublishFilesPath", r.Config.PublishFilesPath),
 				zap.Int32("from", curRange.From), zap.Int32("to", curRange.To),
 				zap.String("text", text), zap.Int("len", len(text)),
 				zap.String("all marks", sb.String()),
