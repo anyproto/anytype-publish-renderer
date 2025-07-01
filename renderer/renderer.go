@@ -74,6 +74,8 @@ type Renderer struct {
 	ObjectTypeDetails *types.Struct
 	ResolvedLayout    model.ObjectTypeLayout
 	LayoutAlign       int64
+
+	urlsRewriteMap map[string]string
 }
 
 func readJsonpbSnapshot(snapshotStr string) (snapshot pb.SnapshotWithType, err error) {
@@ -233,6 +235,51 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	r.RootComp = r.RenderPage()
 
 	return
+}
+
+func (r *Renderer) GetLinkObjectIds() (linkObjectIds []string) {
+	seen := make(map[string]struct{})
+
+	for _, childID := range r.Root.ChildrenIds {
+		b, ok := r.BlocksById[childID]
+		if !ok || b == nil {
+			continue
+		}
+
+		switch b.Content.(type) {
+		case *model.BlockContentOfLink:
+			targetObjectID := b.GetLink().GetTargetBlockId()
+			if targetObjectID == "" {
+				continue
+			}
+			targetDetails := r.findTargetDetails(targetObjectID)
+			layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+			switch layout {
+			// TODO: basic = page, what else?
+			case model.ObjectType_basic:
+				if _, ok := seen[targetObjectID]; !ok {
+					seen[targetObjectID] = struct{}{}
+				}
+			default:
+				continue
+			}
+		default:
+			continue
+		}
+
+	}
+
+	linkObjectIds = make([]string, len(seen))
+	i := 0
+	for objID := range seen {
+		linkObjectIds[i] = objID
+		i++
+	}
+	return
+}
+
+func (r *Renderer) SetUrlRewriteMap(urls map[string]string) {
+	r.urlsRewriteMap = urls
 }
 
 // asset resolver parts
