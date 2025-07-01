@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"path/filepath"
+	"sort"
 	"testing"
 
 	"github.com/anyproto/anytype-heart/pb"
@@ -273,7 +274,7 @@ func TestGetLinkObjectIds(t *testing.T) {
 
 		// when
 		result := r.GetLinkObjectIds()
-
+		sort.Strings(result)
 		// then
 		assert.Equal(t, []string{"target-id-1", "target-id-2"}, result)
 	})
