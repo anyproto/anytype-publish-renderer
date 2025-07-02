@@ -441,6 +441,269 @@ func TestMakeLinkRenderParams(t *testing.T) {
 	})
 }
 
+func TestMakeLinkBlockParamsUrlRewrite(t *testing.T) {
+	t.Run("uses default URL when no rewrite map set", func(t *testing.T) {
+		// given
+		r := NewTestRenderer(
+			WithCachedPbFiles(map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "test-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("test-id"),
+							bundle.RelationKeyName.String():    pbtypes.String("Test Page"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("space-123"),
+						}},
+					}},
+				},
+			}),
+		)
+		block := &model.Block{
+			Content: &model.BlockContentOfLink{
+				Link: &model.BlockContentLink{
+					TargetBlockId: "test-id",
+				},
+			},
+		}
+
+		// when
+		actual := r.makeLinkBlockParams(block)
+
+		// then
+		pathAssertions := []pathAssertion{
+			{"a.linkCard.isPage.c1 > attrs[href]", "anytype://object?objectId=test-id&spaceId=space-123"},
+		}
+		assertLinkBlockAndHtmlTag(t, &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}, actual, pathAssertions)
+	})
+
+	t.Run("uses rewrite URL when mapping exists for target object", func(t *testing.T) {
+		// given
+		r := NewTestRenderer(
+			WithCachedPbFiles(map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "test-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("test-id"),
+							bundle.RelationKeyName.String():    pbtypes.String("Test Page"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("space-123"),
+						}},
+					}},
+				},
+			}),
+		)
+		// Set URL rewrite map
+		r.SetUrlRewriteMap(map[string]string{
+			"test-id": "https://custom-domain.com/page/test-id",
+		})
+
+		block := &model.Block{
+			Content: &model.BlockContentOfLink{
+				Link: &model.BlockContentLink{
+					TargetBlockId: "test-id",
+				},
+			},
+		}
+
+		// when
+		actual := r.makeLinkBlockParams(block)
+
+		// then
+		pathAssertions := []pathAssertion{
+			{"a.linkCard.isPage.c1 > attrs[href]", "https://custom-domain.com/page/test-id"},
+		}
+		assertLinkBlockAndHtmlTag(t, &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}, actual, pathAssertions)
+	})
+
+	t.Run("uses default URL when target object not in rewrite map", func(t *testing.T) {
+		// given
+		r := NewTestRenderer(
+			WithCachedPbFiles(map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "test-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("test-id"),
+							bundle.RelationKeyName.String():    pbtypes.String("Test Page"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("space-123"),
+						}},
+					}},
+				},
+			}),
+		)
+		// Set URL rewrite map with different object ID
+		r.SetUrlRewriteMap(map[string]string{
+			"other-id": "https://custom-domain.com/page/other-id",
+		})
+
+		block := &model.Block{
+			Content: &model.BlockContentOfLink{
+				Link: &model.BlockContentLink{
+					TargetBlockId: "test-id",
+				},
+			},
+		}
+
+		// when
+		actual := r.makeLinkBlockParams(block)
+
+		// then
+		pathAssertions := []pathAssertion{
+			{"a.linkCard.isPage.c1 > attrs[href]", "anytype://object?objectId=test-id&spaceId=space-123"},
+		}
+		assertLinkBlockAndHtmlTag(t, &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}, actual, pathAssertions)
+	})
+
+	t.Run("handles multiple objects in rewrite map", func(t *testing.T) {
+		// given
+		r := NewTestRenderer(
+			WithCachedPbFiles(map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "page-1.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("page-1"),
+							bundle.RelationKeyName.String():    pbtypes.String("Page 1"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("space-123"),
+						}},
+					}},
+				},
+				filepath.Join("objects", "page-2.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("page-2"),
+							bundle.RelationKeyName.String():    pbtypes.String("Page 2"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("space-123"),
+						}},
+					}},
+				},
+			}),
+		)
+		// Set URL rewrite map with multiple mappings
+		r.SetUrlRewriteMap(map[string]string{
+			"page-1": "https://custom-domain.com/articles/page-1",
+			"page-2": "https://custom-domain.com/articles/page-2",
+		})
+
+		block1 := &model.Block{
+			Content: &model.BlockContentOfLink{
+				Link: &model.BlockContentLink{
+					TargetBlockId: "page-1",
+				},
+			},
+		}
+		block2 := &model.Block{
+			Content: &model.BlockContentOfLink{
+				Link: &model.BlockContentLink{
+					TargetBlockId: "page-2",
+				},
+			},
+		}
+
+		// when
+		actual1 := r.makeLinkBlockParams(block1)
+		actual2 := r.makeLinkBlockParams(block2)
+
+		// then
+		pathAssertions1 := []pathAssertion{
+			{"a.linkCard.isPage.c1 > attrs[href]", "https://custom-domain.com/articles/page-1"},
+		}
+		pathAssertions2 := []pathAssertion{
+			{"a.linkCard.isPage.c1 > attrs[href]", "https://custom-domain.com/articles/page-2"},
+		}
+		assertLinkBlockAndHtmlTag(t, &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}, actual1, pathAssertions1)
+		assertLinkBlockAndHtmlTag(t, &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}, actual2, pathAssertions2)
+	})
+
+	t.Run("handles empty rewrite URL", func(t *testing.T) {
+		// given
+		r := NewTestRenderer(
+			WithCachedPbFiles(map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "test-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("test-id"),
+							bundle.RelationKeyName.String():    pbtypes.String("Test Page"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("space-123"),
+						}},
+					}},
+				},
+			}),
+		)
+		// Set URL rewrite map with empty URL
+		r.SetUrlRewriteMap(map[string]string{
+			"test-id": "",
+		})
+
+		block := &model.Block{
+			Content: &model.BlockContentOfLink{
+				Link: &model.BlockContentLink{
+					TargetBlockId: "test-id",
+				},
+			},
+		}
+
+		// when
+		actual := r.makeLinkBlockParams(block)
+
+		// then
+		pathAssertions := []pathAssertion{
+			{"a.linkCard.isPage.c1 > attrs[href]", ""},
+		}
+		assertLinkBlockAndHtmlTag(t, &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}, actual, pathAssertions)
+	})
+
+	t.Run("rewrite map can be updated", func(t *testing.T) {
+		// given
+		r := NewTestRenderer(
+			WithCachedPbFiles(map[string]*pb.SnapshotWithType{
+				filepath.Join("objects", "test-id.pb"): {
+					SbType: model.SmartBlockType_Page,
+					Snapshot: &pb.ChangeSnapshot{Data: &model.SmartBlockSnapshotBase{
+						Details: &types.Struct{Fields: map[string]*types.Value{
+							bundle.RelationKeyId.String():      pbtypes.String("test-id"),
+							bundle.RelationKeyName.String():    pbtypes.String("Test Page"),
+							bundle.RelationKeySpaceId.String(): pbtypes.String("space-123"),
+						}},
+					}},
+				},
+			}),
+		)
+
+		block := &model.Block{
+			Content: &model.BlockContentOfLink{
+				Link: &model.BlockContentLink{
+					TargetBlockId: "test-id",
+				},
+			},
+		}
+
+		// First set a URL rewrite
+		r.SetUrlRewriteMap(map[string]string{
+			"test-id": "https://first-domain.com/test-id",
+		})
+		actual1 := r.makeLinkBlockParams(block)
+
+		// Then update the URL rewrite
+		r.SetUrlRewriteMap(map[string]string{
+			"test-id": "https://second-domain.com/test-id",
+		})
+		actual2 := r.makeLinkBlockParams(block)
+
+		// then
+		pathAssertions1 := []pathAssertion{
+			{"a.linkCard.isPage.c1 > attrs[href]", "https://first-domain.com/test-id"},
+		}
+		pathAssertions2 := []pathAssertion{
+			{"a.linkCard.isPage.c1 > attrs[href]", "https://second-domain.com/test-id"},
+		}
+		assertLinkBlockAndHtmlTag(t, &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}, actual1, pathAssertions1)
+		assertLinkBlockAndHtmlTag(t, &BlockParams{Classes: []string{"block", "align0", "blockLink", "text"}}, actual2, pathAssertions2)
+	})
+}
+
 func assertLinkBlockAndHtmlTag(t *testing.T, expected, actual *BlockParams, pathAssertions []pathAssertion) {
 	assert.Equal(t, expected.Classes, actual.Classes)
 	assert.Equal(t, expected.ContentClasses, actual.ContentClasses)
