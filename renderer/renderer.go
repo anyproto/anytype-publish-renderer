@@ -210,13 +210,14 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	}
 
 	r = &Renderer{
-		Sp:            &snapshot,
-		UberSp:        &uberSnapshot,
-		CachedPbFiles: make(map[string]*pb.SnapshotWithType),
-		BlocksById:    blocksById,
-		BlockNumbers:  make(map[string]int),
-		Root:          blocks[0],
-		Config:        config,
+		Sp:             &snapshot,
+		UberSp:         &uberSnapshot,
+		CachedPbFiles:  make(map[string]*pb.SnapshotWithType),
+		BlocksById:     blocksById,
+		BlockNumbers:   make(map[string]int),
+		Root:           blocks[0],
+		Config:         config,
+		urlsRewriteMap: make(map[string]string, 0),
 	}
 
 	objectType := getRelationField(snapshot.Snapshot.Data.GetDetails(), bundle.RelationKeyType, relationToString)
