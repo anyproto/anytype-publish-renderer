@@ -47,7 +47,7 @@
 			.cardName { position: relative; }
 			.cardName {
 				.iconObject { position: absolute; left: 0; top: 0; }
-				.name { text-indent: 24px; }
+                .name::before { content: ''; display: inline-block; width: 24px; }
 			}
 		}
 
@@ -147,7 +147,7 @@
 			}
 
 			.cardName { @include text-common; line-height: 20px; }
-			.cardName .name { @include clamp2; font-weight: 500; }
+			.cardName .name { font-weight: 500; }
 
 			.archive { position: absolute; right: 10px; top: 10px; z-index: 1; }
 		}
