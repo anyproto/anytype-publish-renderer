@@ -34,11 +34,7 @@ func (r *Renderer) findTargetDetails(targetObjectId string) *types.Struct {
 	return snapshot.GetSnapshot().GetData().GetDetails()
 }
 
-type relType interface {
-	string | bool | int64 | model.ObjectTypeLayout | model.RelationFormat | float64 | *types.ListValue
-}
-
-type relTransformer[V relType] func(*types.Value) V
+type relTransformer[V any] func(*types.Value) V
 
 func relationToString(field *types.Value) string {
 	return field.GetStringValue()
@@ -115,7 +111,7 @@ func relationToList(field *types.Value) *types.ListValue {
 	return null
 }
 
-func getRelationField[V relType](targetDetails *types.Struct, relationKey domain.RelationKey, tr relTransformer[V]) V {
+func getRelationField[V any](targetDetails *types.Struct, relationKey domain.RelationKey, tr relTransformer[V]) V {
 	var null V
 	if f, ok := targetDetails.GetFields()[relationKey.String()]; ok {
 		return tr(f)
