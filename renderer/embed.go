@@ -260,7 +260,7 @@ func extractYoutubeId(url string) string {
 
 func parseGoogleMapsUrl(inputUrl string) string {
 	if match := regexp.MustCompile(`place/([^/]+)`).FindStringSubmatch(inputUrl); match != nil {
-		return fmt.Sprintf("https://www.google.com/maps/embed/v1/place?q=%s", url.QueryEscape(match[1]))
+		return fmt.Sprintf("https://www.google.com/maps/embed/v1/place?key=%s&q=%s", GOOGLE_MAPS, url.QueryEscape(match[1]))
 	}
 	return inputUrl
 }
