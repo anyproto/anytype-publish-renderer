@@ -240,16 +240,8 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 			return NoneTemplate(fmt.Sprintf("file type is not supported: %s", fileTypeStr))
 		}
 
-		var styles map[string]string
-		if width != "" {
-			styles = map[string]string{
-				"width": width,
-			}
-		}
-
 		blockInnerParams := &BlockWrapperParams{
 			Classes:    []string{"wrap"},
-			Styles:     styles,
 			Components: []templ.Component{comp},
 		}
 		blockInner := BlocksWrapper(blockInnerParams)

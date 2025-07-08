@@ -14,28 +14,35 @@ templ BlockTemplate(r *Renderer, p *BlockParams) {
 			</div>
 		}
 
-		<div class={ "content", p.ContentClasses }>
+		<div class={ "content", p.ContentClasses }
+        if p.Width != "" {
+           style={ getStyle(p.Width) }
+
+        }
+
+			>
 		if p.Content != nil {
 			@p.Content
 		}
 		</div>
-
-		<div class="children">
-			for _, childId := range p.ChildrenIds {
-				@r.RenderBlock(childId)
-			}
-		</div>
+		if len(p.ChildrenIds) != 0 {
+			<div class="children">
+				for _, childId := range p.ChildrenIds {
+					@r.RenderBlock(childId)
+				}
+			</div>
+		}
 	</div>
 }
 
 // wraps multiple components
 templ BlocksWrapper(p *BlockWrapperParams) {
-	<div 
+	<div
+	 if p.Classes != nil {
 		class={ p.Classes }
-		if p.Styles != nil {
-			style={ p.Styles }
-		}
-	>
+	 }
+
+		>
 		for _, comp := range p.Components {
 			@comp
 		}
