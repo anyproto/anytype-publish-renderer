@@ -109,8 +109,6 @@ func (r *Renderer) getFileBlock(id string) (block *model.Block, err error) {
 
 func GetWidth(fields *types.Struct) string {
 	width := pbtypes.GetFloat64(fields, "width")
-	log.Debug("image width", zap.Float64("width", width))
-
 	if int(width*100) != 0 {
 		return strconv.Itoa(int(width*100)) + "%"
 	}

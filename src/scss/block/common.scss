@@ -4,7 +4,7 @@
 .blocks {
 	.block { @include text-paragraph; word-break: break-word; margin: 0px 0px 2px 0px; position: relative; display: flex; flex-direction: row; }
 	.block {
-		> .content { padding-top: 2px; padding-bottom: 2px; display: inline-block;}
+		> .content { padding-top: 2px; padding-bottom: 2px; }
 		> .content:empty { display: none; }
 		> .content {
 			.deleted { @include text-paragraph; color: var(--color-control-active); display: flex; gap: 0px 6px; align-items: center; }
