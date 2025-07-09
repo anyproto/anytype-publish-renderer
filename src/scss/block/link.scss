@@ -47,7 +47,7 @@
 			.cardName { position: relative; }
 			.cardName {
 				.iconObject { position: absolute; left: 0; top: 0; }
-				.name { text-indent: 24px; }
+                .name::before { content: ''; display: inline-block; width: 24px; }
 			}
 		}
 
@@ -134,8 +134,8 @@
 		> .content { border-radius: 8px; box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05); border-radius: 8px; }
 
 		.linkCard {
-			.side::after { 
-				content: ''; position: absolute; left: 0px; top: 0px; border-radius: inherit; width: 100%; height: 100%; 
+			.side::after {
+				content: ''; position: absolute; left: 0px; top: 0px; border-radius: inherit; width: 100%; height: 100%;
 				background: rgba(0,0,0,0.03); transition: $transitionAllCommon; pointer-events: none; opacity: 0; z-index: 1;
 			}
 
@@ -147,7 +147,7 @@
 			}
 
 			.cardName { @include text-common; line-height: 20px; }
-			.cardName .name { @include clamp2; font-weight: 500; }
+			.cardName .name { font-weight: 500; }
 
 			.archive { position: absolute; right: 10px; top: 10px; z-index: 1; }
 		}

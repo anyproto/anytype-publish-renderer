@@ -35,7 +35,7 @@ func blockContentTypeToName(b *model.Block) string {
 	case *model.BlockContentOfTable:
 		return "Table"
 	case *model.BlockContentOfLatex:
-		return "Latex"
+		return "Embed"
 	case *model.BlockContentOfBookmark:
 		return "Bookmark"
 	case *model.BlockContentOfLink:
@@ -65,7 +65,7 @@ type BlockParams struct {
 
 type BlockWrapperParams struct {
 	Classes    []string
-	Styles     map[string]string
+	Width      string
 	Components []templ.Component
 }
 
@@ -82,4 +82,19 @@ func makeDefaultBlockParams(b *model.Block) *BlockParams {
 		Classes:     classes,
 		ChildrenIds: b.ChildrenIds,
 	}
+}
+
+func makeWrappedBlockParams(b *model.Block, t templ.Component) *BlockParams {
+	blockParams := makeDefaultBlockParams(b)
+
+	bgColor := b.GetBackgroundColor()
+	if bgColor != "" {
+		blockParams.Classes = append(blockParams.Classes, "bgColor", "bgColor-"+bgColor)
+	}
+
+	blockParams.Content = t
+	blockParams.Width = GetWidth(b.Fields)
+
+	return blockParams
+
 }

@@ -109,8 +109,6 @@ func (r *Renderer) getFileBlock(id string) (block *model.Block, err error) {
 
 func GetWidth(fields *types.Struct) string {
 	width := pbtypes.GetFloat64(fields, "width")
-	log.Debug("image width", zap.Float64("width", width))
-
 	if int(width*100) != 0 {
 		return strconv.Itoa(int(width*100)) + "%"
 	}
@@ -240,16 +238,8 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 			return NoneTemplate(fmt.Sprintf("file type is not supported: %s", fileTypeStr))
 		}
 
-		var styles map[string]string
-		if width != "" {
-			styles = map[string]string{
-				"width": width,
-			}
-		}
-
 		blockInnerParams := &BlockWrapperParams{
 			Classes:    []string{"wrap"},
-			Styles:     styles,
 			Components: []templ.Component{comp},
 		}
 		blockInner := BlocksWrapper(blockInnerParams)

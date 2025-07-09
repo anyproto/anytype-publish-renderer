@@ -185,7 +185,7 @@ func TestMakeRenderText(t *testing.T) {
 		pathAssertions := []pathAssertion{
 			{"div.flex > div.text > a.markupmention.withImage > attrs[href]", "anytype://object?objectId=anytypeId&spaceId=spaceId"},
 			{"div.flex > div.text > a.markupmention.withImage > span.smile > div.iconObject.withDefault.c20 > img.iconCommon > attrs[src]", "/img/icon/default/page.svg"},
-			{"div.flex > div.text > a.markupmention.withImage > img.space > attrs[src]", "./static/img/space.svg"},
+			{"div.flex > div.text > a.markupmention.withImage > img.space > attrs[src]", "/static/img/space.svg"},
 			{"div.flex > div.text > a.markupmention.withImage > span.name > Content", "test"},
 		}
 		assertHtmlTag(t, tag, pathAssertions)
