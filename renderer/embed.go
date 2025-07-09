@@ -29,7 +29,7 @@ type EmbedIframeData struct {
 
 type EmbedRenderParams struct {
 	Id       string
-	Classes  string
+	Classes  []string
 	Content  string
 	Data     EmbedIframeData
 	IsIframe bool
@@ -62,17 +62,12 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 	processor := latex.Processor
 	text := latex.Text
 	style := processor.String()
-	bgColor := b.GetBackgroundColor()
 	embedClass := "is" + style
 	align := b.GetAlign()
 	classes := []string{embedClass, fmt.Sprintf("align%d", align)}
 	data := EmbedIframeData{}
 	isIframe := false
 	sandbox := []string{}
-
-	if bgColor != "" {
-		classes = append(classes, "bgColor", "bgColor-"+bgColor)
-	}
 
 	switch processor {
 	default:
@@ -165,18 +160,12 @@ func (r *Renderer) MakeEmbedRenderParams(b *model.Block) *EmbedRenderParams {
 
 	return &EmbedRenderParams{
 		Id:       b.Id,
-		Classes:  strings.Join(classes, " "),
+		Classes:  classes,
 		Content:  text,
 		Data:     data,
 		IsIframe: isIframe,
 		Sandbox:  strings.Join(sandbox, " "),
 	}
-}
-
-func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
-
-	params := r.MakeEmbedRenderParams(b)
-	return EmbedTemplate(r, params)
 }
 
 func getProcessorByUrl(inputUrl string) *model.BlockContentLatexProcessor {
@@ -451,4 +440,20 @@ func compressAndEncode(text string) (string, error) {
 	encoded = strings.ReplaceAll(encoded, "/", "_")
 
 	return encoded, nil
+}
+
+func (r *Renderer) RenderEmbed(b *model.Block) templ.Component {
+	params := r.MakeEmbedRenderParams(b)
+
+	var embedTemplate templ.Component
+	if params.IsIframe {
+		embedTemplate = IframeEmbedTemplate(r, params)
+	} else {
+		embedTemplate = RawEmbedTemplate(r, params)
+	}
+
+	blockParams := makeWrappedBlockParams(b, embedTemplate)
+	blockParams.Classes = append(blockParams.Classes, params.Classes...)
+
+	return BlockTemplate(r, blockParams)
 }
