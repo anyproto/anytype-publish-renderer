@@ -6,7 +6,7 @@ script EmbedData(data EmbedIframeData) {
 	}, 10);
 }
 templ IframeEmbedTemplate(r *Renderer, p *EmbedRenderParams) {
-	<iframe id={"receiver" + p.Id} src="/static/embed/iframe.html" frameborder="0" scrolling="no" sandbox={p.Sandbox} allowtransparency="true" onload={EmbedData(p.Data)}></iframe>
+	<iframe id={"receiver" + p.Id} src="/embed/iframe.html" frameborder="0" scrolling="no" sandbox={p.Sandbox} allowtransparency="true" onload={EmbedData(p.Data)}></iframe>
 }
 templ RawEmbedTemplate(r *Renderer, p *EmbedRenderParams) {
 	@templ.Raw(p.Content)

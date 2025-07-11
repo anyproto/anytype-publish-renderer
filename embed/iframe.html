@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="/static/js/jquery.js"></script>
+      <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 		<style type="text/css">
 			* { margin: 0px; padding: 0px; box-sizing: border-box; user-select: none; }
 
@@ -36,7 +36,6 @@
 	<body>
 		<div id="root"></div>
 		<div id="scripts"></div>
-
 		<script type="text/javascript">
 			$(() => {
 				const Processor = {
@@ -216,7 +215,7 @@
 					script.onload = function (e) {
 						if (list.length) {
 							loadLibs(list, callBack);
-						} else 
+						} else
 						if (callBack) {
 							callBack();
 						};
@@ -238,7 +237,7 @@
 				};
 
 				function loadGithubGist (html) {
-					const m = html.match(/src="([^"]+)"/); 
+					const m = html.match(/src="([^"]+)"/);
 					if (!m || (m.length < 1)) {
 						return;
 					};
@@ -314,9 +313,9 @@
 							break;
 					};
 
-					return { 
-						html, 
-						libs, 
+					return {
+						html,
+						libs,
 					};
 				};
 
