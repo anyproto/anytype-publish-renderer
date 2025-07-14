@@ -29,7 +29,9 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			<link rel="apple-touch-icon" sizes="180x180" href="https://anytype.io/apple-touch-icon.png" />
 			<link rel="icon" type="image/png" sizes="32x32" href="https://anytype.io/favicon-32x32.png" />
 			<link rel="icon" type="image/png" sizes="16x16" href="https://anytype.io/favicon-16x16.png" />
-
+			<style type="text/css">
+				body { opacity: 0; transition: opacity 0.1s; }
+			</style>
         </head>
 		<body>
 			<div class="menus">
