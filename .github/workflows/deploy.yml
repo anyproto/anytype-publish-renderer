@@ -80,20 +80,6 @@ jobs:
       - name: Deploy embed iframe to S3 bucket
         run: gsutil -m rsync -d -r embed/ gs://$GCS_BUCKET/embed/
 
-      - name: Ensure CORS for bucket
-        run: |
-          cat > /tmp/cors.json <<EOF
-          [
-            {
-              "origin": ["*"],
-              "responseHeader": ["Content-Type"],
-              "method": ["GET", "HEAD", "OPTIONS"],
-              "maxAgeSeconds": 3600
-            }
-          ]
-          EOF
-          gsutil cors set /tmp/cors.json  gs://$GCS_BUCKET
-          rm /tmp/cors.json
       - name: Set content-encoding for js.gz files
         run: |
           gsutil ls "gs://$GCS_BUCKET/static/**/*.js.gz" | while read file; do
