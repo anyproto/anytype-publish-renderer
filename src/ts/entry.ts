@@ -397,22 +397,22 @@ function renderPrimitivesSvgs () {
             .catch(error => console.error("Error loading SVG:", error));
     });
 }
-
-window.onMessage = (data) => {
-	const { type, height, blockId, url } = data;
-
+window.addEventListener('message', function(event) {
+	const { type, height, blockId, url } = event.data;
 	switch (type) {
 		case 'resize': {
+			if (height == 0) {
+				return
+			}
 			$(`#receiver${blockId}`).css({ height: Math.max(80, height) });
 			break;
 		};
-
 		case 'openUrl': {
 			window.open(url, '_blank');
 			break;
 		};
 	};
-};
+});
 
 $(document).ready(() => {
 	const win = $(window);

@@ -29,18 +29,8 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			<link rel="apple-touch-icon" sizes="180x180" href="https://anytype.io/apple-touch-icon.png" />
 			<link rel="icon" type="image/png" sizes="32x32" href="https://anytype.io/favicon-32x32.png" />
 			<link rel="icon" type="image/png" sizes="16x16" href="https://anytype.io/favicon-16x16.png" />
-
 			<style type="text/css">
-				#root-loader { position: fixed; width: 100%; height: 100%; left: 0px; top: 0px; background: #fff; z-index: 1000; transition: opacity 0.3s ease-in-out; }
-				#root-loader .inner { 
-					width: 120px; text-align: center; position: absolute; transform: translate3d(-50%,-50%,0px); display: flex; flex-direction: column; gap: 6px 0px;
-					left: 50%; top: 50%;
-				}
-				#root-loader .anim { opacity: 1; transform: scale3d(1,1,1); transition-duration: 0.3s; transition-property: opacity, transform; transition-timing-function: ease-in-out; }
-				#root-loader .anim.from { opacity: 0; transform: scale3d(0.8,0.8,1); }
-				#root-loader .anim.to { opacity: 0; transform: translate3d(0px,-20px,0px); }
-				#root-loader .logo { width: 120px; height: 24px; background: url('/static/img/logo.svg') no-repeat; background-size: 100%; }
-				#root-loader.hide { opacity: 0; }
+				body { opacity: 0; transition: opacity 0.1s; }
 			</style>
         </head>
 		<body>
@@ -58,15 +48,9 @@ templ PageTemplate(r *Renderer, p *RenderPageParams) {
 			</div>
 
 			<main>
-				<div id="root-loader">
-					<div class="inner">
-						<div class="logo anim from" />
-					</div>
-				</div>
-
 				<header class={p.HeaderClasses}>
 					<div class="side left">
-						if p.SpaceName != ""{ 
+						if p.SpaceName != "" {
 							<div class="space">
 								if p.SpaceIcon != nil {
 									@p.SpaceIcon

@@ -155,7 +155,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</title><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://anytype.io/apple-touch-icon.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://anytype.io/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://anytype.io/favicon-16x16.png\"><style type=\"text/css\">\n\t\t\t\t#root-loader { position: fixed; width: 100%; height: 100%; left: 0px; top: 0px; background: #fff; z-index: 1000; transition: opacity 0.3s ease-in-out; }\n\t\t\t\t#root-loader .inner { \n\t\t\t\t\twidth: 120px; text-align: center; position: absolute; transform: translate3d(-50%,-50%,0px); display: flex; flex-direction: column; gap: 6px 0px;\n\t\t\t\t\tleft: 50%; top: 50%;\n\t\t\t\t}\n\t\t\t\t#root-loader .anim { opacity: 1; transform: scale3d(1,1,1); transition-duration: 0.3s; transition-property: opacity, transform; transition-timing-function: ease-in-out; }\n\t\t\t\t#root-loader .anim.from { opacity: 0; transform: scale3d(0.8,0.8,1); }\n\t\t\t\t#root-loader .anim.to { opacity: 0; transform: translate3d(0px,-20px,0px); }\n\t\t\t\t#root-loader .logo { width: 120px; height: 24px; background: url('/static/img/logo.svg') no-repeat; background-size: 100%; }\n\t\t\t\t#root-loader.hide { opacity: 0; }\n\t\t\t</style></head><body><div class=\"menus\"><div id=\"menu-more\" class=\"menuWrap\"><div class=\"menu vertical\"><div class=\"content\"><a id=\"reportButton\" class=\"item textColor textColor-red\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</title><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://anytype.io/apple-touch-icon.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://anytype.io/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://anytype.io/favicon-16x16.png\"><style type=\"text/css\">\n\t\t\t\tbody { opacity: 0; transition: opacity 0.1s; }\n\t\t\t</style></head><body><div class=\"menus\"><div id=\"menu-more\" class=\"menuWrap\"><div class=\"menu vertical\"><div class=\"content\"><a id=\"reportButton\" class=\"item textColor textColor-red\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -164,7 +164,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\"><span class=\"name\">Report</span></a></div></div><div class=\"dimmer\"></div></div></div><main><div id=\"root-loader\"><div class=\"inner\"><div class=\"logo anim from\"></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\"><span class=\"name\">Report</span></a></div></div><div class=\"dimmer\"></div></div></div><main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -208,7 +208,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(p.SpaceName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 74, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 58, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -297,7 +297,7 @@ func PageTemplate(r *Renderer, p *RenderPageParams) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(r.GetStaticFolderUrl("/js/loader.js"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 113, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `renderer/page.templ`, Line: 97, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {

@@ -35,7 +35,7 @@ module.exports = (env, argv) => {
 				},
 			},
 		},
-		
+
 		entry: './src/ts/entry.ts',
 
 		output: {
@@ -46,7 +46,7 @@ module.exports = (env, argv) => {
 		},
 
 		resolve: {
-			extensions: [ '.ts', '.tsx', '.js', '.jsx' ],
+			extensions: ['.ts', '.tsx', '.js', '.jsx'],
 			alias: {
 				dist: path.resolve(__dirname, 'dist'),
 			},
@@ -100,7 +100,7 @@ module.exports = (env, argv) => {
 							},
 						},
 						env: {
-							targets: 'Chrome >= 48', // browser compatibility
+							targets: 'Chrome >= 48',
 						},
 					},
 				},
@@ -113,38 +113,43 @@ module.exports = (env, argv) => {
 					type: 'asset/inline'
 				},
 				{
-					test: /\.s?css/,
+					test: /\.s?css$/,
 					use: [
-						{ loader: 'style-loader' },
-						{ loader: 'css-loader' },
-						{ loader: 'sass-loader' }
-					]
+					  rspack.CssExtractRspackPlugin.loader,
+					  'css-loader',
+					  'sass-loader',
+					],
+					type: 'javascript/auto'
 				}
 			]
 		},
 
 		plugins: [
 			process.env.RSDOCTOR && new RsdoctorRspackPlugin({}),
+			new rspack.CssExtractRspackPlugin({
+				filename: '[name].[contenthash].css',
+				chunkFilename: '[name].[contenthash].chunk.css',
+			}),
 			new rspack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
 
-			// Custom plugin to generate chunk-loader.js after the build
 			{
 				apply: (compiler) => {
 					compiler.hooks.emit.tapAsync('ChunkLoaderPlugin', (compilation, callback) => {
-						const chunks = [];
+						const jsChunks = [];
+						const cssChunks = [];
 
 						compilation.chunks.forEach((chunk) => {
 							chunk.files.forEach((file) => {
-								if (file.endsWith('.js')) {
-									chunks.push(file);
-								};
+								if (file.endsWith('.js')) jsChunks.push(file);
+								if (file.endsWith('.css')) cssChunks.push(file);
 							});
 						});
 
 						let chunkLoaderContent = fs.readFileSync(path.resolve(__dirname, 'static', 'js', 'loader.tmpl.js'), 'utf8');
 
-						// Replace %CHUNKS% with the actual chunks
-						chunkLoaderContent = chunkLoaderContent.replace('%CHUNKS%', JSON.stringify(chunks));
+						chunkLoaderContent = chunkLoaderContent
+							.replace('%CHUNKS%', JSON.stringify(jsChunks))
+							.replace('%CSS%', JSON.stringify(cssChunks));
 
 						fs.writeFileSync(path.resolve(__dirname, 'static', 'js', 'loader.js'), chunkLoaderContent);
 						callback();

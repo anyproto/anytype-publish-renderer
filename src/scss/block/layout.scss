@@ -3,8 +3,8 @@
 .block.blockLayout:not(.blockLayout.layoutDiv):not(.blockLayout.layoutHeader) {
 	> .content { display: none; }
 	> .children {
-		> .block.first { padding-top: 0px !important; margin-top: 0px !important; }
-		> .block.last { padding-bottom: 0px !important; margin-bottom: 0px !important; }
+		> .block.first:not(.blockText.textCallout) { padding-top: 0px !important; margin-top: 0px !important; }
+		> .block.last:not(.blockText.textCallout) { padding-bottom: 0px !important; margin-bottom: 0px !important; }
 	}
 }
 

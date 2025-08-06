@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<script src="/static/js/jquery.js"></script>
-		<style type="text/css">
+  <head>
+    <!-- Updating jquery to e.g. 3.7.1 breaks some embeds (telegram, kroki). See ba20a759c8d74641b16d8dbfc779c4b3d9841fc7 -->
+    <script src="/static/js/jquery.js"></script>
+	<style type="text/css">
 			* { margin: 0px; padding: 0px; box-sizing: border-box; user-select: none; }
 
 			body { background-color: #fff; }
@@ -36,7 +37,6 @@
 	<body>
 		<div id="root"></div>
 		<div id="scripts"></div>
-
 		<script type="text/javascript">
 			$(() => {
 				const Processor = {
@@ -216,7 +216,7 @@
 					script.onload = function (e) {
 						if (list.length) {
 							loadLibs(list, callBack);
-						} else 
+						} else
 						if (callBack) {
 							callBack();
 						};
@@ -238,7 +238,7 @@
 				};
 
 				function loadGithubGist (html) {
-					const m = html.match(/src="([^"]+)"/); 
+					const m = html.match(/src="([^"]+)"/);
 					if (!m || (m.length < 1)) {
 						return;
 					};
@@ -314,9 +314,9 @@
 							break;
 					};
 
-					return { 
-						html, 
-						libs, 
+					return {
+						html,
+						libs,
 					};
 				};
 
