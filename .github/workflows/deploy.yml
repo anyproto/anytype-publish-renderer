@@ -86,6 +86,13 @@ jobs:
             gsutil setmeta -h "Content-Type:application/javascript" -h "Content-Encoding:gzip" "$file"
           done
 
+      - name: Set cache-control for loader.js
+        run: |
+          gsutil setmeta -h "Cache-Control:no-store, max-age=0" \
+            gs://$GCS_BUCKET/static/js/loader.js \
+            gs://$GCS_BUCKET/static/js/loader.js.br \
+            gs://$GCS_BUCKET/static/js/loader.js.gz
+
       - name: Verify uploaded files
         run: |
           gsutil ls gs://$GCS_BUCKET/static/**
