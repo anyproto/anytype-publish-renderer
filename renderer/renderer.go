@@ -18,6 +18,7 @@ import (
 	"github.com/anyproto/anytype-heart/pkg/lib/bundle"
 	"github.com/anyproto/anytype-heart/pkg/lib/logging"
 	"github.com/anyproto/anytype-heart/pkg/lib/pb/model"
+	"github.com/anyproto/anytype-heart/util/pbtypes"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/types"
 	"go.uber.org/zap"
@@ -74,6 +75,8 @@ type Renderer struct {
 	ObjectTypeDetails *types.Struct
 	ResolvedLayout    model.ObjectTypeLayout
 	LayoutAlign       int64
+
+	urlsRewriteMap map[string]string
 }
 
 func readJsonpbSnapshot(snapshotStr string) (snapshot pb.SnapshotWithType, err error) {
@@ -208,13 +211,14 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	}
 
 	r = &Renderer{
-		Sp:            &snapshot,
-		UberSp:        &uberSnapshot,
-		CachedPbFiles: make(map[string]*pb.SnapshotWithType),
-		BlocksById:    blocksById,
-		BlockNumbers:  make(map[string]int),
-		Root:          blocks[0],
-		Config:        config,
+		Sp:             &snapshot,
+		UberSp:         &uberSnapshot,
+		CachedPbFiles:  make(map[string]*pb.SnapshotWithType),
+		BlocksById:     blocksById,
+		BlockNumbers:   make(map[string]int),
+		Root:           blocks[0],
+		Config:         config,
+		urlsRewriteMap: make(map[string]string, 0),
 	}
 
 	objectType := getRelationField(snapshot.Snapshot.Data.GetDetails(), bundle.RelationKeyType, relationToString)
@@ -233,6 +237,55 @@ func NewRenderer(config RenderConfig) (r *Renderer, err error) {
 	r.RootComp = r.RenderPage()
 
 	return
+}
+
+func (r *Renderer) GetBacklinks() []string {
+	return pbtypes.GetStringList(r.Sp.Snapshot.Data.GetDetails(), bundle.RelationKeyBacklinks.String())
+}
+
+func (r *Renderer) GetLinkObjectIds() (linkObjectIds []string) {
+	seen := make(map[string]struct{})
+
+	for _, childID := range r.Root.ChildrenIds {
+		b, ok := r.BlocksById[childID]
+		if !ok || b == nil {
+			continue
+		}
+
+		switch b.Content.(type) {
+		case *model.BlockContentOfLink:
+			targetObjectID := b.GetLink().GetTargetBlockId()
+			if targetObjectID == "" {
+				continue
+			}
+			targetDetails := r.findTargetDetails(targetObjectID)
+			layout := getRelationField(targetDetails, bundle.RelationKeyLayout, relationToObjectTypeLayout)
+			switch layout {
+			// TODO: basic = page, what else?
+			case model.ObjectType_basic:
+				if _, ok := seen[targetObjectID]; !ok {
+					seen[targetObjectID] = struct{}{}
+				}
+			default:
+				continue
+			}
+		default:
+			continue
+		}
+
+	}
+
+	linkObjectIds = make([]string, len(seen))
+	i := 0
+	for objID := range seen {
+		linkObjectIds[i] = objID
+		i++
+	}
+	return
+}
+
+func (r *Renderer) SetUrlRewriteMap(urls map[string]string) {
+	r.urlsRewriteMap = urls
 }
 
 // asset resolver parts
