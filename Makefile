@@ -26,7 +26,7 @@ check-fmt:
 	@GO_FILES=$$($(GO_FILES_CMD)); \
 	GOIMPORTS_OUTPUT=$$(goimports -d -l $$GO_FILES); \
 	if [ -n "$$GOIMPORTS_OUTPUT" ]; then \
-		echo "The following files have improperly ordered imports. Please run 'make fmt' to fix them:"; \
+		echo "The following files have formatting issues. Please run 'make fmt' to fix them:"; \
 		echo "$$GOIMPORTS_OUTPUT"; \
 		exit 1; \
 	fi

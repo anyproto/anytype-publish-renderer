@@ -240,6 +240,7 @@ func (r *Renderer) RenderFile(b *model.Block) templ.Component {
 
 		blockInnerParams := &BlockWrapperParams{
 			Classes:    []string{"wrap"},
+			Width:      width,
 			Components: []templ.Component{comp},
 		}
 		blockInner := BlocksWrapper(blockInnerParams)
