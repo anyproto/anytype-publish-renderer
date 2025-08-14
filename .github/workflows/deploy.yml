@@ -67,12 +67,12 @@ jobs:
         run: echo "GCS_BUCKET=anytype-${{ github.event.inputs.role }}-publishserver" >> $GITHUB_ENV
 
       - name: Google cloud auth
-        uses: google-github-actions/auth@2.1.10
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ github.event.inputs.role == 'prod' && secrets.PROD_GCP_SERVICE_ACCOUNT || secrets.STAGE_GCP_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@2.1.4
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy static site to S3 bucket
         run: gsutil -m rsync -d -r static/ gs://$GCS_BUCKET/static/
@@ -85,6 +85,13 @@ jobs:
           gsutil ls "gs://$GCS_BUCKET/static/**/*.js.gz" | while read file; do
             gsutil setmeta -h "Content-Type:application/javascript" -h "Content-Encoding:gzip" "$file"
           done
+
+      - name: Set cache-control for loader.js
+        run: |
+          gsutil setmeta -h "Cache-Control:no-store, max-age=0" \
+            gs://$GCS_BUCKET/static/js/loader.js \
+            gs://$GCS_BUCKET/static/js/loader.js.br \
+            gs://$GCS_BUCKET/static/js/loader.js.gz
 
       - name: Verify uploaded files
         run: |
