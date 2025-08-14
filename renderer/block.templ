@@ -41,6 +41,9 @@ templ BlocksWrapper(p *BlockWrapperParams) {
 	 if p.Classes != nil {
 		class={ p.Classes }
 	 }
+	 if p.Width != "" {
+        style={ getStyle(p.Width) }
+     }
 
 		>
 		for _, comp := range p.Components {
