@@ -15,8 +15,8 @@
         ANYTYPE_LOG_LEVEL="renderer*=DEBUG;*=WARN";
         ANYTYPE_LOG_NOGELF="1";
         nativeBuildInputs = [
-          pkgs.go_1_23
-          pkgs.nodejs_22
+          pkgs.go_1_24
+          pkgs.nodejs_24
         ];
       };
     });
