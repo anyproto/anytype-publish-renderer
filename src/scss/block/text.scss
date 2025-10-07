@@ -7,8 +7,8 @@
 			.markers:empty { display: none; flex-shrink: 0; }
 			.markers { display: flex; padding: 1px 0px; }
 			.markers {
-				.marker { 
-					text-align: center; display: inline-block; vertical-align: top; position: relative; width: 24px; height: 24px; 
+				.marker {
+					text-align: center; display: inline-block; vertical-align: top; position: relative; width: 24px; height: 24px;
 					line-height: 24px; margin-right: 6px;
 				}
 				.marker {
@@ -32,10 +32,10 @@
 					.markerInner.textColor-teal { background-color: var(--color-teal) !important; }
 					.markerInner.textColor-lime { background-color: var(--color-lime) !important; }
 				}
-				
+
 				.marker.number { vertical-align: baseline; min-width: 24px; width: auto; word-break: normal; }
 				.marker.number > span { min-width: 100%; display: inline-block; text-align: center; }
-				
+
 				.marker.check, .marker.toggle {
 					img { width: 100%; height: 100%; }
 				}
@@ -52,7 +52,8 @@
 
 /* Title */
 
-.block.blockText.textTitle, h1 { padding: 6px 0px 0px 0px !important; @include text-title; }
+.block.blockText.textTitle { padding: 6px 0px 0px 0px !important; @include text-title; }
+ h1 { @include text-title; }
 .block.blockText.textTitle {
 	> .content {
 		> .flex { gap: 0px 8px; }
@@ -71,11 +72,13 @@
 
 /* Header2 */
 
-.block.blockText.textHeader2, h2 { padding: 14px 0px 0px 0px; @include text-header2; }
+.block.blockText.textHeader2 { padding: 14px 0px 0px 0px; @include text-header2; }
+h2 { @include text-header2; }
 
 /* Header3 */
 
-.block.blockText.textHeader3, h3 { padding: 13px 0px 2px 0px; @include text-header3; }
+.block.blockText.textHeader3 { padding: 13px 0px 2px 0px; @include text-header3; }
+h3 { @include text-header3; }
 
 /* Callout */
 
@@ -119,7 +122,7 @@
 
 /* Quote */
 
-.block.blockText.textQuote { 
+.block.blockText.textQuote {
 	> .content { padding-left: 24px;}
 
 	> .additional {
