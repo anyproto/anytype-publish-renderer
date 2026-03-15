@@ -136,6 +136,26 @@ h3 { @include text-header3; }
 	> .children { display: none; }
 }
 
+/* ToggleHeader */
+
+.block.blockText.textToggleHeader1 { padding: 25px 0px 0px 0px; @include text-header1; }
+.block.blockText.textToggleHeader1 {
+	> .children { display: none; }
+	> .content > .flex > .markers { padding: 3px 0px 1px 0px; }
+}
+
+.block.blockText.textToggleHeader2 { padding: 14px 0px 0px 0px; @include text-header2; }
+.block.blockText.textToggleHeader2 {
+	> .children { display: none; }
+	> .content > .flex > .markers { padding: 2px 0px 1px 0px; }
+}
+
+.block.blockText.textToggleHeader3 { padding: 13px 0px 2px 0px; @include text-header3; }
+.block.blockText.textToggleHeader3 {
+	> .children { display: none; }
+	> .content > .flex > .markers { padding: 1px 0px 2px 0px; }
+}
+
 .blocks.isTask {
 	.block.blockText.textTitle { @include text-header1; }
 	.block.blockText.textTitle {
