@@ -22,11 +22,11 @@ import (
 
 func emojiParam(t model.BlockContentTextStyle) int32 {
 	switch t {
-	case model.BlockContentText_Header1:
+	case model.BlockContentText_Header1, model.BlockContentText_ToggleHeader1:
 		return 30
-	case model.BlockContentText_Header2:
+	case model.BlockContentText_Header2, model.BlockContentText_ToggleHeader2:
 		return 26
-	case model.BlockContentText_Header3:
+	case model.BlockContentText_Header3, model.BlockContentText_ToggleHeader3:
 		return 22
 	default:
 		return 20
@@ -36,12 +36,12 @@ func emojiParam(t model.BlockContentTextStyle) int32 {
 func applyHeader(style model.BlockContentTextStyle, s string) string {
 	var tagName string
 	switch style {
-	case model.BlockContentText_Header1:
+	case model.BlockContentText_Header1, model.BlockContentText_ToggleHeader1:
 	case model.BlockContentText_Title:
 		tagName = "h1"
-	case model.BlockContentText_Header2:
+	case model.BlockContentText_Header2, model.BlockContentText_ToggleHeader2:
 		tagName = "h2"
-	case model.BlockContentText_Header3:
+	case model.BlockContentText_Header3, model.BlockContentText_ToggleHeader3:
 		tagName = "h3"
 
 	}
@@ -296,7 +296,10 @@ func (r *Renderer) makeTextBlockParams(b *model.Block) (params *BlockParams) {
 
 	var innerFlex []templ.Component
 	switch style {
-	case model.BlockContentText_Toggle:
+	case model.BlockContentText_Toggle,
+		model.BlockContentText_ToggleHeader1,
+		model.BlockContentText_ToggleHeader2,
+		model.BlockContentText_ToggleHeader3:
 		externalComp := ToggleMarkerTemplate(utils.GetColor(color))
 		innerFlex = append(innerFlex, externalComp, textComp)
 	case model.BlockContentText_Numbered:

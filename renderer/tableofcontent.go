@@ -27,7 +27,10 @@ func (r *Renderer) makeTableOfContentBlockParams(block *model.Block) *BlockParam
 func (r *Renderer) getList() []templ.Component {
 	blocks := r.traverseBlocks(r.BlocksById, r.Root.GetId(), false)
 	var list []templ.Component
-	styles := []model.BlockContentTextStyle{model.BlockContentText_Header1, model.BlockContentText_Header2, model.BlockContentText_Header3}
+	styles := []model.BlockContentTextStyle{
+		model.BlockContentText_Header1, model.BlockContentText_Header2, model.BlockContentText_Header3,
+		model.BlockContentText_ToggleHeader1, model.BlockContentText_ToggleHeader2, model.BlockContentText_ToggleHeader3,
+	}
 
 	var hasH1, hasH2 bool
 
@@ -46,20 +49,20 @@ func (r *Renderer) getList() []templ.Component {
 
 		depth := 0
 
-		if style == model.BlockContentText_Header1 {
+		if style == model.BlockContentText_Header1 || style == model.BlockContentText_ToggleHeader1 {
 			depth = 0
 			hasH1 = true
 			hasH2 = false
 		}
 
-		if style == model.BlockContentText_Header2 {
+		if style == model.BlockContentText_Header2 || style == model.BlockContentText_ToggleHeader2 {
 			hasH2 = true
 			if hasH1 {
 				depth++
 			}
 		}
 
-		if style == model.BlockContentText_Header3 {
+		if style == model.BlockContentText_Header3 || style == model.BlockContentText_ToggleHeader3 {
 			if hasH1 {
 				depth++
 			}
