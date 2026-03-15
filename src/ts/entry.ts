@@ -69,7 +69,7 @@ function renderCover () {
 };
 
 function renderToggles () {
-    $('.block.textToggle').each((i, block) => {
+    $('.block.textToggle, .block.textToggleHeader1, .block.textToggleHeader2, .block.textToggleHeader3').each((i, block) => {
 		block = $(block);
 		block.find('> .content .marker.toggle').off('click').on('click', function () {
 			block.toggleClass('isToggled');
