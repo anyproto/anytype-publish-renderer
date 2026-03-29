@@ -39,11 +39,17 @@ func (r *Renderer) makeLinkBlockParams(b *model.Block) *BlockParams {
 	objectTypeName, coverTemplate := r.getAdditionalParams(b, targetDetails)
 	linkComponents, cardClasses := r.getLinkComponent(coverTemplate, iconTemplate, cardClasses, name, description, objectTypeName, archiveClass)
 
+	var url string
+	if rewriteUrl, ok := r.urlsRewriteMap[targetObjectId]; ok {
+		url = rewriteUrl
+	} else {
+		url = r.makeAnytypeLink(targetDetails, targetObjectId)
+	}
 	lp := &LinkRenderParams{
 		Id:           b.GetId(),
 		SidesClasses: strings.Join(sidesClasses, " "),
 		CardClasses:  strings.Join(cardClasses, " "),
-		Url:          templ.SafeURL(r.makeAnytypeLink(targetDetails, targetObjectId)),
+		Url:          templ.SafeURL(url),
 		Components:   linkComponents,
 	}
 	blockParams.Content = LinkTemplate(lp)
